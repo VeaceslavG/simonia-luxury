@@ -1,0 +1,47 @@
+@use "./variables.scss" as variables;
+
+@mixin button($backGroundColor, $textColor) {
+  font-weight: 400;
+  width: 160px;
+  height: 50px;
+  font-size: 20px;
+  background-color: $backGroundColor;
+  color: $textColor;
+  border-radius: 30px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($backGroundColor, 10%);
+  }
+  &:active {
+    transform: scale(0.98);
+  }
+}
+@mixin header {
+  max-width: 1530px; // 1440
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+@mixin headerTitle {
+  font-size: 96px;
+  font-weight: 700;
+  color: #2C3930;
+}
+@mixin sectionTitle {
+  font-size: 42px;
+  color: black;
+}
+@mixin icons($size: 30px) {
+  width: $size;
+  height: $size;
+  margin: 10px;
+}
+@mixin positioning {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
