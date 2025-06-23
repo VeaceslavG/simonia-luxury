@@ -1,24 +1,25 @@
 @use "./variables.scss" as variables;
 
 @mixin button($backGroundColor, $textColor) {
+  border: none;
   font-weight: 400;
   width: 160px;
   height: 50px;
   font-size: 20px;
   background-color: $backGroundColor;
   color: $textColor;
-  border-radius: 30px;
+  border-radius: variables.$itemBorderRadius;
   cursor: pointer;
 
   &:hover {
-    background-color: darken($backGroundColor, 10%);
+    background-color: darken($backGroundColor, 5%);
   }
   &:active {
     transform: scale(0.98);
   }
 }
-@mixin header {
-  max-width: 1530px; // 1440
+@mixin nav {
+  max-width: 1530px;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -26,22 +27,32 @@
   align-items: center;
 }
 @mixin headerTitle {
-  font-size: 96px;
+  font-size: 86px;
   font-weight: 700;
   color: #2C3930;
+}
+@mixin headerText {
+  font-size: 42px;
+  color: #2C3930;
+  font-weight: 500;
 }
 @mixin sectionTitle {
   font-size: 42px;
   color: black;
 }
-@mixin icons($size: 30px) {
+@mixin icons($size: 25px) {
   width: $size;
   height: $size;
-  margin: 10px;
+  margin: 0 10px;
 }
 @mixin positioning {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+}
+@mixin headerWidth {
+  max-width: 1530px;
+  width: 100%;
+  margin: 0 auto;
 }

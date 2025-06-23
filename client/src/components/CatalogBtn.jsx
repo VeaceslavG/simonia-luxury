@@ -1,4 +1,4 @@
-export default function CatalogItem({ title, menuIcon, arrowIcon }) {
+export default function CatalogBtn({ title, menuIcon, arrowIcon }) {
   return (
     <div className="menu-item">
       <img src={menuIcon} alt="Catalog Icon" className="catalogIcon" />

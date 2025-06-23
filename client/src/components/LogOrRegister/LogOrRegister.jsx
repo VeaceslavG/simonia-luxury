@@ -1,3 +1,5 @@
+import "./LogOrRegister.scss";
+
 export default function LogOrRegister({ accIcon, action }) {
   return (
     <div className="accountManagement">

@@ -1,0 +1,71 @@
+@use "../../variables.scss" as variables;
+@use "../../mixins.scss" as mixins;
+
+.introBlockContainer {
+  margin: 0 auto;
+
+  .introUpSection {
+    padding: 0 20px;
+    @include mixins.headerWidth;
+    @include mixins.positioning;
+    background-color: #fff;
+  }
+
+  .introBlockBG {
+    background-color: #DCD7C9;
+    max-height: 750px;
+    height: 100%;
+
+    .introBlock {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      @include mixins.headerWidth;
+      padding: 0 20px;
+
+
+      .introLeftSection {
+        max-width: 750px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        max-height: 500px;
+        height: 100%;
+        gap: 24px;
+
+        .introTitle {
+          @include mixins.headerTitle;
+        }
+
+        .introText {
+          @include mixins.headerText;
+        }
+
+        .introBlockBtns {
+          @include mixins.positioning;
+          justify-content: start;
+          gap: 24px;
+
+          .orderBtn {
+            @include mixins.button(variables.$primaryColor, #DCD7C9);
+          }
+          
+          .exploreBtn {
+            @include mixins.button(#DCD7C9, variables.$primaryColor);
+            border: 1px solid variables.$primaryColor;
+          }
+        }
+      }
+
+      .introImageContainer {
+        max-width: 1000px;
+        
+        .introImage {
+          object-fit: cover;
+          width: 100%;
+        }
+      }
+    }
+  }
+}

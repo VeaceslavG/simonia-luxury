@@ -1,0 +1,40 @@
+@use "../../mixins.scss" as mixins;
+@use "../../variables.scss" as variables;
+
+.header-icons {
+  display: flex;
+  align-items: center;
+
+  .icon-group {
+    @include mixins.positioning;
+
+    .icon {
+      @include mixins.icons;
+    }
+
+    .count {
+      font-size: 16px;
+    }
+  }
+
+  .divider {
+    margin-left: 10px;
+    height: 20px;
+    width: 2px;
+    background-color: black;
+  }
+
+  .cart {
+    .cart-badge {
+      background-color: #3F4F44;
+      color: #DCD7C9;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

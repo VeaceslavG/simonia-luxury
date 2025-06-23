@@ -1,0 +1,23 @@
+@use "../../variables.scss" as variables;
+@use "../../mixins.scss" as mixins;
+
+.search-bar {
+  width: 100%;
+  max-width: 600px;
+  padding: 0.5rem;
+
+  input {
+    height: 36px;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: variables.$textSize;
+    border: 1px solid #A27B5C;
+    border-radius: variables.$itemBorderRadius;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+
+    &:focus {
+      border-color: #808080;
+    }
+  }
+}

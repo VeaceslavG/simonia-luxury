@@ -8,60 +8,46 @@
 body {
   margin: 0 auto;
 }
-.headerContainer {
-  background-color: variables.$headerBackgroundColor;
+.navContainer {
   color: white;
-}
-nav {
-  width: 100%;
-  max-width: 1640px;
-  margin: 0 auto;
-  height: 50px;
-  @include mixins.header;
-  padding: 0 20px;
+  background-color: variables.$navBackgroundColor;
 
-  .phoneNumber {
-    font-weight: bold;
-    font-size: variables.$textSize;
-    cursor: pointer;
-  } 
+  nav {
+    // width: 100%;
+    // max-width: 1640px;
+    margin: 0 auto;
+    height: 50px;
+    @include mixins.nav;
+    padding: 0 20px;
 
-  .menuItems {
-    max-width: 780px;
-    width: 100%;
-    @include mixins.positioning;
+    .phoneNumber {
+      font-weight: bold;
+      font-size: variables.$textSize;
+      cursor: pointer;
+    } 
 
-    .menu-item {
+    .menuItems {
+      max-width: 780px;
+      width: 100%;
       @include mixins.positioning;
-      cursor: pointer;
 
-      .menuTitle {
-        font-weight: variables.$headerFontWeight;
-        font-size: variables.$textSize;
-        color: white;
+      .menu-item {
+        @include mixins.positioning;
+        cursor: pointer;
+
+        .menuTitle {
+          font-weight: variables.$headerFontWeight;
+          font-size: variables.$textSize;
+          color: white;
+        }
+        .catalogIcon {
+          @include mixins.icons(20px);
+        }
+
+        .arrowIcon {
+          @include mixins.icons;
+        }
       }
-      .catalogIcon {
-        @include mixins.icons(20px);
-      }
-
-      .arrowIcon {
-        @include mixins.icons;
-      }
-    }
-  }
-
-  .accountManagement {
-    @include mixins.positioning;
-    max-width: 175px;
-    width: 100%;
-    font-size: variables.$textSize;
-
-    .accIcon {
-      @include mixins.icons;
-    }
-
-    .accountAction {
-      cursor: pointer;
     }
   }
 }
