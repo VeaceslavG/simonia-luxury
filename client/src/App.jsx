@@ -1,39 +1,31 @@
-import catalogIcon from "./assets/catalogIcon.png";
-import catalogArrowIcon from "./assets/catalogArrowIcon.png";
-import accountIcon from "./assets/accountIcon.png";
-import headerSofa from "./assets/headerSofa.png";
+import headerSofa from "./assets/header/headerSofa.png";
+import wishProductIcon from "./assets/products/wishIcon.png";
+import coltarEx from "./assets/aboutUs/coltarEx.jpg";
+import patEx from "./assets/aboutUs/patEx.jpg";
 
+import Nav from "./components/Nav/Nav";
 import IntroBlock from "./components/IntroBlock/IntroBlock";
-import MenuItem from "./components/MenuItem";
-import CatalogBtn from "./components/CatalogBtn";
-import LogOrRegister from "./components/LogOrRegister/LogOrRegister";
+import Benefits from "./components/Benefits/Benefits";
+import Products from "./components/Products/Products";
+import AboutUs from "./components/AboutUs/AboutUs";
+import Contacts from "./components/Contacts/Contacts";
 
 function App() {
   return (
-    <div>
-      <div className="navContainer">
-        <nav aria-label="Main navigation">
-          <span className="phoneNumber">+373 602 85 786</span>
-          <div className="menuItems">
-            <CatalogBtn
-              title="Catalog de produse"
-              menuIcon={catalogIcon}
-              arrowIcon={catalogArrowIcon}
-            />
-            <MenuItem title="Principală" />
-            <MenuItem title="Mobilier" />
-            <MenuItem title="Despre noi" />
-            <MenuItem title="Contacte" />
-          </div>
-          <LogOrRegister accIcon={accountIcon} action="Log In / Register" />
-        </nav>
-      </div>
-      <IntroBlock
-        introTitle="Mobilă moale la comandă"
-        introText="Mobila dorințelor tale"
-        introImage={headerSofa}
-      />
-    </div>
+    <>
+      <main>
+        <Nav />
+        <IntroBlock
+          introTitle="Mobilă moale la comandă"
+          introText="Mobila dorințelor tale"
+          introImage={headerSofa}
+        />
+        <Benefits />
+        <Products wishIcon={wishProductIcon} />
+        <AboutUs firstPicture={patEx} secondPicture={coltarEx} />
+        <Contacts />
+      </main>
+    </>
   );
 }
 

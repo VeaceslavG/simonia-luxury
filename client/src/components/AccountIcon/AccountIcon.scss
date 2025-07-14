@@ -2,13 +2,9 @@
 @use "../../mixins.scss" as mixins;
 
 .accountManagement {
-      @include mixins.positioning;
-      max-width: 160px;
-      width: 100%;
-      font-size: variables.$textSize;
-
       .accIcon {
         @include mixins.icons;
+        margin: 0;
       }
 
       .accountAction {

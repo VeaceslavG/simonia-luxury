@@ -1,0 +1,125 @@
+@use "../../mixins.scss" as mixins;
+@use "../../variables.scss" as variables;
+
+.navContainer {
+  
+  .navFirstSectionBG {
+    background-color: variables.$navBackgroundColor;
+
+    .navFirstSection {
+      background-color: variables.$navBackgroundColor;
+      background-size: cover;
+      margin: 0 auto;
+      height: 50px;
+      @include mixins.nav;
+      padding: 0 20px;
+      color: white;
+      position: relative;
+      transition: all 0.3s ease;
+
+      // Subtle bottom border animation on hover
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: rgba(white, 0);
+      }
+    
+      &:hover::after {
+        background: rgba(white, 0.2);
+      }
+    
+      .phoneNumber {
+        text-align: center;
+        font-weight: bold;
+        font-size: variables.$textSize;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        padding: 5px 10px;
+        border-radius: variables.$itemBorderRadius;
+        max-width: 150px;
+        width: 100%;
+      
+        &:hover {
+          background: rgba(white, 0.1);
+          transform: translateY(-1px);
+          text-shadow: 0 0 5px rgba(white, 0.3);
+        }
+      } 
+
+      .menuItems {
+        max-width: 780px;
+        width: 100%;
+        @include mixins.positioning;
+      
+        .menu-item {
+          @include mixins.positioning;
+          cursor: pointer;
+          padding: 0 12px;
+          height: 100%;
+          transition: all 0.2s ease;
+          position: relative;
+
+          &.catalog {
+            &::after {
+              display: none;
+            }
+          }
+        
+          // Animated underline effect
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: white;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+          }
+        
+          &:hover {
+            .menuTitle {
+              color: rgba(white, 0.9);
+            }
+          
+            .catalogIcon, .arrowIcon {
+              transform: translateY(1px);
+              opacity: 0.9;
+            }
+          
+            &::after {
+              width: calc(100% - 24px); // Matches padding
+            }
+          }
+        
+          .menuTitle {
+            font-weight: variables.$headerFontWeight;
+            font-size: variables.$textSize;
+            color: white;
+            transition: color 0.2s ease;
+          }
+        
+          .catalogIcon {
+            @include mixins.icons(20px);
+            transition: all 0.2s ease;
+          }
+        
+          .arrowIcon {
+            @include mixins.icons;
+            transition: all 0.2s ease;
+          }
+        }
+      }
+    }
+  }
+  .navSecondSection {
+    padding: 0 20px;
+    @include mixins.headerWidth;
+    @include mixins.positioning;
+  }
+}

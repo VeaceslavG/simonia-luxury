@@ -1,21 +1,45 @@
 @use "./variables.scss" as variables;
 
-@mixin button($backGroundColor, $textColor) {
-  border: none;
-  font-weight: 400;
-  width: 160px;
-  height: 50px;
-  font-size: 20px;
-  background-color: $backGroundColor;
-  color: $textColor;
+@mixin button($bg-color, $text-color) {
+  padding: 12px 28px;
   border-radius: variables.$itemBorderRadius;
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
-
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  border: none;
+  background-color: $bg-color;
+  color: $text-color;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
   &:hover {
-    background-color: darken($backGroundColor, 5%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
+  
   &:active {
-    transform: scale(0.98);
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover::after {
+    opacity: 1;
   }
 }
 @mixin nav {
@@ -36,9 +60,16 @@
   color: #2C3930;
   font-weight: 500;
 }
+@mixin contentContainer($topMargin) {
+  max-width: 1440px;
+  width: 100%;
+  margin: $topMargin auto;
+  padding: 0 20px;
+}
 @mixin sectionTitle {
   font-size: 42px;
   color: black;
+  font-weight: 600;
 }
 @mixin icons($size: 25px) {
   width: $size;

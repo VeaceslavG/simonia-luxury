@@ -1,0 +1,80 @@
+@use "../../mixins.scss" as mixins;
+@use "../../variables.scss" as variables;
+
+.catalog {
+  position: relative;
+  font-family: 'Onest', sans-serif;
+
+  .menuTitleWrapper {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 7px 10px;
+    border-radius: variables.$itemBorderRadius;
+    transition: background-color 0.3s ease;
+    background-color: #3F4F44;
+    border: 1px solid transparent;
+
+    &:hover {
+      background-color: #2C3930;
+    }
+  }
+
+  .menuTitle {
+    font-size: 16px;
+    font-weight: 500;
+    color: #FFFFFF; 
+    margin-right: 8px;
+  }
+
+  .arrowIcon {
+    width: 12px;
+    height: auto;
+    filter: brightness(0) invert(1);
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #FFFFFF; 
+    width: 100%;
+    border: 1px solid #DCD7C9;
+    border-radius: variables.$itemBorderRadius;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    // z-index: 1000;
+    padding: 8px 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li a {
+        display: block;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #2C3930; 
+        font-size: 14px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+
+        &:hover {
+          background-color: #e9e5dc;
+          color: #000000;
+        }
+      }
+    }
+  }
+
+  &:hover .dropdown-content {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}

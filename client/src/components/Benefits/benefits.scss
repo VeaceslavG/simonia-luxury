@@ -1,0 +1,30 @@
+@use "../../mixins.scss" as mixins;
+@use "../../variables.scss" as variables;
+
+.benefitsContainer {
+  @include mixins.contentContainer(100px);
+
+  .benefitCard {
+    max-width: 100%;
+
+    .benefitTitle {
+      gap: 1rem;
+
+      .benefitIcon {
+        width: 46px;
+        height: 46px;
+      }
+
+      .benefitTitleText {
+        font-size: 32px;
+        font-weight: 700;
+      }
+    }
+
+    .benefitDescription {
+      font-size: variables.$textSize;
+      line-height: 1.5;
+      opacity: 0.7;
+    }
+  }
+}

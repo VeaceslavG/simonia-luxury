@@ -4,13 +4,6 @@
 .introBlockContainer {
   margin: 0 auto;
 
-  .introUpSection {
-    padding: 0 20px;
-    @include mixins.headerWidth;
-    @include mixins.positioning;
-    background-color: #fff;
-  }
-
   .introBlockBG {
     background-color: #DCD7C9;
     max-height: 750px;
@@ -49,11 +42,20 @@
 
           .orderBtn {
             @include mixins.button(variables.$primaryColor, #DCD7C9);
+
+            &:hover {
+              background-color: darken(variables.$primaryColor, 5%);
+            }
           }
           
           .exploreBtn {
             @include mixins.button(#DCD7C9, variables.$primaryColor);
             border: 1px solid variables.$primaryColor;
+
+             &:hover {
+              background-color: rgba(variables.$primaryColor, 0.05);
+              border-color: darken(variables.$primaryColor, 10%);
+            }
           }
         }
       }

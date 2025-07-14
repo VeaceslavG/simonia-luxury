@@ -1,0 +1,238 @@
+import canapeaImg from "../../assets/products/canapea.jpg";
+import coltarGriImg from "../../assets/products/coltar1.jpg";
+import fotoliuImg from "../../assets/products/fotoliu.jpg";
+import patImg from "../../assets/products/pat.jpg";
+
+export const productsData = [
+  // Canapele
+  {
+    id: 1,
+    category: "canapele",
+    name: "Canapea Moderna",
+    image: canapeaImg,
+    price: "12000 lei",
+  },
+  {
+    id: 2,
+    category: "canapele",
+    name: "Canapea Extensibila",
+    image: canapeaImg,
+    price: "13500 lei",
+  },
+  {
+    id: 3,
+    category: "canapele",
+    name: "Canapea Pat",
+    image: canapeaImg,
+    price: "15000 lei",
+  },
+  {
+    id: 4,
+    category: "canapele",
+    name: "Canapea",
+    image: canapeaImg,
+    price: "16500 lei",
+  },
+  {
+    id: 5,
+    category: "canapele",
+    name: "Canapea",
+    image: canapeaImg,
+    price: "16500 lei",
+  },
+  {
+    id: 6,
+    category: "canapele",
+    name: "Canapea",
+    image: canapeaImg,
+    price: "16500 lei",
+  },
+  {
+    id: 7,
+    category: "canapele",
+    name: "Canapea",
+    image: canapeaImg,
+    price: "16500 lei",
+  },
+  {
+    id: 8,
+    category: "canapele",
+    name: "Canapea",
+    image: canapeaImg,
+    price: "16500 lei",
+  },
+
+  // Coltare
+  {
+    id: 9,
+    category: "coltare",
+    name: "Coltar Modern",
+    image: coltarGriImg,
+    price: "16000 lei",
+  },
+  {
+    id: 10,
+    category: "coltare",
+    name: "Coltar Minimalist",
+    image: coltarGriImg,
+    price: "15500 lei",
+  },
+  {
+    id: 11,
+    category: "coltare",
+    name: "Coltar Extensibil",
+    image: coltarGriImg,
+    price: "17000 lei",
+  },
+  {
+    id: 12,
+    category: "coltare",
+    name: "Coltar Premium",
+    image: coltarGriImg,
+    price: "18500 lei",
+  },
+  {
+    id: 13,
+    category: "coltare",
+    name: "Coltar Modern",
+    image: coltarGriImg,
+    price: "16000 lei",
+  },
+  {
+    id: 14,
+    category: "coltare",
+    name: "Coltar Minimalist",
+    image: coltarGriImg,
+    price: "15500 lei",
+  },
+  {
+    id: 15,
+    category: "coltare",
+    name: "Coltar Extensibil",
+    image: coltarGriImg,
+    price: "17000 lei",
+  },
+  {
+    id: 16,
+    category: "coltare",
+    name: "Coltar Premium",
+    image: coltarGriImg,
+    price: "18500 lei",
+  },
+
+  // Fotolii
+  {
+    id: 17,
+    category: "fotolii",
+    name: "Fotoliu Relaxare",
+    image: fotoliuImg,
+    price: "5000 lei",
+  },
+  {
+    id: 18,
+    category: "fotolii",
+    name: "Fotoliu Birou",
+    image: fotoliuImg,
+    price: "4800 lei",
+  },
+  {
+    id: 19,
+    category: "fotolii",
+    name: "Fotoliu Massaj",
+    image: fotoliuImg,
+    price: "7500 lei",
+  },
+  {
+    id: 20,
+    category: "fotolii",
+    name: "Fotoliu Vintage",
+    image: fotoliuImg,
+    price: "6200 lei",
+  },
+  {
+    id: 21,
+    category: "fotolii",
+    name: "Fotoliu Relaxare",
+    image: fotoliuImg,
+    price: "5000 lei",
+  },
+  {
+    id: 22,
+    category: "fotolii",
+    name: "Fotoliu Birou",
+    image: fotoliuImg,
+    price: "4800 lei",
+  },
+  {
+    id: 23,
+    category: "fotolii",
+    name: "Fotoliu Massaj",
+    image: fotoliuImg,
+    price: "7500 lei",
+  },
+  {
+    id: 24,
+    category: "fotolii",
+    name: "Fotoliu Vintage",
+    image: fotoliuImg,
+    price: "6200 lei",
+  },
+
+  // Paturi
+  {
+    id: 25,
+    category: "paturi",
+    name: "Pat Matrimonial",
+    image: patImg,
+    price: "14000 lei",
+  },
+  {
+    id: 26,
+    category: "paturi",
+    name: "Pat Single",
+    image: patImg,
+    price: "9500 lei",
+  },
+  {
+    id: 27,
+    category: "paturi",
+    name: "Pat Copii",
+    image: patImg,
+    price: "12000 lei",
+  },
+  {
+    id: 28,
+    category: "paturi",
+    name: "Pat Premium",
+    image: patImg,
+    price: "22000 lei",
+  },
+  {
+    id: 29,
+    category: "paturi",
+    name: "Pat Matrimonial",
+    image: patImg,
+    price: "14000 lei",
+  },
+  {
+    id: 30,
+    category: "paturi",
+    name: "Pat Single",
+    image: patImg,
+    price: "9500 lei",
+  },
+  {
+    id: 31,
+    category: "paturi",
+    name: "Pat Copii",
+    image: patImg,
+    price: "12000 lei",
+  },
+  {
+    id: 32,
+    category: "paturi",
+    name: "Pat Premium",
+    image: patImg,
+    price: "22000 lei",
+  },
+];

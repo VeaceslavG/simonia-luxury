@@ -1,6 +1,6 @@
 import "./headerIcons.scss";
-import wishIcon from "../../assets/wishIcon.png";
-import cartIcon from "../../assets/cart.png";
+import wishIcon from "../../assets/header/wishIcon.png";
+import cartIcon from "../../assets/header/cart.png";
 
 export default function HeaderIcons({ wishlistCount = 0, cartCount = 0 }) {
   return (

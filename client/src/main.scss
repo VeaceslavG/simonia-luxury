@@ -8,46 +8,4 @@
 body {
   margin: 0 auto;
 }
-.navContainer {
-  color: white;
-  background-color: variables.$navBackgroundColor;
 
-  nav {
-    // width: 100%;
-    // max-width: 1640px;
-    margin: 0 auto;
-    height: 50px;
-    @include mixins.nav;
-    padding: 0 20px;
-
-    .phoneNumber {
-      font-weight: bold;
-      font-size: variables.$textSize;
-      cursor: pointer;
-    } 
-
-    .menuItems {
-      max-width: 780px;
-      width: 100%;
-      @include mixins.positioning;
-
-      .menu-item {
-        @include mixins.positioning;
-        cursor: pointer;
-
-        .menuTitle {
-          font-weight: variables.$headerFontWeight;
-          font-size: variables.$textSize;
-          color: white;
-        }
-        .catalogIcon {
-          @include mixins.icons(20px);
-        }
-
-        .arrowIcon {
-          @include mixins.icons;
-        }
-      }
-    }
-  }
-}

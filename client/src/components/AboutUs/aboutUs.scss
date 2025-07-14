@@ -1,0 +1,56 @@
+@use "../../mixins.scss" as mixins;
+@use "../../variables.scss" as variables;
+
+.aboutUsContainer {
+  @include mixins.contentContainer(100px);
+  @include mixins.positioning;
+
+  .aboutUsLeftSide {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+
+    .aboutUsTitle {
+      @include mixins.sectionTitle;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .aboutUsText {
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 600px;
+      width: 100%;
+    }
+  }
+
+  .aboutUsRightSide {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .mainImg {
+      width: 455px;
+      height: auto;
+      border-radius: variables.$itemBorderRadius;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transform: rotate(-2deg);
+      z-index: 1;
+    }
+
+    .smallImg {
+      position: absolute;
+      bottom: -20px;
+      right: 50px;
+      width: 234px;
+      border-radius: variables.$itemBorderRadius;
+      border: 5px solid white;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transform: rotate(3deg);
+      z-index: 2;
+    }
+  }
+}
