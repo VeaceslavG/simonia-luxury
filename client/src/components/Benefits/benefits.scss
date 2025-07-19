@@ -3,11 +3,18 @@
 
 .benefitsContainer {
   @include mixins.contentContainer(100px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
 
   .benefitCard {
+    flex: 1 1 300px;
     max-width: 100%;
 
     .benefitTitle {
+      display: flex;
+      align-items: center;
       gap: 1rem;
 
       .benefitIcon {
@@ -25,6 +32,45 @@
       font-size: variables.$textSize;
       line-height: 1.5;
       opacity: 0.7;
+    }
+  }
+
+  // Tablets
+  @media (max-width: 992px) {
+    .benefitCard {
+      flex: 1 1 250px;
+
+      .benefitTitleText {
+        font-size: 28px;
+      }
+
+      .benefitDescription {
+        font-size: calc(variables.$textSize - 2px);
+      }
+    }
+  }
+
+  // Phones
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: center;
+
+    .benefitCard {
+      width: 100%;
+
+      .benefitTitleText {
+        font-size: 24px;
+        text-align: center;
+      }
+
+      .benefitDescription {
+        font-size: 16px;
+        text-align: center;
+      }
+
+      .benefitTitle {
+        justify-content: center;
+      }
     }
   }
 }

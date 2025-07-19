@@ -9,6 +9,7 @@ import Benefits from "./components/Benefits/Benefits";
 import Products from "./components/Products/Products";
 import AboutUs from "./components/AboutUs/AboutUs";
 import Contacts from "./components/Contacts/Contacts";
+import Footer from "./components/Footer/Footer";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Products wishIcon={wishProductIcon} />
         <AboutUs firstPicture={patEx} secondPicture={coltarEx} />
         <Contacts />
+        <Footer />
       </main>
     </>
   );

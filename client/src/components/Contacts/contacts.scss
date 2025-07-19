@@ -99,11 +99,43 @@
 
 @media (max-width: 768px) {
   .contactsContainer {
+    gap: 40px;
     flex-direction: column;
+    // align-items: center;
+
+    .contactsLeftSide {
+      width: 100%;
+    }
 
     .contactsRightSide {
+      width: 100%;
+
       .map-container {
+        width: 100%;
         height: 300px;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .contactsContainer {
+    .contactsLeftSide {
+      width: auto;
+
+      .contactsTitle, .phoneNumber, .address {
+        text-align: center;
+      }
+      .scheduleSection {
+        .scheduleTitle{
+          text-align: center;
+        }
+        .schedule {
+          text-align: center;
+        }
+      }
+      .socialMedia {
+        justify-content: center;
       }
     }
   }

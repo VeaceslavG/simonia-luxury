@@ -1,0 +1,119 @@
+@use "../../variables.scss" as variables;
+@use "../../mixins.scss" as mixins;
+
+.footerBG {
+  margin-top: 100px;
+  background-color: #3F4F44;
+  color: #DCD7C9;
+  padding: 30px 60px;
+
+  a {
+    color: #DCD7C9;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #FFFFFF;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+  }
+
+  @media (max-width: 576px) {
+    padding: 20px 10px;
+  }
+}
+
+.footerContainer {
+  @include mixins.contentContainer(0);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.footer__top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.footer__logo {
+  img {
+    width: 250px;
+    height: auto;
+
+    @media (max-width: 576px) {
+      width: 200px;
+    }
+  }
+}
+
+.footer__menu,
+.footer__social {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  @media (max-width: 576px) {
+    gap: 8px;
+  }
+}
+
+.footer__bottom {
+  border-top: 1px solid #2C3930;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 576px) {
+    gap: 8px;
+  }
+}
+
+.footer__developer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  svg {
+    transition: fill 0.3s ease;
+  }
+
+  a:hover svg {
+    fill: #FFFFFF;
+  }
+
+  span {
+    font-size: 14px;
+
+    @media (max-width: 576px) {
+      font-size: 12px;
+    }
+  }
+}
+
+.footer__copy {
+  font-size: 14px;
+
+  @media (max-width: 576px) {
+    font-size: 12px;
+  }
+}

@@ -2,9 +2,29 @@
 @use "../../variables.scss" as variables;
 
 .navContainer {
-  
+  position: relative;
+  z-index: 1000;
+
   .navFirstSectionBG {
     background-color: variables.$navBackgroundColor;
+    transition: all 0.3s ease;
+    
+    // Sticky behavior for desktop
+    @media (min-width: 996px) {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      
+      &.scrolled {
+        background-color: darken(variables.$navBackgroundColor, 5%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        
+        .navFirstSection {
+          height: 45px; // Slightly smaller when scrolled
+        }
+      }
+    }
 
     .navFirstSection {
       background-color: variables.$navBackgroundColor;
@@ -64,6 +84,7 @@
           position: relative;
 
           &.catalog {
+            padding-right: 0;
             &::after {
               display: none;
             }
@@ -93,7 +114,7 @@
             }
           
             &::after {
-              width: calc(100% - 24px); // Matches padding
+              width: calc(100% - 24px);
             }
           }
         
@@ -112,14 +133,108 @@
           .arrowIcon {
             @include mixins.icons;
             transition: all 0.2s ease;
+            margin-right: 0;
           }
         }
       }
     }
   }
+
   .navSecondSection {
     padding: 0 20px;
     @include mixins.headerWidth;
     @include mixins.positioning;
+    position: relative;
+    background: white; // Ensure contrast with sticky nav
+    z-index: 999; // Below the sticky nav
+
+    .mobile-cart-icon {
+      display: none;
+    }
+
+    .mobile-burger-menu {
+      display: none;
+    }
+  }
+}
+
+/* Mobile styles (under 995px) */
+@media (max-width: 995px) {
+  .navContainer {
+    .navFirstSectionBG {
+      display: none;
+    }
+
+    .navSecondSection {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      height: 70px;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+      .search-bar, .desktopCartIcon {
+        display: none;
+      }
+
+      .mobileCartIcon {
+        display: block;
+      }
+
+      .logo {
+        // order: 2;
+        // position: absolute;
+        // left: 50%;
+        // transform: translateX(-50%);
+        width: auto;
+        z-index: 1;
+
+        img {
+          max-height: 40px;
+          width: auto;
+        }
+      }
+
+      .desktop-search-container {
+        display: none;
+      }
+
+      .mobile-burger-menu {
+        display: block;
+        order: 3;
+        flex: 0 0 auto;
+        z-index: 10;
+      }
+    }
+  }
+}
+
+/* Desktop styles (above 995px) */
+@media (min-width: 996px) {
+  .navContainer {
+    .navFirstSectionBG {
+      .navFirstSection {
+        .mobileBurgerMenu {
+          display: none;
+        }
+      }
+    }
+
+    .navSecondSection {
+      .mobileCartIcon,
+      .mobile-burger-menu {
+        display: none;
+      }
+    }
+  }
+}
+
+/* Number copied feedback */
+.numberCopied {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: rgba(white, 0.9);
   }
 }

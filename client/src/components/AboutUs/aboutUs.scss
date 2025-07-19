@@ -4,12 +4,17 @@
 .aboutUsContainer {
   @include mixins.contentContainer(100px);
   @include mixins.positioning;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
 
   .aboutUsLeftSide {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    flex: 1;
+    flex: 1 1 400px;
+    min-width: 300px;
 
     .aboutUsTitle {
       @include mixins.sectionTitle;
@@ -26,7 +31,7 @@
   }
 
   .aboutUsRightSide {
-    flex: 1;
+    flex: 1 1 300px;
     position: relative;
     display: flex;
     justify-content: center;
@@ -34,6 +39,7 @@
 
     .mainImg {
       width: 455px;
+      max-width: 100%;
       height: auto;
       border-radius: variables.$itemBorderRadius;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -46,11 +52,98 @@
       bottom: -20px;
       right: 50px;
       width: 234px;
+      max-width: 50%;
       border-radius: variables.$itemBorderRadius;
       border: 5px solid white;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       transform: rotate(3deg);
       z-index: 2;
+    }
+  }
+
+  @media (max-width: 992px) {
+    align-items: flex-start;
+    gap: 1.5rem;
+
+    .aboutUsLeftSide {
+      flex: 1 1 250px;
+      min-width: 280px;
+
+      .aboutUsTitle {
+        font-size: 28px;
+      }
+
+      .aboutUsText {
+        font-size: 15px;
+      }
+    }
+
+    .aboutUsRightSide {
+      .mainImg {
+        width: 380px;
+      }
+
+      .smallImg {
+        bottom: -10px;
+        right: 20px;
+        width: 180px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .aboutUsLeftSide,
+    .aboutUsRightSide {
+      width: 100%;
+    }
+
+    .aboutUsRightSide {
+      justify-content: flex-start;
+
+      .mainImg {
+        width: 380px;
+      }
+
+      .smallImg {
+        width: 200px;
+        bottom: -10px;
+        right: 30%;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    align-items: center;
+
+    .aboutUsLeftSide {
+      flex: auto;
+      align-items: center;
+      text-align: center;
+
+      .aboutUsTitle {
+        font-size: 24px;
+      }
+
+      .aboutUsText {
+        font-size: 14px;
+      }
+    }
+
+    .aboutUsRightSide {
+      justify-content: center;
+
+      .mainImg {
+        width: 280px;
+      }
+
+      .smallImg {
+        width: 120px;
+        bottom: -5px;
+        right: 20px;
+      }
     }
   }
 }

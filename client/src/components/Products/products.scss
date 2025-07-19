@@ -11,6 +11,7 @@
     display: flex;
     justify-content: center;
     gap: 1rem;
+    flex-wrap: wrap; // added for responsiveness
 
     button.category-btn {
       background: transparent;
@@ -61,7 +62,13 @@
     }
   }
 
-  // Product Cards 
+  // Product Cards container layout
+  .productsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+
   .productCard {
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border-radius: variables.$itemBorderRadius;
@@ -130,7 +137,6 @@
     .productName {
       display: block;
       font-size: 1rem;
-      // font-weight: 500;
       margin: 0.5rem 0 0.25rem;
       color: variables.$textColor;
       line-height: 1.4;
@@ -145,22 +151,58 @@
     }
   }
 
-  @media (max-width: 768px) {
+  // Tablets
+  @media (max-width: 992px) {
+    .productsGrid {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
     .productCard {
       .viewProduct .productImage {
-        height: 160px;
+        height: 180px;
       }
 
       .card-body {
         padding: 1rem;
       }
 
-      .productName {
-        font-size: 0.95rem;
-      }
-
+      .productName,
       .productPrice {
         font-size: 0.95rem;
+      }
+    }
+  }
+
+  // Phones
+  @media (max-width: 576px) {
+    .category-menu {
+      gap: 0.5rem;
+
+      button.category-btn {
+        font-size: 0.95rem;
+        padding: 0 0.5rem;
+      }
+    }
+
+    .productsGrid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .productCard {
+      .viewProduct .productImage {
+        height: 160px;
+      }
+
+      .card-body {
+        padding: 0.75rem;
+      }
+
+      .productName,
+      .productPrice {
+        font-size: 0.9rem;
+        text-align: center;
       }
     }
   }

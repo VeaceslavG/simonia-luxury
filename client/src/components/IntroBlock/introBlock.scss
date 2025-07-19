@@ -8,6 +8,7 @@
     background-color: #DCD7C9;
     max-height: 750px;
     height: 100%;
+    padding: 40px 0;
 
     .introBlock {
       display: flex;
@@ -15,7 +16,6 @@
       justify-content: space-between;
       @include mixins.headerWidth;
       padding: 0 20px;
-
 
       .introLeftSection {
         max-width: 750px;
@@ -37,8 +37,9 @@
 
         .introBlockBtns {
           @include mixins.positioning;
-          justify-content: start;
+          justify-content: flex-start;
           gap: 24px;
+          flex-wrap: wrap;
 
           .orderBtn {
             @include mixins.button(variables.$primaryColor, #DCD7C9);
@@ -47,12 +48,12 @@
               background-color: darken(variables.$primaryColor, 5%);
             }
           }
-          
+
           .exploreBtn {
             @include mixins.button(#DCD7C9, variables.$primaryColor);
             border: 1px solid variables.$primaryColor;
 
-             &:hover {
+            &:hover {
               background-color: rgba(variables.$primaryColor, 0.05);
               border-color: darken(variables.$primaryColor, 10%);
             }
@@ -62,10 +63,105 @@
 
       .introImageContainer {
         max-width: 1000px;
-        
+
         .introImage {
           object-fit: cover;
           width: 100%;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 1189px) {
+    .introBlockBG {
+      .introBlock {
+        .introLeftSection {
+          max-width: 100%;
+
+          .introTitle {
+            font-size: 65px; // adjust as per your mixin scaling
+          }
+          .introText {
+            font-size: 40px;
+          }
+        }
+      }
+    }
+  }
+
+  // Tablets (<=992px)
+  @media (max-width: 998px) {
+    .introBlockBG {
+      .introBlock {
+        flex-direction: column;
+        text-align: center;
+        gap: 2rem;
+        // padding: 40px 20px;
+
+        .introLeftSection {
+          max-width: 100%;
+          align-items: center;
+
+          .introTitle {
+            font-size: 36px; // adjust as per your mixin scaling
+          }
+
+          .introText {
+            font-size: 16px; // adjust as per your mixin scaling
+          }
+
+          .introBlockBtns {
+            justify-content: center;
+          }
+        }
+
+        .introImageContainer {
+          max-width: 75%;
+
+          .introImage {
+            width: 100%;
+            height: auto;
+          }
+        }
+      }
+    }
+  }
+
+  // Phones (<=576px)
+  @media (max-width: 576px) {
+    .introBlockBG {
+      .introBlock {
+        padding: 30px 10px;
+
+        .introLeftSection {
+          gap: 16px;
+
+          .introTitle {
+            font-size: 28px;
+          }
+
+          .introText {
+            font-size: 14px;
+          }
+
+          .introBlockBtns {
+            gap: 16px;
+
+            .orderBtn,
+            .exploreBtn {
+              padding: 10px 20px;
+              font-size: 14px;
+            }
+          }
+        }
+
+        .introImageContainer {
+          max-width: 100%;
+
+          .introImage {
+            width: 100%;
+            height: auto;
+          }
         }
       }
     }
