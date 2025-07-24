@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import TabButton from "../TabButton";
 import { productsData } from "./productsData";
 import "./products.scss";
 
-export default function Products({ wishIcon }) {
+export default function Products({ cartIcon }) {
   const [selectedCategory, setSelectedCategory] = useState("canapele");
 
   function handleFilter(category) {
@@ -20,22 +21,26 @@ export default function Products({ wishIcon }) {
     productContent = (
       <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="col">
-            <div className="card h-100 productCard">
-              <div className="viewProduct">
-                <img
-                  className="card-img-top productImage"
-                  src={product.image}
-                  alt={product.name}
-                />
-                <img className="wishProductIcon" src={wishIcon} alt="" />
-              </div>
-              <div className="card-body">
-                <span className="card-title productName">{product.name}</span>
-                <span className="card-text productPrice">{product.price}</span>
+          <Link to={`/product/${product.id}`} key={product.id}>
+            <div className="col">
+              <div className="card h-100 productCard">
+                <div className="viewProduct">
+                  <img
+                    className="card-img-top productImage"
+                    src={product.image}
+                    alt={product.name}
+                  />
+                  <img className="cartProductIcon" src={cartIcon} alt="" />
+                </div>
+                <div className="card-body">
+                  <span className="card-title productName">{product.name}</span>
+                  <span className="card-text productPrice">
+                    {product.price}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     );

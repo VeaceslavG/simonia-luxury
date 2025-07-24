@@ -1,0 +1,77 @@
+@use "../../variables.scss" as variables;
+@use "../../mixins.scss" as mixins;
+
+.productPage {
+  @include mixins.contentContainer(0);
+
+  .productImage {
+    border-radius: variables.$itemBorderRadius;
+    max-height: 500px;
+    object-fit: cover;
+  }
+
+  .productName {
+    @include mixins.sectionTitle;
+  }
+
+  .productPrice {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #A27B5C;
+  }
+
+  .productDescription {
+    font-size: 1rem; // 16px
+    color: #3F4F44;
+  }
+
+  .quantityContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .quantityBtn {
+      background: #DCD7C9;
+      border: none;
+      width: 40px;
+      height: 40px;
+      font-size: 1.25rem;
+      color: #2C3930;
+      border-radius: 4px;
+      transition: 0.2s ease;
+
+      &:hover:enabled {
+        background: #A27B5C;
+        color: white;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .quantityInput {
+      width: 60px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 5px;
+      font-size: 1rem;
+    }
+  }
+
+  .addToCartBtn {
+    background: #3F4F44;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: variables.$itemBorderRadius;
+    transition: 0.3s ease;
+
+    &:hover {
+      opacity: .8;
+    }
+  }
+}

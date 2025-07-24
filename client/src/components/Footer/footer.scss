@@ -1,7 +1,7 @@
 @use "../../variables.scss" as variables;
 @use "../../mixins.scss" as mixins;
 
-.footerBG {
+.footerBg {
   margin-top: 100px;
   background-color: #3F4F44;
   color: #DCD7C9;
@@ -33,11 +33,11 @@
   gap: 30px;
 }
 
-.footer__top {
+.footerTop {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 30px;
 
   @media (max-width: 768px) {
@@ -47,7 +47,7 @@
   }
 }
 
-.footer__logo {
+.footerLogo {
   img {
     width: 250px;
     height: auto;
@@ -58,8 +58,9 @@
   }
 }
 
-.footer__menu,
-.footer__social {
+.footerMenu,
+.footerSocial,
+.footerContact {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -75,7 +76,16 @@
   }
 }
 
-.footer__bottom {
+.footerContact {
+  .contactItem {
+    cursor: pointer;
+  }
+  .text {
+    cursor: inherit;
+  }
+}
+
+.footerBottom {
   border-top: 1px solid #2C3930;
   padding-top: 20px;
   display: flex;
@@ -88,7 +98,7 @@
   }
 }
 
-.footer__developer {
+.footerDeveloper {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -110,7 +120,7 @@
   }
 }
 
-.footer__copy {
+.footerCopy {
   font-size: 14px;
 
   @media (max-width: 576px) {

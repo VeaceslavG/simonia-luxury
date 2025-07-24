@@ -4,6 +4,8 @@ import FirstSection from "./FirstSection";
 import SecondSection from "./SecondSection";
 
 export default function Nav() {
+  //TODO: After scrolling the nav bar should remain on the screen
+
   const [isScrolled, setIsScrolled] = useState(false);
 
   const handleScroll = () => {

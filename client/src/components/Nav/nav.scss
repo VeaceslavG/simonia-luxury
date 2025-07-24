@@ -84,7 +84,7 @@
           position: relative;
 
           &.catalog {
-            padding-right: 0;
+            //* padding-right: 0; => the distance between elements is more pleasing to the eye using this
             &::after {
               display: none;
             }

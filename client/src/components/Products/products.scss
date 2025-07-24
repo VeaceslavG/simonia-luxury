@@ -11,7 +11,7 @@
     display: flex;
     justify-content: center;
     gap: 1rem;
-    flex-wrap: wrap; // added for responsiveness
+    flex-wrap: wrap;
 
     button.category-btn {
       background: transparent;
@@ -78,10 +78,15 @@
     position: relative;
 
     &:hover {
+      .viewProduct {
+        .cartProductIcon {
+          display: block;
+        }
+      }
       transform: translateY(-5px);
       box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.08);
       border-color: rgba(variables.$textColor, 0.12);
-
+      
       .productImage {
         transform: scale(1.04);
       }
@@ -92,7 +97,8 @@
       overflow: hidden;
       background: #f9f9f9;
 
-      .wishProductIcon {
+      .cartProductIcon {
+        display: none;
         position: absolute;
         top: 12px;
         right: 12px;
@@ -102,7 +108,7 @@
         filter: opacity(0.7);
         transition: all 0.2s ease;
         z-index: 2;
-
+        
         &:hover {
           filter: opacity(1) drop-shadow(0 0 4px rgba(0,0,0,0.1));
           transform: scale(1.2);

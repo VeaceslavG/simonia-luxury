@@ -1,28 +1,46 @@
+import { useState } from "react";
 import "./footer.scss";
 import logo from "../../assets/footer/logo.png";
 
 export default function Footer() {
+  const [copied, setCopied] = useState(false);
+
+  const phoneNumber = "+373 602 85 786";
+
+  function handleCopy() {
+    navigator.clipboard
+      .writeText(phoneNumber)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  }
+
   const facebookAcc = "https://www.facebook.com/simonia.luxury";
   const instagramAcc = "https://www.instagram.com/simonia_luxury/";
   const tiktokAcc =
     "https://www.tiktok.com/@simonialuxury?is_from_webapp=1&sender_device=pc";
+  const googleMapsLocation = "https://maps.app.goo.gl/7rYtqFcwhD9t1dTK9";
 
   return (
-    <div className="footerBG">
+    <div className="footerBg">
       <footer className="footerContainer">
-        <div className="footer__top">
-          <div className="footer__logo">
+        <div className="footerTop">
+          <div className="footerLogo">
             <img src={logo} alt="Simonia Luxury Logo" />
           </div>
 
-          <div className="footer__menu">
+          <div className="footerMenu">
             <a href="#">Beneficii</a>
             <a href="#">Mobilier</a>
             <a href="#">Despre noi</a>
             <a href="#">Contacte</a>
           </div>
 
-          <div className="footer__social">
+          <div className="footerSocial">
             <a href={instagramAcc} target="_blank" rel="noopener noreferrer">
               Instagram
             </a>
@@ -33,10 +51,30 @@ export default function Footer() {
               TikTok
             </a>
           </div>
+
+          <div className="footerContact">
+            <span className="contactItem" onClick={handleCopy}>
+              <span className="numberCopied">
+                {copied ? "Copied!" : phoneNumber}
+              </span>
+            </span>
+            <a
+              target="_blanc"
+              href={googleMapsLocation}
+              className="contactItem"
+            >
+              Calea Moșilor 4
+            </a>
+            <span className="text contactItem">
+              Marți - Duminică: 09:00 - 16:00
+              <br />
+              Disponibili online până la ora 21:00
+            </span>
+          </div>
         </div>
 
-        <div className="footer__bottom">
-          <div className="footer__developer">
+        <div className="footerBottom">
+          <div className="footerDeveloper">
             <a
               href="https://github.com/VeaceslavG"
               target="_blank"
@@ -55,7 +93,7 @@ export default function Footer() {
             </a>
           </div>
 
-          <p className="footer__copy">
+          <p className="footerCopy">
             &copy; {new Date().getFullYear()} Simonia Luxury. All rights
             reserved.
           </p>

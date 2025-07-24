@@ -10,11 +10,11 @@ import catalogArrowIcon from "../../assets/header/catalogArrowIcon.png";
 export default function FirstSection() {
   const [copied, setCopied] = useState(false);
 
-  const textToCopy = "+373 602 85 786";
+  const phoneNumber = "+373 602 85 786";
 
-  const handleCopy = () => {
+  function handleCopy() {
     navigator.clipboard
-      .writeText(textToCopy)
+      .writeText(phoneNumber)
       .then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -22,14 +22,14 @@ export default function FirstSection() {
       .catch((err) => {
         console.error("Failed to copy: ", err);
       });
-  };
+  }
 
   return (
     <div className="navFirstSectionBG">
       <div className="navFirstSection">
         <span className="phoneNumber" onClick={handleCopy}>
           <span className="numberCopied">
-            {copied ? "Copied!" : textToCopy}
+            {copied ? "Copied!" : phoneNumber}
           </span>
         </span>
         <div className="menuItems">
