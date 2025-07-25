@@ -11,6 +11,7 @@
     padding: 40px 0;
 
     .introBlock {
+      overflow: visible;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -89,9 +90,10 @@
     }
   }
 
-  // Tablets (<=992px)
+  // Tablets (<=998px)
   @media (max-width: 998px) {
     .introBlockBG {
+      margin-top: 70px;
       .introBlock {
         flex-direction: column;
         text-align: center;

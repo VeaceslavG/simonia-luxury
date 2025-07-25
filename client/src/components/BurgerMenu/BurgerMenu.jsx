@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { slide as Menu } from "react-burger-menu";
 import "./burgerMenu.scss";
 
@@ -16,11 +16,11 @@ export default function BurgerMenu() {
       { text: "Paturi", href: "/paturi" },
     ],
     menu: [
-      { text: "Acasă", href: "/" },
-      { text: "Beneficii", href: "/" },
-      { text: "Produse", href: "/" },
-      { text: "Despre Noi", href: "/" },
-      { text: "Contacte", href: "/" },
+      { text: "Acasă", href: "/#home" },
+      { text: "Beneficii", href: "/#benefits" },
+      { text: "Produse", href: "/#products" },
+      { text: "Despre Noi", href: "/#about" },
+      { text: "Contacte", href: "/#contacts" },
     ],
   };
 

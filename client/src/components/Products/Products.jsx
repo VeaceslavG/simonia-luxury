@@ -47,34 +47,30 @@ export default function Products({ cartIcon }) {
   }
 
   return (
-    <div className="container productsContainer">
+    <div id="products" className="container productsContainer">
       {/* Tabs menu */}
       <menu className="category-menu text-center mb-5">
         <TabButton
           isSelected={selectedCategory === "canapele"}
           onClick={() => handleFilter("canapele")}
-          className="category-btn"
         >
           Canapele
         </TabButton>
         <TabButton
           isSelected={selectedCategory === "coltare"}
           onClick={() => handleFilter("coltare")}
-          className="category-btn"
         >
           Colțare
         </TabButton>
         <TabButton
           isSelected={selectedCategory === "fotolii"}
           onClick={() => handleFilter("fotolii")}
-          className="category-btn"
         >
           Fotolii
         </TabButton>
         <TabButton
           isSelected={selectedCategory === "paturi"}
           onClick={() => handleFilter("paturi")}
-          className="category-btn"
         >
           Paturi
         </TabButton>

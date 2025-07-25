@@ -17,7 +17,7 @@ export default function HomePage() {
       <Nav />
       <IntroBlock
         introTitle="Mobilă moale la comandă"
-        introText="Mobila dorințelor tale"
+        introText="Mobilă de lux pentru casa ta"
         introImage={headerSofa}
       />
       <Benefits />

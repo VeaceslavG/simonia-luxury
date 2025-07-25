@@ -12,7 +12,7 @@ export default function Contacts() {
     "https://www.tiktok.com/@simonialuxury?is_from_webapp=1&sender_device=pc";
 
   return (
-    <div className="contactsBG">
+    <div id="contacts" className="contactsBG">
       <div className="contactsContainer">
         <div className="contactsLeftSide">
           <div className="contactsTitle">Contacte</div>

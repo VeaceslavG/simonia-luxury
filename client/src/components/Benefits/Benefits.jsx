@@ -3,7 +3,7 @@ import "./benefits.scss";
 
 export default function Benefits() {
   return (
-    <div className="container benefitsContainer">
+    <div id="benefits" className="container benefitsContainer">
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {benefitsData.map((benefit) => (
           <div key={benefit.id} className="col">

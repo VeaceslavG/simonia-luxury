@@ -2,23 +2,32 @@ import "./aboutUs.scss";
 
 export default function AboutUs({ firstPicture, secondPicture }) {
   return (
-    <div className="aboutUsContainer">
+    <div id="about" className="aboutUsContainer">
       <div className="aboutUsLeftSide">
-        <div className="aboutUsTitle">Despre noi</div>
+        <div className="aboutUsTitle">Despre Simonia Luxury</div>
+        <div className="aboutUsSubtitle">
+          Mobilă Moale Premium pentru Eleganța și Confortul Casei Tale
+        </div>
         <div className="aboutUsText">
-          Compania Simonia Luxury este alcătuită dintr-o echipă care are ca scop
-          crearea mobilei moi, menită să lase impresii de neuitat clienților
-          noștri. Ne dorim să oferim soluții care îmbină confortul, luxul și
-          utilitatea. Odată ce apelați la noi, vă vom fi alături începând cu o
-          consultație și terminând cu amenajarea mobilei în locuințele
-          dumneavoastră. Vă asigurăm că farmecul și liniștea celor care ne aleg
-          vor depinde de canapelele, colțarele, fotoliile și paturile pe care le
-          realizăm.
+          Simonia Luxury este o companie dedicată creării de mobilă moale de
+          lux, realizată cu atenție la detalii și materiale de cea mai înaltă
+          calitate. <br />
+          Echipa noastră de specialiști produce canapele, colțare, fotolii și
+          paturi elegante, fiecare piesă fiind concepută pentru a transforma
+          orice locuință într-un spațiu rafinat și confortabil. <br />
+          Oferim servicii complete: consultație personalizată, design unic,
+          producție atentă și montaj profesional direct în casa ta. <br />
+          Alegând Simonia Luxury, te bucuri de un ambient plin de stil, liniște
+          și farmec, creat special pentru tine și familia ta.
         </div>
       </div>
       <div className="aboutUsRightSide">
-        <img className="mainImg" src={firstPicture} alt="" />
-        <img className="smallImg" src={secondPicture} alt="" />
+        <img
+          className="mainImg"
+          src={firstPicture}
+          alt="Mobilă moale premium Simonia Luxury"
+        />
+        <img className="smallImg" src={secondPicture} alt="Colțare de lux" />
       </div>
     </div>
   );
