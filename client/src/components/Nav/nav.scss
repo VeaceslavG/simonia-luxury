@@ -9,7 +9,6 @@
     background-color: variables.$navBackgroundColor;
     transition: all 0.3s ease;
     
-    // Sticky behavior for desktop
     @media (min-width: 996px) {
       position: fixed;
       width: 100%;
@@ -147,8 +146,7 @@
     @include mixins.positioning;
     padding-top: 50px;
     position: relative;
-    background: white; // Ensure contrast with sticky nav
-    z-index: 999; // Below the sticky nav
+    background: white;
 
     .mobile-cart-icon {
       display: none;
@@ -160,7 +158,7 @@
   }
 }
 
-/* Mobile styles (under 995px) */
+// Mobile styles (under 995px)
 @media (max-width: 995px) {
   .navContainer {
     .navFirstSectionBG {
@@ -185,10 +183,6 @@
       }
 
       .logo {
-        // order: 2;
-        // position: absolute;
-        // left: 50%;
-        // transform: translateX(-50%);
         width: auto;
         z-index: 1;
 
@@ -212,7 +206,7 @@
   }
 }
 
-/* Desktop styles (above 995px) */
+// Desktop styles (above 995px) 
 @media (max-width: 995px) {
   .navContainer {
     .navSecondSection {
@@ -223,12 +217,10 @@
       height: 70px;
       background: white;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-      position: fixed; // 🔑 Adaugă aceasta
-      top: 0;          // 🔑 Fixează sus
+      position: fixed;
+      top: 0;
       left: 0;
       right: 0;
-      z-index: 1000;   // 🔑 Mai mare decât orice alt element
 
       .search-bar, .desktopCartIcon {
         display: none;
@@ -281,7 +273,7 @@
   }
 }
 
-/* Number copied feedback */
+// Number copied feedback 
 .numberCopied {
   transition: all 0.3s ease;
   

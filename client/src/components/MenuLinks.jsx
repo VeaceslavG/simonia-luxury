@@ -7,7 +7,7 @@ export default function MenuLinks({ items, onClick, ...props }) {
 
   function handleClick(e, href) {
     e.preventDefault();
-    if (onClick) onClick(); // apeleaza corect functia
+    if (onClick) onClick();
 
     const sectionId = href.replace("/#", "");
 

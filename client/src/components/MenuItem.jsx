@@ -1,5 +1,3 @@
-// import "./menuItem.scss";
-
 export default function MenuItem({ children, ...props }) {
   return (
     <div className="menu-item">

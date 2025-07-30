@@ -80,7 +80,7 @@
           max-width: 100%;
 
           .introTitle {
-            font-size: 65px; // adjust as per your mixin scaling
+            font-size: 65px;
           }
           .introText {
             font-size: 40px;
@@ -98,18 +98,17 @@
         flex-direction: column;
         text-align: center;
         gap: 2rem;
-        // padding: 40px 20px;
 
         .introLeftSection {
           max-width: 100%;
           align-items: center;
 
           .introTitle {
-            font-size: 36px; // adjust as per your mixin scaling
+            font-size: 36px;
           }
 
           .introText {
-            font-size: 16px; // adjust as per your mixin scaling
+            font-size: variables.$textSize;
           }
 
           .introBlockBtns {

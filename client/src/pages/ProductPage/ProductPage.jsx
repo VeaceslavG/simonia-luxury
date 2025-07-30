@@ -7,8 +7,6 @@ import "./productPage.scss";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 
-//TODO: Specifying product dimensions
-
 export default function ProductPage() {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);

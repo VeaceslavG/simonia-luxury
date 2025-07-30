@@ -3,6 +3,8 @@ import HomePage from "./pages/home/HomePage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import ScrollToTop from "./components/ScrollToTop";
 
+//TODO: Specifying product dimensions at ProductPage
+
 function App() {
   return (
     <Router>
