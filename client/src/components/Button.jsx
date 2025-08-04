@@ -1,3 +1,7 @@
-export default function Button({ title, className }) {
-  return <button className={className}>{title}</button>;
+export default function Button({ title, className, ...props }) {
+  return (
+    <button className={className} {...props}>
+      {title}
+    </button>
+  );
 }

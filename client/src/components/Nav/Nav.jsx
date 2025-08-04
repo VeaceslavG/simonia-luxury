@@ -3,12 +3,14 @@ import "./nav.scss";
 import FirstSection from "./FirstSection";
 import SecondSection from "./SecondSection";
 
-export default function Nav() {
+//TODO: Cand sunt pe alta pagina si dau click la o categorie din catalogul de produse, se trimite pe pagina principala la produse, dar nu se selecteaza categoria
+
+export default function Nav({ onCategorySelect }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const handleScroll = () => {
+  function handleScroll() {
     setIsScrolled(window.scrollY > 10);
-  };
+  }
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -31,8 +33,14 @@ export default function Nav() {
 
   return (
     <div id="home" className="navContainer">
-      <FirstSection isScrolled={isScrolled} />
-      <SecondSection onSearch={handleSearch} />
+      <FirstSection
+        isScrolled={isScrolled}
+        onCategorySelect={onCategorySelect}
+      />
+      <SecondSection
+        onSearch={handleSearch}
+        onCategorySelect={onCategorySelect}
+      />
     </div>
   );
 }

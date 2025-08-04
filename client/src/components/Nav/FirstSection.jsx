@@ -8,12 +8,10 @@ import AccountIcon from "../AccountIcon/AccountIcon";
 import accountIcon from "../../assets/header/accountIcon.png";
 import catalogArrowIcon from "../../assets/header/catalogArrowIcon.png";
 
-export default function FirstSection({ isScrolled }) {
+export default function FirstSection({ isScrolled, onCategorySelect }) {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [copied, setCopied] = useState(false);
-
   const phoneNumber = "+373 602 85 786";
 
   function handleCopy() {
@@ -48,7 +46,11 @@ export default function FirstSection({ isScrolled }) {
           </span>
         </span>
         <div className="menuItems">
-          <CatalogBtn title="Catalog de produse" arrowIcon={catalogArrowIcon} />
+          <CatalogBtn
+            title="Catalog de produse"
+            arrowIcon={catalogArrowIcon}
+            onCategorySelect={onCategorySelect}
+          />
           <MenuItem onClick={() => handleMenuClick("home")}>Acasă</MenuItem>
           <MenuItem onClick={() => handleMenuClick("benefits")}>
             Beneficii

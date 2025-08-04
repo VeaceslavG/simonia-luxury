@@ -1,0 +1,54 @@
+@use "../../mixins.scss" as mixins;
+@use "../../variables.scss" as variables;
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: hsl(44, 21%, 95%);
+  padding: 30px;
+  border-radius: variables.$itemBorderRadius;
+  width: 90%;
+  max-width: 500px;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    
+    input, textarea {
+      border-radius: variables.$itemBorderRadius;
+      border: 1px solid #000;
+      padding: 10px;
+      font-size: variables.$textSize;
+    }
+
+    button[type="submit"] {
+      background: #2C3930;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+  }
+
+  button {
+    border-radius: variables.$itemBorderRadius;
+    margin-top: 10px;
+    background: none;
+    border: 1px solid #ccc;
+    padding: 8px;
+    cursor: pointer;
+  }
+}

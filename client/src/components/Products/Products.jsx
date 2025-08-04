@@ -1,24 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import TabButton from "../TabButton";
 import { productsData } from "./productsData";
 import "./products.scss";
 
-export default function Products({ cartIcon }) {
-  const [selectedCategory, setSelectedCategory] = useState("canapele");
+export default function Products({ cartIcon, selectedCategory }) {
+  const [activeCategory, setActiveCategory] = useState("canapele");
+
+  useEffect(() => {
+    console.log("Categoria selectată:", selectedCategory);
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    // Actualizăm doar dacă avem o categorie selectată explicit
+    if (selectedCategory) {
+      setActiveCategory(selectedCategory);
+    } else {
+      // Forcează "canapele" când nu avem selecție
+      setActiveCategory("canapele");
+    }
+  }, [selectedCategory]);
 
   function handleFilter(category) {
-    setSelectedCategory(category);
+    setActiveCategory(category);
   }
 
-  let productContent;
+  const filteredProducts = productsData.filter(
+    (product) => product.category.toLowerCase() === activeCategory
+  );
 
-  if (selectedCategory) {
-    const filteredProducts = productsData.filter(
-      (product) => product.category === selectedCategory
-    );
+  return (
+    <div id="products" className="container productsContainer">
+      {/* Tabs menu */}
+      <menu className="category-menu text-center mb-5">
+        <TabButton
+          isSelected={activeCategory === "canapele"}
+          onClick={() => handleFilter("canapele")}
+        >
+          Canapele
+        </TabButton>
+        <TabButton
+          isSelected={activeCategory === "coltare"}
+          onClick={() => handleFilter("coltare")}
+        >
+          Colțare
+        </TabButton>
+        <TabButton
+          isSelected={activeCategory === "fotolii"}
+          onClick={() => handleFilter("fotolii")}
+        >
+          Fotolii
+        </TabButton>
+        <TabButton
+          isSelected={activeCategory === "paturi"}
+          onClick={() => handleFilter("paturi")}
+        >
+          Paturi
+        </TabButton>
+      </menu>
 
-    productContent = (
+      {/* Products Grid */}
       <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
         {filteredProducts.map((product) => (
           <Link to={`/product/${product.id}`} key={product.id}>
@@ -43,40 +84,6 @@ export default function Products({ cartIcon }) {
           </Link>
         ))}
       </div>
-    );
-  }
-
-  return (
-    <div id="products" className="container productsContainer">
-      {/* Tabs menu */}
-      <menu className="category-menu text-center mb-5">
-        <TabButton
-          isSelected={selectedCategory === "canapele"}
-          onClick={() => handleFilter("canapele")}
-        >
-          Canapele
-        </TabButton>
-        <TabButton
-          isSelected={selectedCategory === "coltare"}
-          onClick={() => handleFilter("coltare")}
-        >
-          Colțare
-        </TabButton>
-        <TabButton
-          isSelected={selectedCategory === "fotolii"}
-          onClick={() => handleFilter("fotolii")}
-        >
-          Fotolii
-        </TabButton>
-        <TabButton
-          isSelected={selectedCategory === "paturi"}
-          onClick={() => handleFilter("paturi")}
-        >
-          Paturi
-        </TabButton>
-      </menu>
-
-      {productContent}
     </div>
   );
 }

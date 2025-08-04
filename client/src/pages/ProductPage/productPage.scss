@@ -3,6 +3,10 @@
 
 .productPage {
   @include mixins.contentContainer(0);
+  
+  @media (max-width: 995px) {
+    margin-top: 70px;
+  }
 
   .productImage {
     border-radius: variables.$itemBorderRadius;

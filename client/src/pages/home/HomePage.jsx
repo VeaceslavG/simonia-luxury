@@ -1,3 +1,6 @@
+import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import headerSofa from "../../assets/header/headerSofa.png";
 import cartProductIcon from "../../assets/products/cart.png";
 import coltarEx from "../../assets/aboutUs/coltarEx.jpg";
@@ -12,16 +15,67 @@ import Contacts from "../../components/Contacts/Contacts";
 import Footer from "../../components/Footer/Footer";
 
 export default function HomePage() {
+  const location = useLocation();
+  const [selectedCategory, setSelectedCategory] = useState(
+    location.state?.selectedCategory || "canapele"
+  );
+
+  const navigate = useNavigate();
+
+  const hasHandledState = useRef(false);
+
+  useEffect(() => {
+    // Rulăm logica o singură dată pentru a “consuma” location.state
+    if (!hasHandledState.current) {
+      if (location.state?.selectedCategory) {
+        setSelectedCategory(location.state.selectedCategory);
+
+        setTimeout(() => {
+          const section = document.getElementById("products");
+          if (section) {
+            section.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 0);
+      } else {
+        setSelectedCategory("canapele");
+      }
+
+      hasHandledState.current = true;
+
+      // Curățăm state-ul în URL (navigare "internă")
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
+
+  function handleCategorySelect(category) {
+    const lowerCaseCategory = category.toLowerCase();
+    setSelectedCategory(lowerCaseCategory);
+
+    if (location.pathname === "/") {
+      const section = document.getElementById("products");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate("/", {
+        state: { selectedCategory: lowerCaseCategory },
+      });
+    }
+  }
+
   return (
     <>
-      <Nav />
+      <Nav onCategorySelect={handleCategorySelect} />
       <IntroBlock
         introTitle="Mobilă moale la comandă"
         introText="Mobilă de lux pentru casa ta"
         introImage={headerSofa}
       />
       <Benefits />
-      <Products cartIcon={cartProductIcon} />
+      <Products
+        selectedCategory={selectedCategory}
+        cartIcon={cartProductIcon}
+      />
       <AboutUs firstPicture={patEx} secondPicture={coltarEx} />
       <Contacts />
       <Footer />
