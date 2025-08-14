@@ -10,6 +10,7 @@
 
     .icon {
       @include mixins.icons;
+      cursor: pointer;
     }
 
     .count {

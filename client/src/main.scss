@@ -11,4 +11,20 @@ body {
   a {
     text-decoration: none;
   }
+
+  .Toastify__toast--success {
+    background-color: #dcd7c9 !important;
+    color: #3f4f44 !important;
+    font-weight: 600;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 10px rgba(44, 57, 48, 0.3);
+  }
+
+  .Toastify__progress-bar--success {
+    background-color: #a27b5c !important;
+  }
+
+  .Toastify__toast-icon svg {
+    fill: #2c3930 !important;
+  }
 }

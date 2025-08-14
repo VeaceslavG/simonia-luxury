@@ -2,20 +2,32 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/home/HomePage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import ScrollToTop from "./components/ScrollToTop";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+// import CartPage from "./pages/CartPage/CartPage";
+import { CartProvider } from "./context/CartContext";
+import CartModal from "./components/CartModal/CartModal";
+import HeaderIcons from "./components/HeaderIcons/HeaderIcons";
 
 //TODO: Specifying product dimensions at ProductPage
 
 function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <main>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-        </Routes>
-      </main>
-    </Router>
+    <CartProvider>
+      <Router>
+        <ScrollToTop />
+        <HeaderIcons />
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/product/:id" element={<ProductPage />} />
+            {/* <Route path="/cart" element={<CartPage />} /> */}
+          </Routes>
+          <ToastContainer position="bottom-right" autoClose={2000} />
+          <CartModal />
+        </main>
+      </Router>
+    </CartProvider>
   );
 }
 

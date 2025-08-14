@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { productsData } from "../../components/Products/productsData";
+import { useCart } from "../../context/CartContext";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./productPage.scss";
 
@@ -10,20 +13,12 @@ import Footer from "../../components/Footer/Footer";
 export default function ProductPage() {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
 
   const product = productsData.find((p) => p.id.toString() === id);
 
   if (!product) {
     return <div className="text-center py-5">Product not found</div>;
-  }
-
-  function handleAddToCart() {
-    console.log("Added to cart:", {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      quantity: quantity,
-    });
   }
 
   function decreaseQuantity() {
@@ -49,7 +44,7 @@ export default function ProductPage() {
 
           <div className="col-md-6 d-flex flex-column justify-content-center">
             <h1 className="productName mb-3">{product.name}</h1>
-            <p className="productPrice mb-3">{product.price}</p>
+            <p className="productPrice mb-3">{product.price} MDL</p>
             <p className="productDescription mb-4">
               {product.description ||
                 "Aici se află descrierea produsului selectat de dumneavoastră."}
@@ -67,7 +62,9 @@ export default function ProductPage() {
                 type="number"
                 min="1"
                 value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value))}
+                onChange={(e) =>
+                  setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                }
                 className="quantityInput"
               />
               <button className="quantityBtn" onClick={increaseQuantity}>
@@ -75,7 +72,13 @@ export default function ProductPage() {
               </button>
             </div>
 
-            <button className="btn addToCartBtn" onClick={handleAddToCart}>
+            <button
+              className="btn addToCartBtn"
+              onClick={() => {
+                addItem(product, quantity);
+                toast.success(`${product.name} a fost adăugat în coș!`);
+              }}
+            >
               Adaugă în coș
             </button>
           </div>

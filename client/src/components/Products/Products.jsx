@@ -2,21 +2,19 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import TabButton from "../TabButton";
 import { productsData } from "./productsData";
+import { useCart } from "../../context/CartContext";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./products.scss";
 
 export default function Products({ cartIcon, selectedCategory }) {
   const [activeCategory, setActiveCategory] = useState("canapele");
+  const { addItem } = useCart();
 
   useEffect(() => {
-    console.log("Categoria selectată:", selectedCategory);
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    // Actualizăm doar dacă avem o categorie selectată explicit
     if (selectedCategory) {
       setActiveCategory(selectedCategory);
     } else {
-      // Forcează "canapele" când nu avem selecție
       setActiveCategory("canapele");
     }
   }, [selectedCategory]);
@@ -63,22 +61,30 @@ export default function Products({ cartIcon, selectedCategory }) {
       <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
         {filteredProducts.map((product) => (
           <Link to={`/product/${product.id}`} key={product.id}>
-            <div className="col">
-              <div className="card h-100 productCard">
-                <div className="viewProduct">
-                  <img
-                    className="card-img-top productImage"
-                    src={product.image}
-                    alt={product.name}
-                  />
-                  <img className="cartProductIcon" src={cartIcon} alt="" />
-                </div>
-                <div className="card-body">
-                  <span className="card-title productName">{product.name}</span>
-                  <span className="card-text productPrice">
-                    {product.price}
-                  </span>
-                </div>
+            <div className="card h-100 productCard">
+              <div className="viewProduct position-relative">
+                <img
+                  className="card-img-top productImage"
+                  src={product.image}
+                  alt={product.name}
+                />
+                <img
+                  className="cartProductIcon"
+                  src={cartIcon}
+                  alt=""
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addItem(product);
+                    toast.success(`${product.name} a fost adăugat în coș!`);
+                  }}
+                />
+              </div>
+              <div className="card-body">
+                <span className="card-title productName">{product.name}</span>
+                <span className="card-text productPrice">
+                  {product.price} MDL
+                </span>
               </div>
             </div>
           </Link>
