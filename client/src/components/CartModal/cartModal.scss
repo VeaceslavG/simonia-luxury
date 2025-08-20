@@ -66,7 +66,7 @@
       .quantityBtn {
         border: 1px solid #ccc;
         padding: 4px 8px;
-        background: #DCD7C9;
+        background: #D8C4B6;
         border: none;
         cursor: pointer;
         transition: 0.2s ease;
@@ -110,7 +110,7 @@
     }
 
     .checkoutButton {
-      background: #2C3930;
+      background: variables.$primaryColor;
       color: white;
       border: none;
       padding: 10px;
@@ -120,7 +120,7 @@
     }
 
     .clearCartButton {
-      background: #B83232  ;
+      background: #B85042;
       color: #fff;
       border: none;
       padding: 10px;

@@ -6,7 +6,7 @@ import SearchBar from "../SearchBar/SearchBar";
 import HeaderIcons from "../HeaderIcons/HeaderIcons";
 import BurgerMenu from "../BurgerMenu/BurgerMenu";
 
-import logo from "../../assets/header/logo.png";
+import logo from "../../assets/header/logoBlue.png";
 
 export default function SecondSection({ onSearch, onCategorySelect }) {
   const navigate = useNavigate();

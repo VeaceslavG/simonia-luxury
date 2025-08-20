@@ -5,7 +5,7 @@
   margin: 0 auto;
 
   .introBlockBG {
-    background-color: #DCD7C9;
+    background-color: #F5EFE7;
     max-height: 750px;
     height: 100%;
     padding: 40px 0;
@@ -43,7 +43,7 @@
           flex-wrap: wrap;
 
           .orderBtn {
-            @include mixins.button(variables.$primaryColor, #DCD7C9);
+            @include mixins.button(variables.$primaryColor, #F5EFE7);
 
             &:hover {
               background-color: darken(variables.$primaryColor, 5%);
@@ -51,7 +51,7 @@
           }
 
           .exploreBtn {
-            @include mixins.button(#DCD7C9, variables.$primaryColor);
+            @include mixins.button(transparent, variables.$primaryColor);
             border: 1px solid variables.$primaryColor;
 
             &:hover {

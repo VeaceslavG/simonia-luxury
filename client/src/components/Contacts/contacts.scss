@@ -21,21 +21,20 @@
       .contactsTitle {
         @include mixins.sectionTitle;
         margin-bottom: 20px;
-        color: variables.$primaryColor;
       }
 
       .phoneNumber {
         display: block;
         font-size: 18px;
         margin-bottom: 10px;
-        color: #2c3930;
+        color: variables.$textColor;
       }
 
       .address {
         display: block;
         font-size: 16px;
         margin-bottom: 20px;
-        color: #2c3930;
+        color: variables.$textColor;
       }
 
       .scheduleSection {
@@ -46,7 +45,8 @@
           font-weight: 500;
           display: block;
           margin-bottom: 5px;
-          color: #3f4f44;
+          color: variables.$primaryColor;
+          opacity: .6;
         }
 
         .schedule {
@@ -55,7 +55,7 @@
           gap: 4px;
           span {
             font-size: 16px;
-            color: #555;
+            color: variables.$textColor;
           }
         }
       }

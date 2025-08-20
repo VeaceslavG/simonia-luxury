@@ -35,7 +35,7 @@
     }
 
     button[type="submit"] {
-      background: #2C3930;
+      background: variables.$primaryColor;
       color: white;
       border: none;
       padding: 10px;
@@ -50,5 +50,6 @@
     border: 1px solid #ccc;
     padding: 8px;
     cursor: pointer;
+    color: variables.$textColor;
   }
 }

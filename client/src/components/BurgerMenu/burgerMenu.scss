@@ -1,3 +1,6 @@
+@use "../../variables.scss" as variables;
+@use "../../mixins.scss" as mixins;
+
 .bm-overlay {
   background: rgba(0, 0, 0, 0.3);
   cursor: pointer;
@@ -17,7 +20,7 @@
 }
 
 .bm-burger-bars {
-  background: #DCD7C9;
+  background: variables.$navBackgroundColor;
 }
 
 .bm-cross-button {
@@ -34,7 +37,7 @@
 }
 
 .bm-menu {
-  background: #3F4F44;
+  background: variables.$navBackgroundColor;
   padding: 2.5em 1.5em 0;
   font-size: 1.15em;
   
@@ -46,7 +49,7 @@
 
 .bm-menu a {
   cursor: pointer;
-  color: #DCD7C9;
+  color: #F5EFE7;
   text-decoration: none;
   display: block;
   padding: 10px 0;
@@ -73,7 +76,7 @@
   button {
     background: transparent;
     border: none;
-    color: #DCD7C9;
+    color: #F5EFE7;
     font-size: 1rem;
     cursor: pointer;
     padding: 0.5rem 1rem;

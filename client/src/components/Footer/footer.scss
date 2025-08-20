@@ -3,13 +3,13 @@
 
 .footerBg {
   margin-top: 100px;
-  background-color: #3F4F44;
-  color: #DCD7C9;
+  background-color: variables.$navBackgroundColor;
+  color: #fff;
   padding: 30px 60px;
 
   a {
     cursor: pointer;
-    color: #DCD7C9;
+    color: #fff;
     text-decoration: none;
     transition: color 0.3s ease;
 
@@ -87,7 +87,7 @@
 }
 
 .footerBottom {
-  border-top: 1px solid #2C3930;
+  border-top: 1px solid #F5EFE7;
   padding-top: 20px;
   display: flex;
   flex-direction: column;

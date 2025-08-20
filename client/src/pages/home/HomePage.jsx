@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import headerSofa from "../../assets/header/headerSofa.png";
+import headerSofa from "../../assets/header/sofaBlue.png";
 import cartProductIcon from "../../assets/products/cart.png";
 import coltarEx from "../../assets/aboutUs/coltarEx.jpg";
 import patEx from "../../assets/aboutUs/patEx.jpg";

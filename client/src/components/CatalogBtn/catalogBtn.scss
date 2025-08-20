@@ -11,12 +11,13 @@
     cursor: pointer;
     padding: 7px 10px;
     border-radius: variables.$itemBorderRadius;
-    transition: background-color 0.3s ease;
-    background-color: #3F4F44;
+    transition: 0.3s ease;
+    // background-color: #3F4F44;
     border: 1px solid transparent;
 
     &:hover {
-      background-color: #2C3930;
+      // background-color: #2C3930;
+      opacity: .6;
     }
   }
 

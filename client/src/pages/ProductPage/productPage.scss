@@ -16,17 +16,18 @@
 
   .productName {
     @include mixins.sectionTitle;
+    color: variables.$textColor;
   }
 
   .productPrice {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #A27B5C;
+    color: variables.$primaryColor;
   }
 
   .productDescription {
     font-size: 1rem; // 16px || variables.$textSize
-    color: #3F4F44;
+    color: variables.$textColor;
   }
 
   .quantityContainer {
@@ -35,12 +36,12 @@
     gap: 10px;
 
     .quantityBtn {
-      background: #DCD7C9;
+      background: #D8C4B6;
       border: none;
       width: 40px;
       height: 40px;
       font-size: 1.25rem;
-      color: #2C3930;
+      color: variables.$navBackgroundColor;
       border-radius: 4px;
       transition: 0.2s ease;
 
@@ -66,7 +67,7 @@
   }
 
   .addToCartBtn {
-    background: #3F4F44;
+    background: variables.$navBackgroundColor;
     color: white;
     border: none;
     padding: 12px 24px;

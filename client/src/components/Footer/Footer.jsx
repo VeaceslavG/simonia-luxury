@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import "./footer.scss";
-import logo from "../../assets/footer/logo.png";
+import logo from "../../assets/footer/logoBlue.png";
 
 export default function Footer() {
   const navigate = useNavigate();

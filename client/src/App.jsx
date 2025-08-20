@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 // import CartPage from "./pages/CartPage/CartPage";
 import { CartProvider } from "./context/CartContext";
 import CartModal from "./components/CartModal/CartModal";
-import HeaderIcons from "./components/HeaderIcons/HeaderIcons";
+// import HeaderIcons from "./components/HeaderIcons/HeaderIcons";
 
 //TODO: Specifying product dimensions at ProductPage
 
@@ -16,7 +16,7 @@ function App() {
     <CartProvider>
       <Router>
         <ScrollToTop />
-        <HeaderIcons />
+        {/* <HeaderIcons /> */}
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />

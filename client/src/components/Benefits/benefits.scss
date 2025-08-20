@@ -25,10 +25,12 @@
       .benefitTitleText {
         font-size: 32px;
         font-weight: 700;
+        color: variables.$textColor;
       }
     }
 
     .benefitDescription {
+      color: variables.$textColor;
       font-size: variables.$textSize;
       line-height: 1.5;
       opacity: 0.7;
