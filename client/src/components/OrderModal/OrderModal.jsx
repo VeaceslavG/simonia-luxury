@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./orderModal.scss";
 
 export default function OrderModal({ isOpen, onClose }) {
@@ -18,26 +20,22 @@ export default function OrderModal({ isOpen, onClose }) {
     e.preventDefault();
 
     try {
-      const response = await fetch("/api/order", {
+      const response = await fetch("http://localhost:8080/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData), // doar datele introduse în formular
       });
 
       if (response.ok) {
-        alert("Comanda a fost trimisă cu succes!");
-        setFormData({
-          name: "",
-          phone: "",
-          email: "",
-          notes: "",
-        });
+        toast.success("Comanda a fost trimisă cu succes!");
+        setFormData({ name: "", phone: "", email: "", notes: "" });
         onClose();
       } else {
-        alert("A apărut o eroare.");
+        const errorText = await response.text();
+        toast.error(`Eroare la trimiterea comenzii: ${errorText}`);
       }
     } catch (err) {
-      alert("Eroare de rețea.");
+      toast.error("Eroare de rețea.");
       console.error(err);
     }
   }
@@ -76,7 +74,7 @@ export default function OrderModal({ isOpen, onClose }) {
             placeholder="Observații"
             value={formData.notes}
             onChange={handleChange}
-          ></textarea>
+          />
           <button type="submit">Trimite</button>
         </form>
         <button onClick={onClose}>Închide</button>

@@ -30,7 +30,7 @@ export default function CartModal() {
             <ul className="cartList">
               {cartItems.map((item) => (
                 <li key={item.id} className="cartItem">
-                  <img src={item.image} alt={item.name} />
+                  <img src={item.image_url} alt={item.name} />
                   <div className="cartItemDetails">
                     <h5>{item.name}</h5>
                     <p>{item.price} MDL</p>

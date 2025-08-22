@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { productsData } from "../../components/Products/productsData";
 import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,12 +13,30 @@ export default function ProductPage() {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
+  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState(null);
 
-  const product = productsData.find((p) => p.id.toString() === id);
+  // Fetch produs din backend
+  useEffect(() => {
+    async function fetchProduct() {
+      try {
+        const res = await fetch(`http://localhost:8080/api/products/${id}`);
+        if (!res.ok) throw new Error("Eroare la încărcarea produsului");
+        const data = await res.json();
+        setProduct(data);
+      } catch (err) {
+        console.error(err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProduct();
+  }, [id]);
 
-  if (!product) {
-    return <div className="text-center py-5">Product not found</div>;
-  }
+  if (loading) return <div className="text-center py-5">Se încarcă...</div>;
+  if (!product)
+    return <div className="text-center py-5">Produsul nu a fost găsit</div>;
 
   function decreaseQuantity() {
     if (quantity > 1) setQuantity(quantity - 1);
@@ -36,7 +53,7 @@ export default function ProductPage() {
         <div className="row g-4">
           <div className="col-md-6">
             <img
-              src={product.image}
+              src={product.image_url}
               alt={product.name}
               className="img-fluid shadow productImage"
             />

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import TabButton from "../TabButton";
-import { productsData } from "./productsData";
 import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,6 +9,7 @@ import "./products.scss";
 export default function Products({ cartIcon, selectedCategory }) {
   const [activeCategory, setActiveCategory] = useState("canapele");
   const { addItem } = useCart();
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     if (selectedCategory) {
@@ -19,11 +19,18 @@ export default function Products({ cartIcon, selectedCategory }) {
     }
   }, [selectedCategory]);
 
+  useEffect(() => {
+    fetch("http://localhost:8080/api/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error(err));
+  }, []);
+
   function handleFilter(category) {
     setActiveCategory(category);
   }
 
-  const filteredProducts = productsData.filter(
+  const filteredProducts = products.filter(
     (product) => product.category.toLowerCase() === activeCategory
   );
 
@@ -65,7 +72,7 @@ export default function Products({ cartIcon, selectedCategory }) {
               <div className="viewProduct position-relative">
                 <img
                   className="card-img-top productImage"
-                  src={product.image}
+                  src={product.image_url}
                   alt={product.name}
                 />
                 <img
