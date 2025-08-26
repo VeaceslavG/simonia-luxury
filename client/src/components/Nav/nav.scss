@@ -186,12 +186,17 @@
         display: block;
       }
 
-      .logo {
-        width: auto;
+      .logoContainer {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 150px; 
+        height: auto;
         z-index: 1;
 
         img {
-          max-height: 40px;
+          max-height: 50px;
           width: auto;
         }
       }

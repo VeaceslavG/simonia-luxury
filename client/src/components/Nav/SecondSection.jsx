@@ -6,9 +6,9 @@ import SearchBar from "../SearchBar/SearchBar";
 import HeaderIcons from "../HeaderIcons/HeaderIcons";
 import BurgerMenu from "../BurgerMenu/BurgerMenu";
 
-import logo from "../../assets/header/logoBlue.png";
+import logo from "../../assets/header/logoBlueS.png";
 
-export default function SecondSection({ onSearch, onCategorySelect }) {
+export default function SecondSection({ onCategorySelect }) {
   const navigate = useNavigate();
 
   function handleLogoClick(sectionId) {
@@ -28,7 +28,7 @@ export default function SecondSection({ onSearch, onCategorySelect }) {
 
       <Logo logoIcon={logo} onClick={() => handleLogoClick("home")} />
 
-      <SearchBar onSearch={onSearch} />
+      <SearchBar />
 
       <HeaderIcons additionClass="desktopCartIcon" />
 

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -26,6 +27,22 @@ func enableCORS(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// Endpoint GET /api/search?query=...
+func searchProducts(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("query")
+	var products []Product
+
+	if query == "" {
+		DB.Find(&products)
+	} else {
+		// Căutare după nume sau categorie, case-insensitive
+		DB.Where("LOWER(name) LIKE ? OR LOWER(category) LIKE ?", "%"+strings.ToLower(query)+"%", "%"+strings.ToLower(query)+"%").Find(&products)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(products)
 }
 
 func getProductByID(w http.ResponseWriter, r *http.Request) {
@@ -125,6 +142,7 @@ func main() {
 	r.PathPrefix("/images/").Handler(http.StripPrefix("/images/", http.FileServer(http.Dir("./assets/products/"))))
 
 	// Comenzi
+	r.HandleFunc("/api/search", searchProducts).Methods("GET")
 	r.HandleFunc("/api/orders", createOrder).Methods("POST", "OPTIONS")
 	r.HandleFunc("/api/orders", getOrders).Methods("GET", "OPTIONS")
 

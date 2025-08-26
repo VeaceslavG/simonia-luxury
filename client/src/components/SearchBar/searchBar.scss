@@ -1,23 +1,68 @@
 @use "../../variables.scss" as variables;
 @use "../../mixins.scss" as mixins;
 
-.search-bar {
+.search-bar-wrapper {
   width: 100%;
   max-width: 600px;
-  padding: 0.5rem;
-  
-  input {
-    height: 36px;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: variables.$textSize;
-    border: 1px solid #D8C4B6;
-    outline: none;
-    border-radius: variables.$itemBorderRadius;
-    transition: border-color 0.2s ease-in-out;
+  margin: 0 auto;
 
-    &:focus {
-      border-color: #808080;
+  .search-bar {
+    display: flex;
+    width: 100%;
+    gap: 0.5rem;
+    padding: 0.5rem;
+
+    input {
+      flex: 1;
+      height: 36px;
+      padding: 0.75rem 1rem;
+      font-size: variables.$textSize;
+      border: 1px solid #D8C4B6;
+      outline: none;
+      border-radius: variables.$itemBorderRadius;
+      transition: border-color 0.2s ease-in-out;
+
+      &:focus {
+        border-color: #808080;
+      }
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      padding: 0 1rem;
+      background-color: #3e5879;
+      color: #fff;
+      border: none;
+      border-radius: variables.$itemBorderRadius;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+
+      &:hover {
+        background-color: #2c3e5a;
+      }
+
+      svg {
+        display: block;
+      }
     }
   }
+}
+
+/* Stil toast custom doar pentru SearchBar */
+.custom-toast {
+  background-color: #F5EFE7;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.custom-toast-body {
+  margin: 0;
+  font-weight: 500;
+}
+
+.custom-toast-progress {
+  background: #ff4d4f;
 }

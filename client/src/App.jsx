@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 // import CartPage from "./pages/CartPage/CartPage";
 import { CartProvider } from "./context/CartContext";
 import CartModal from "./components/CartModal/CartModal";
+import Products from "./components/Products/Products";
+import SearchResults from "./components/SearchResults/SearchResults";
 // import HeaderIcons from "./components/HeaderIcons/HeaderIcons";
 
 //TODO: Specifying product dimensions at ProductPage
@@ -20,6 +22,8 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/search-results" element={<SearchResults />} />
             <Route path="/product/:id" element={<ProductPage />} />
             {/* <Route path="/cart" element={<CartPage />} /> */}
           </Routes>

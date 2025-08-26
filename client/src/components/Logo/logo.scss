@@ -5,10 +5,14 @@
   width: 150px;
   height: 80px;
   cursor: pointer;
-  
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   .logoImage {
-    object-fit: cover;
     width: 100%;
     height: 100%;
+    object-fit: contain;
   }
 }
