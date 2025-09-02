@@ -19,6 +19,12 @@ export default function ProductPage() {
   // Fetch produs din backend
   useEffect(() => {
     async function fetchProduct() {
+      if (!id) {
+        setLoading(false);
+        setProduct(null);
+        return;
+      }
+
       try {
         const res = await fetch(`http://localhost:8080/api/products/${id}`);
         if (!res.ok) throw new Error("Eroare la încărcarea produsului");

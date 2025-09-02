@@ -22,7 +22,10 @@ export default function OrderModal({ isOpen, onClose }) {
     try {
       const response = await fetch("http://localhost:8080/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
         body: JSON.stringify(formData), // doar datele introduse în formular
       });
 

@@ -1,4 +1,5 @@
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
 import "./cartModal.scss";
 
@@ -12,6 +13,8 @@ export default function CartModal() {
     isCartOpen,
     closeCart,
   } = useCart();
+
+  const { user } = useAuth();
 
   if (!isCartOpen) return null;
 
@@ -28,59 +31,69 @@ export default function CartModal() {
         ) : (
           <>
             <ul className="cartList">
-              {cartItems.map((item) => (
-                <li key={item.id} className="cartItem">
-                  <img src={item.image_url} alt={item.name} />
-                  <div className="cartItemDetails">
-                    <h5>{item.name}</h5>
-                    <p>{item.price} MDL</p>
-                    <div className="quantityContainer">
-                      <button
-                        className="quantityBtn"
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
-                        }
-                        disabled={item.quantity <= 1}
-                      >
-                        −
-                      </button>
+              {cartItems.map((item) => {
+                // Generează o cheie unică bazată pe item.id și userID (dacă există)
+                const uniqueKey = `cart-item-${item.id}-${item.ProductID}`;
 
-                      <input
-                        type="number"
-                        min="1"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateQuantity(
-                            item.id,
-                            Math.max(1, parseInt(e.target.value) || 1)
-                          )
-                        }
-                        className="quantityInput"
-                      />
+                return (
+                  <li key={uniqueKey} className="cartItem">
+                    <img
+                      src={item.product?.image_url || "/default-image.jpg"}
+                      alt={item.product?.name}
+                    />
+                    <div className="cartItemDetails">
+                      <h5>{item.product?.name || "Produs fără nume"}</h5>
+                      <p>{item.product?.price || 0} MDL</p>
+                      <div className="quantityContainer">
+                        <button
+                          className="quantityBtn"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
+                          disabled={item.quantity <= 1}
+                        >
+                          −
+                        </button>
 
-                      <button
-                        className="quantityBtn"
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
-                        }
-                      >
-                        +
-                      </button>
+                        <input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateQuantity(
+                              item.id,
+                              Math.max(1, parseInt(e.target.value) || 1)
+                            )
+                          }
+                          className="quantityInput"
+                        />
+
+                        <button
+                          className="quantityBtn"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <img
-                    onClick={() => removeItem(item.id)}
-                    className="removeButton"
-                    src={trashIcon}
-                    alt="Delete"
-                  />
-                </li>
-              ))}
+                    <img
+                      onClick={() => removeItem(item.id)}
+                      className="removeButton"
+                      src={trashIcon}
+                      alt="Delete"
+                    />
+                  </li>
+                );
+              })}
             </ul>
 
             <div className="cartSummary">
               <p>Total: {cartSubtotal} MDL</p>
-              <button className="checkoutButton">Finalizează comanda</button>
+              <button className="checkoutButton" disabled={!user}>
+                {user ? "Finalizează comanda" : "Loghează-te pentru a finaliza"}
+              </button>
               <button className="clearCartButton" onClick={clearCart}>
                 Golește coșul
               </button>

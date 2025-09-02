@@ -101,7 +101,7 @@ export default function Products({ selectedCategory, searchQuery }) {
           <p className="text-center">Niciun produs găsit</p>
         )}
         {displayedProducts.map((product) => (
-          <Link to={`/product/${product.id}`} key={product.id}>
+          <Link to={`/product/${product.ID}`} key={product.ID}>
             <div className="card h-100 productCard">
               <div className="viewProduct position-relative">
                 <img
