@@ -1,5 +1,6 @@
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
 import "./cartModal.scss";
 
@@ -17,6 +18,15 @@ export default function CartModal() {
   } = useCart();
 
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  function handleCheckout() {
+    if (!user) {
+      navigate("/account");
+      closeCart();
+      return;
+    }
+  }
 
   if (!isCartOpen) return null;
 
@@ -95,7 +105,7 @@ export default function CartModal() {
 
             <div className="cartSummary">
               <p>Total: {cartSubtotal} MDL</p>
-              <button className="checkoutButton" disabled={!user}>
+              <button className="checkoutButton" onClick={handleCheckout}>
                 {user ? "Finalizează comanda" : "Loghează-te pentru a finaliza"}
               </button>
               <button className="clearCartButton" onClick={clearCart}>

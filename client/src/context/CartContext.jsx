@@ -29,42 +29,10 @@ export function CartProvider({ children }) {
     return item.id || item.ID;
   }
 
-  // sincronizare cu backend
-  // const syncCartWithBackend = async (items) => {
-  //   if (!token || !items || items.length === 0) return;
-
-  //   const payload = {
-  //     items: items
-  //       .map((i) => ({ productId: getProductId(i), quantity: i.quantity }))
-  //       .filter((i) => i.productId && i.productId > 0),
-  //   };
-
-  //   try {
-  //     await fetch("http://localhost:8080/api/cart/sync", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify(payload),
-  //     });
-  //   } catch (err) {
-  //     console.error("Eroare la sincronizarea coșului:", err);
-  //   }
-  // };
-
   useEffect(() => {
     async function loadCart() {
       setLoading(true);
 
-      // Dacă nu e token → golim coșul
-      if (!token) {
-        setCartItems([]);
-        setLoading(false);
-        return;
-      }
-
-      // Încarcă localStorage
       let localItems = [];
       try {
         const saved = localStorage.getItem("cart");
@@ -73,8 +41,15 @@ export function CartProvider({ children }) {
         console.error("Eroare parsare localStorage:", err);
       }
 
+      if (!token) {
+        // Dacă nu e logat, folosim ce e în localStorage
+        setCartItems(localItems);
+        setLoading(false);
+        return;
+      }
+
       try {
-        // 1. Dacă există produse în localStorage, trimitem doar pe ele la backend
+        // Dacă există produse în localStorage, trimitem la backend
         if (localItems.length > 0) {
           for (const localItem of localItems) {
             await fetch("http://localhost:8080/api/cart", {
@@ -92,13 +67,11 @@ export function CartProvider({ children }) {
           localStorage.removeItem("cart");
         }
 
-        // 2. Preluăm coșul complet de pe server
+        // Preluăm coșul de pe server
         const res = await fetch("http://localhost:8080/api/cart", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const serverItems = res.ok ? await res.json() : [];
-
-        // 3. Setăm exact ce vine de la server
         setCartItems(serverItems);
       } catch (err) {
         console.error("Eroare la încărcarea coșului de pe server:", err);
