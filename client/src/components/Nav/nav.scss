@@ -17,7 +17,7 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       
       &.scrolled {
-        background-color: darken(variables.$navBackgroundColor, 5%);
+        background-color: #1b2b46;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         
         .navFirstSection {
@@ -27,7 +27,7 @@
     }
 
     .navFirstSection {
-      background-color: variables.$navBackgroundColor;
+      // background-color: variables.$navBackgroundColor;
       background-size: cover;
       margin: 0 auto;
       height: 50px;

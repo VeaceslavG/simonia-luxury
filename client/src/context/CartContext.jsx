@@ -21,73 +21,121 @@ export function CartProvider({ children }) {
     setIsCartOpen(false);
   }
 
-  // Efect pentru încărcarea coșului
+  function getProductId(item) {
+    return item.product?.id || item.product?.ID || item.productId;
+  }
+
+  function getCartItemId(item) {
+    return item.id || item.ID;
+  }
+
+  // sincronizare cu backend
+  // const syncCartWithBackend = async (items) => {
+  //   if (!token || !items || items.length === 0) return;
+
+  //   const payload = {
+  //     items: items
+  //       .map((i) => ({ productId: getProductId(i), quantity: i.quantity }))
+  //       .filter((i) => i.productId && i.productId > 0),
+  //   };
+
+  //   try {
+  //     await fetch("http://localhost:8080/api/cart/sync", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(payload),
+  //     });
+  //   } catch (err) {
+  //     console.error("Eroare la sincronizarea coșului:", err);
+  //   }
+  // };
+
   useEffect(() => {
     async function loadCart() {
       setLoading(true);
 
-      if (token && user) {
-        // Utilizator autentificat - încărcăm coșul de pe server
-        try {
-          const res = await fetch("http://localhost:8080/api/cart", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+      // Dacă nu e token → golim coșul
+      if (!token) {
+        setCartItems([]);
+        setLoading(false);
+        return;
+      }
 
-          if (res.ok) {
-            const data = await res.json();
-            setCartItems(data);
-          } else {
-            console.error("Eroare la încărcarea coșului de pe server");
-            // Încercăm să încărcăm din localStorage ca fallback
-            loadFromLocalStorage();
+      // Încarcă localStorage
+      let localItems = [];
+      try {
+        const saved = localStorage.getItem("cart");
+        if (saved) localItems = JSON.parse(saved);
+      } catch (err) {
+        console.error("Eroare parsare localStorage:", err);
+      }
+
+      try {
+        // 1. Dacă există produse în localStorage, trimitem doar pe ele la backend
+        if (localItems.length > 0) {
+          for (const localItem of localItems) {
+            await fetch("http://localhost:8080/api/cart", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                productId: localItem.productId || localItem.product?.id,
+                quantity: localItem.quantity,
+              }),
+            });
           }
-        } catch (err) {
-          console.error("Eroare de rețea:", err);
-          loadFromLocalStorage();
+          localStorage.removeItem("cart");
         }
-      } else {
-        // Utilizator neautentificat - încărcăm doar din localStorage
-        loadFromLocalStorage();
+
+        // 2. Preluăm coșul complet de pe server
+        const res = await fetch("http://localhost:8080/api/cart", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const serverItems = res.ok ? await res.json() : [];
+
+        // 3. Setăm exact ce vine de la server
+        setCartItems(serverItems);
+      } catch (err) {
+        console.error("Eroare la încărcarea coșului de pe server:", err);
+        setCartItems(localItems);
       }
 
       setLoading(false);
     }
 
-    function loadFromLocalStorage() {
-      try {
-        const saved = localStorage.getItem("cart");
-        if (saved) {
-          setCartItems(JSON.parse(saved));
-        }
-      } catch (error) {
-        console.error("Eroare la parsarea coșului din localStorage:", error);
-        setCartItems([]);
-      }
-    }
-
     loadCart();
   }, [token, user]);
 
-  // Funcție pentru sincronizarea coșului cu backend-ul
-  const syncCartWithBackend = async (items) => {
-    if (!token) return;
-
-    try {
-      await fetch("http://localhost:8080/api/cart/sync", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ items }),
-      });
-    } catch (err) {
-      console.error("Eroare la sincronizarea coșului:", err);
-    }
-  };
-
-  // Adăugare produs
+  // Adaugare produs
   const addItem = async (product, quantity = 1) => {
+    if (!product || !quantity) return;
+
+    if (!token) {
+      // vizitator
+      const newItems = [...cartItems];
+      const existingIndex = newItems.findIndex(
+        (item) => getProductId(item) === (product.id || product.ID)
+      );
+
+      if (existingIndex !== -1) newItems[existingIndex].quantity += quantity;
+      else
+        newItems.push({
+          product,
+          productId: product.id || product.ID,
+          quantity,
+        });
+
+      setCartItems(newItems);
+      localStorage.setItem("cart", JSON.stringify(newItems));
+      return;
+    }
+
+    // utilizator logat
     try {
       const res = await fetch("http://localhost:8080/api/cart", {
         method: "POST",
@@ -102,13 +150,11 @@ export function CartProvider({ children }) {
       });
 
       if (!res.ok) {
-        console.error("Eroare la adăugarea produsului în coș:", res.status);
+        console.error("Eroare la adăugarea produsului:", res.status);
         return;
       }
 
       const newItem = await res.json();
-      // console.log("New cart item from backend:", newItem);
-
       setCartItems((prev) => {
         const existingIndex = prev.findIndex(
           (item) =>
@@ -117,68 +163,72 @@ export function CartProvider({ children }) {
         );
 
         if (existingIndex !== -1) {
-          // produs deja în coș → actualizează cantitatea
           const updated = [...prev];
-          updated[existingIndex].quantity += quantity;
+          // înlocuim cantitatea cu cea de la server, nu adăugăm din nou
+          updated[existingIndex].quantity = newItem.quantity;
           return updated;
         } else {
-          // produs nou
-          return [...prev, { ...newItem, quantity }];
+          return [...prev, newItem]; // deja are quantity de la server
         }
       });
     } catch (err) {
-      console.error("Eroare de rețea în addItem:", err);
+      console.error("Eroare rețea addItem:", err);
     }
   };
 
   // Ștergere produs
   const removeItem = async (id) => {
-    const newCartItems = cartItems.filter((item) => item.id !== id); // Schimbă item.ID în item.id
-    setCartItems(newCartItems);
-    localStorage.setItem("cart", JSON.stringify(newCartItems));
+    if (!token) {
+      const newCartItems = cartItems.filter(
+        (item) => getProductId(item) !== id
+      );
+      setCartItems(newCartItems);
+      localStorage.setItem("cart", JSON.stringify(newCartItems));
+      return;
+    }
 
-    if (token) {
-      try {
-        await fetch(`http://localhost:8080/api/cart/item/${id}`, {
-          // Folosește id
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } catch (err) {
-        console.error("Eroare la ștergerea din coșul de pe server:", err);
-      }
+    const newCartItems = cartItems.filter((item) => getCartItemId(item) !== id);
+    setCartItems(newCartItems);
+
+    try {
+      await fetch(`http://localhost:8080/api/cart/item/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.error("Eroare la ștergere server:", err);
     }
   };
 
   // Actualizare cantitate
   const updateQuantity = async (id, quantity) => {
-    // Schimbă numele parametrului din ID în id
     if (quantity < 1) return;
 
-    const newCartItems = cartItems.map(
-      (item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item // Schimbă item.ID în item.id
+    if (!token) {
+      const newCartItems = cartItems.map((item) =>
+        getProductId(item) === id ? { ...item, quantity } : item
+      );
+      setCartItems(newCartItems);
+      localStorage.setItem("cart", JSON.stringify(newCartItems));
+      return;
+    }
+
+    const newCartItems = cartItems.map((item) =>
+      getCartItemId(item) === id ? { ...item, quantity } : item
     );
-
     setCartItems(newCartItems);
-    localStorage.setItem("cart", JSON.stringify(newCartItems));
 
-    if (token) {
-      try {
-        await fetch(`http://localhost:8080/api/cart/item/${id}`, {
-          // Folosește id
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ quantity }),
-        });
-      } catch (err) {
-        console.error("Eroare la actualizarea cantității pe server:", err);
-      }
+    try {
+      await fetch(`http://localhost:8080/api/cart/item/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ quantity }),
+      });
+    } catch (err) {
+      console.error("Eroare la update server:", err);
     }
   };
 
@@ -191,32 +241,13 @@ export function CartProvider({ children }) {
       try {
         await fetch("http://localhost:8080/api/cart", {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
       } catch (err) {
-        console.error("Eroare la golirea coșului de pe server:", err);
+        console.error("Eroare la golire server:", err);
       }
     }
   };
-
-  // Efect pentru migrarea coșului când utilizatorul se autentifică
-  useEffect(() => {
-    if (token && user && cartItems.length > 0) {
-      // Migrăm coșul din localStorage către contul utilizatorului
-      const migrateCartToAccount = async () => {
-        try {
-          await syncCartWithBackend(cartItems);
-          console.log("Coș migrat cu succes către cont");
-        } catch (err) {
-          console.error("Eroare la migrarea coșului:", err);
-        }
-      };
-
-      migrateCartToAccount();
-    }
-  }, [token, user]);
 
   // Subtotal
   const cartSubtotal = cartItems.reduce(
@@ -238,6 +269,8 @@ export function CartProvider({ children }) {
         closeCart,
         isCartOpen,
         loading,
+        getProductId,
+        getCartItemId,
       }}
     >
       {children}

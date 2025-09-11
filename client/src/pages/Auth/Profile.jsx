@@ -65,8 +65,8 @@ export default function Profile() {
         <ul>
           {cartItems.map((item) => (
             <li key={item.ID}>
-              {item.Product?.name || "Unknown Product"} - {item.Quantity} x $
-              {item.Product?.price || 0}
+              {item.product?.name || "Unknown Product"} - {item.quantity} x{" "}
+              {item.product?.price || 0} MDL
             </li>
           ))}
         </ul>
@@ -81,7 +81,7 @@ export default function Profile() {
             <li key={order.ID}>
               Order #{order.ID} - {order.items?.length || 0} items - $
               {order.items?.reduce(
-                (total, i) => total + (i.Price || 0) * (i.Quantity || 0),
+                (total, i) => total + (i.price || 0) * (i.quantity || 0),
                 0
               )}
             </li>

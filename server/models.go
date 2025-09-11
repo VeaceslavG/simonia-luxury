@@ -45,7 +45,6 @@ type User struct {
 
 type CartItem struct {
 	gorm.Model
-	ID        uint    `json:"id" gorm:"primaryKey"`
 	UserID    uint    `json:"userId" gorm:"index;not null"`
 	ProductID uint    `json:"productId" gorm:"index;not null"`
 	Quantity  int     `json:"quantity"`

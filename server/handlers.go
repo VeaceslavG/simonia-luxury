@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -325,8 +324,8 @@ func syncCart(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
 		Items []struct {
-			ID       uint `json:"id"`
-			Quantity int  `json:"quantity"`
+			ProductID uint `json:"productId"`
+			Quantity  int  `json:"quantity"`
 		} `json:"items"`
 	}
 
@@ -341,13 +340,17 @@ func syncCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, item := range input.Items {
-		cartItem := CartItem{
-			UserID:    userID,
-			ProductID: item.ID,
-			Quantity:  item.Quantity,
-		}
-		if err := DB.Create(&cartItem).Error; err != nil {
-			log.Printf("Failed to add product %d to cart: %v", item.ID, err)
+		var existing CartItem
+		if err := DB.Where("user_id = ? AND product_id = ?", userID, item.ProductID).First(&existing).Error; err == nil {
+			existing.Quantity += item.Quantity
+			DB.Save(&existing)
+		} else {
+			cartItem := CartItem{
+				UserID:    userID,
+				ProductID: item.ProductID,
+				Quantity:  item.Quantity,
+			}
+			DB.Create(&cartItem)
 		}
 	}
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"strconv"
 )
 
@@ -51,6 +50,4 @@ func SeedProducts() {
 			DB.Create(&p)
 		}
 	}
-
-	log.Println("✅ Produsele au fost resetate și adăugate cu 8 produse per categorie")
 }

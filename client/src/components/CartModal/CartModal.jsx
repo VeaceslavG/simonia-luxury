@@ -12,6 +12,8 @@ export default function CartModal() {
     clearCart,
     isCartOpen,
     closeCart,
+    getCartItemId,
+    getProductId,
   } = useCart();
 
   const { user } = useAuth();
@@ -31,9 +33,11 @@ export default function CartModal() {
         ) : (
           <>
             <ul className="cartList">
-              {cartItems.map((item) => {
-                // Generează o cheie unică bazată pe item.id și userID (dacă există)
-                const uniqueKey = `cart-item-${item.id}-${item.ProductID}`;
+              {cartItems.map((item, index) => {
+                // Generează o cheie unică bazată pe cartItemId și userID (dacă există)
+                const cartItemId =
+                  getCartItemId(item) || getProductId(item) || index;
+                const uniqueKey = `cart-item-${cartItemId}`;
 
                 return (
                   <li key={uniqueKey} className="cartItem">
@@ -48,7 +52,7 @@ export default function CartModal() {
                         <button
                           className="quantityBtn"
                           onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
+                            updateQuantity(cartItemId, item.quantity - 1)
                           }
                           disabled={item.quantity <= 1}
                         >
@@ -61,7 +65,7 @@ export default function CartModal() {
                           value={item.quantity}
                           onChange={(e) =>
                             updateQuantity(
-                              item.id,
+                              cartItemId,
                               Math.max(1, parseInt(e.target.value) || 1)
                             )
                           }
@@ -71,7 +75,7 @@ export default function CartModal() {
                         <button
                           className="quantityBtn"
                           onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
+                            updateQuantity(cartItemId, item.quantity + 1)
                           }
                         >
                           +
@@ -79,7 +83,7 @@ export default function CartModal() {
                       </div>
                     </div>
                     <img
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(cartItemId)}
                       className="removeButton"
                       src={trashIcon}
                       alt="Delete"
