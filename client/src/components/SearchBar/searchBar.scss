@@ -33,7 +33,7 @@
       justify-content: center;
       height: 36px;
       padding: 0 1rem;
-      background-color: #3e5879;
+      background-color: variables.$primaryColor;
       color: #fff;
       border: none;
       border-radius: variables.$itemBorderRadius;
@@ -42,6 +42,11 @@
 
       &:hover {
         background-color: #2c3e5a;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      }
+
+      &:active {
+        transform: scale(0.98);
       }
 
       svg {

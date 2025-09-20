@@ -1,0 +1,218 @@
+@use "../../variables.scss" as variables;
+@use "../../mixins.scss" as mixins;
+
+// Login & Register
+.profileContainer {
+  @include mixins.contentContainer(50px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 550px;
+  gap: 30px;
+
+  .loginTitle, .registerTitle {
+    @include mixins.sectionTitle;
+    max-width: 500px;
+  }
+
+  .inputForm {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 25px;
+
+    .input {
+      @include mixins.inputForm;
+    }
+
+    .submitLogin, .submitRegister {
+      cursor: pointer;
+      padding: 12px;
+      border: none;
+      background-color: variables.$primaryColor;
+      color: #fff;
+      border-radius: variables.$itemBorderRadius;
+      transition: all 0.3s ease;
+      font-weight: 600px;
+      letter-spacing: 0.5px;
+
+      &:hover {
+        background-color: #2c3e5a;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+  }
+
+  // Don't have an account? Register && Already have an account? Login
+  p {
+    .registerLink, .loginLink {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: variables.$primaryColor;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.25s ease;
+
+      &:hover {
+        color: darken(variables.$primaryColor, 10%);
+        text-decoration: underline;
+      }
+    
+      &:active {
+        color: lighten(variables.$primaryColor, 5%);
+      }
+    }
+  }
+}
+
+// Profile Page
+.profilePageContainer {
+  @include mixins.contentContainer(50px);
+  max-width: 800px;
+  // margin: 0 auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: variables.$itemBorderRadius;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+
+  .profileTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: variables.$primaryColor;
+    text-align: center;
+  }
+
+  .sectionProfileTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: darken(variables.$primaryColor, 10%);
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid rgba(variables.$primaryColor, 0.15);
+    padding-bottom: 8px;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.6;
+
+    &.emptyMsg {
+      text-align: center;
+      color: #777;
+      font-style: italic;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      padding: 12px 16px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: variables.$itemBorderRadius;
+      margin-bottom: 10px;
+      background-color: #fafafa;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between; // important pentru trash icon
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: #f0f4f9;
+    }
+
+    .cartProfileItemLink {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #333;
+      flex: 1; // să ocupe tot spațiul disponibil
+    }
+
+    .productProfileImage {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: variables.$itemBorderRadius;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      margin-right: 12px;
+      background-color: #f8f8f8;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .removeCartItemBtn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      margin-left: 12px;
+      flex-shrink: 0;
+
+      img {
+        width: 22px;
+        height: 22px;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      &:hover img {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+
+  // Stil pentru informațiile de utilizator (nume/email)
+  .profileInfo{
+    font-weight: 500;
+    color: #333;
+    background: #f9f9f9;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  // Buton logout
+  button {
+    align-self: center;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 12px;
+    background-color: variables.$primaryColor;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.1s ease;
+
+    &:hover {
+      background-color: darken(variables.$primaryColor, 8%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}

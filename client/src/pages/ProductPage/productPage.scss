@@ -67,16 +67,24 @@
   }
 
   .addToCartBtn {
-    background: variables.$navBackgroundColor;
-    color: white;
-    border: none;
+    cursor: pointer;
     padding: 12px 24px;
     font-size: 1rem;
+    border: none;
+    background-color: variables.$primaryColor;
+    color: #fff;
     border-radius: variables.$itemBorderRadius;
-    transition: 0.3s ease;
+    transition: all 0.3s ease;
+    font-weight: 600px;
+    letter-spacing: 0.5px;
 
     &:hover {
-      opacity: .8;
+      background-color: #2c3e5a;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    &:active {
+      transform: scale(0.98);
     }
   }
 }

@@ -1,5 +1,19 @@
 @use "./variables.scss" as variables;
 
+@mixin inputForm() {
+  padding: 12px;
+  font-size: variables.$textSize;
+  border-radius: variables.$itemBorderRadius;
+  border: 1px solid #ccc;
+  transition: all 0.25s ease;
+
+  &:focus {
+    outline: none;
+    border-color: variables.$primaryColor;
+    box-shadow: 0 0 6px rgba(variables.$primaryColor, 0.5);
+  }
+}
+
 @mixin button($bg-color, $text-color) {
   padding: 12px 28px;
   border-radius: variables.$itemBorderRadius;

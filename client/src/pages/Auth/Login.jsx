@@ -2,15 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-export default function Login() {
+export default function Login({ children }) {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const res = await fetch("http://localhost:8080/api/login", {
@@ -30,30 +32,37 @@ export default function Login() {
     } catch (err) {
       alert(err.message);
     }
+
+    setLoading(false);
   }
 
   return (
-    <div className="p-4 max-w-sm mx-auto">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      <form onSubmit={handleLogin} className="flex flex-col gap-2">
-        <input
-          type="email"
-          placeholder="Email"
-          className="border p-2 rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="border p-2 rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit" className="bg-green-600 text-white py-2 rounded">
-          Login
-        </button>
-      </form>
-    </div>
+    <>
+      <div className="profileContainer">
+        <h2 className="loginTitle">Login</h2>
+        <form className="inputForm" onSubmit={handleLogin}>
+          <input
+            id="email"
+            type="email"
+            placeholder="E-mail"
+            className="emailLoginInput input"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            id="password"
+            type="password"
+            placeholder="Password"
+            className="passwordLoginInput input"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit" className="submitLogin">
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+        {children}
+      </div>
+    </>
   );
 }

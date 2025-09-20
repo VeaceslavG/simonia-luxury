@@ -1,42 +1,56 @@
 import { useState } from "react";
+import Nav from "../../components/Nav/Nav";
 import Login from "../Auth/Login";
 import Register from "../Auth/Register";
 import Profile from "../Auth/Profile";
+import Footer from "../../components/Footer/Footer";
 import { useAuth } from "../../context/AuthContext";
+import "./accountPage.scss";
 
 export default function AccountPage() {
   const { user } = useAuth();
   const [mode, setMode] = useState("login");
 
-  if (user) return <Profile />;
+  if (user) {
+    return (
+      <>
+        <Nav />
+        <Profile />
+        <Footer />
+      </>
+    );
+  }
 
   return (
-    <div className="p-4 max-w-md mx-auto">
+    <div>
       {mode === "login" ? (
         <>
-          <Login />
-          <p className="mt-4 text-center">
-            Don't have an account?{" "}
-            <span
-              className="text-blue-600 cursor-pointer"
-              onClick={() => setMode("register")}
-            >
-              Register
-            </span>
-          </p>
+          <Nav />
+          <Login>
+            <p>
+              Don't have an account?{" "}
+              <button
+                className="registerLink"
+                onClick={() => setMode("register")}
+              >
+                Register
+              </button>
+            </p>
+          </Login>
+          <Footer />
         </>
       ) : (
         <>
-          <Register />
-          <p className="mt-4 text-center">
-            Already have an account?{" "}
-            <span
-              className="text-blue-600 cursor-pointer"
-              onClick={() => setMode("login")}
-            >
-              Login
-            </span>
-          </p>
+          <Nav />
+          <Register>
+            <p>
+              Already have an account?{" "}
+              <button className="loginLink" onClick={() => setMode("login")}>
+                Login
+              </button>
+            </p>
+          </Register>
+          <Footer />
         </>
       )}
     </div>

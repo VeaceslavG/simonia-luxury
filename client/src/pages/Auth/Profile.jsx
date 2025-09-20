@@ -1,11 +1,15 @@
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import trashIcon from "../../assets/cartModal/trashIcon.png";
 
 export default function Profile() {
   const { user, token, logout } = useAuth();
   const [orders, setOrders] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { removeItem } = useCart();
 
   useEffect(() => {
     if (!token) {
@@ -49,52 +53,72 @@ export default function Profile() {
     fetchData();
   }, [token]);
 
-  if (loading) return <p className="text-center mt-4">Loading...</p>;
-  if (!user) return <p className="text-center mt-4">You are not logged in.</p>;
+  if (loading) return <p>Loading...</p>;
+  if (!user) return <p>You are not logged in.</p>;
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-2">My Profile</h2>
-      <p>Name: {user.Name}</p>
-      <p>Email: {user.Email}</p>
+    <>
+      <div className="profilePageContainer">
+        <h2 className="profileTitle">Profilul meu</h2>
+        <p className="profileInfo">Nume: {user.Name}</p>
+        <p className="profileInfo">Email: {user.Email}</p>
 
-      <h3 className="mt-4 font-semibold">My Cart</h3>
-      {cartItems.length === 0 ? (
-        <p>Cart is empty</p>
-      ) : (
-        <ul>
-          {cartItems.map((item) => (
-            <li key={item.ID}>
-              {item.product?.name || "Unknown Product"} - {item.quantity} x{" "}
-              {item.product?.price || 0} MDL
-            </li>
-          ))}
-        </ul>
-      )}
+        <h3 className="sectionProfileTitle">Coșul meu</h3>
+        {cartItems.length === 0 ? (
+          <p>Coșul este gol</p>
+        ) : (
+          <ul>
+            {cartItems.map((item) => (
+              <li key={item.ID}>
+                <Link
+                  to={`/product/${item.product?.ID}`}
+                  className="cartProfileItemLink"
+                >
+                  <img
+                    src={item.product?.image_url}
+                    alt={item.product?.name || "Product"}
+                    className="productProfileImage"
+                  />
+                  <span>
+                    {item.product?.name} - {item.quantity} x{" "}
+                    {item.product?.price} MDL
+                  </span>
+                </Link>
+                <button
+                  className="removeCartItemBtn"
+                  onClick={async () => {
+                    await removeItem(item.ID);
+                    setCartItems((prev) =>
+                      prev.filter((ci) => ci.ID !== item.ID)
+                    );
+                  }}
+                >
+                  <img src={trashIcon} alt="Remove" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <h3 className="mt-4 font-semibold">My Orders</h3>
-      {orders.length === 0 ? (
-        <p>No orders yet</p>
-      ) : (
-        <ul>
-          {orders.map((order) => (
-            <li key={order.ID}>
-              Order #{order.ID} - {order.items?.length || 0} items - $
-              {order.items?.reduce(
-                (total, i) => total + (i.price || 0) * (i.quantity || 0),
-                0
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+        <h3 className="sectionProfileTitle">Comenzile mele</h3>
+        {orders.length === 0 ? (
+          <p>Nu am comenzi</p>
+        ) : (
+          <ul>
+            {orders.map((order) => (
+              <li key={order.ID}>
+                Order #{order.ID} - {order.items?.length || 0} items - $
+                {order.items?.reduce(
+                  (total, i) => total + (i.price || 0) * (i.quantity || 0),
+                  0
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <button
-        onClick={logout}
-        className="bg-red-600 text-white py-2 px-4 rounded mt-4"
-      >
-        Logout
-      </button>
-    </div>
+        <button onClick={logout}>Logout</button>
+      </div>
+    </>
   );
 }
