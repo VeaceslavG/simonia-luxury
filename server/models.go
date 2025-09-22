@@ -15,7 +15,7 @@ type Product struct {
 
 type Order struct {
 	gorm.Model
-	UserID *uint       `json:"userId" gorm:"uniqueIndex:uid_pid"`
+	UserID *uint       `json:"userId"`
 	Name   string      `json:"name"`
 	Phone  string      `json:"phone"`
 	Email  string      `json:"email"`
@@ -38,7 +38,7 @@ type User struct {
 	gorm.Model
 	Email        string `gorm:"uniqueIndex"`
 	Name         string
-	PasswordHash string
+	PasswordHash string     `json:"-"`
 	Orders       []Order    `gorm:"foreignKey:UserID"`
 	CartItems    []CartItem `gorm:"foreignKey:UserID"`
 }

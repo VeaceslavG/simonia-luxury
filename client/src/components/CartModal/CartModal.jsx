@@ -2,6 +2,8 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./cartModal.scss";
 
 export default function CartModal() {
@@ -17,15 +19,51 @@ export default function CartModal() {
     getProductId,
   } = useCart();
 
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
 
-  function handleCheckout() {
+  async function handleCheckout() {
     if (!user) {
       navigate("/account");
       closeCart();
       return;
     }
+
+    console.log("Checkout data:", {
+      name: user?.Name,
+      email: user?.Email,
+      phone: user?.Phone,
+    });
+
+    fetch("http://localhost:8080/api/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        // dacă în `user` ai name/email/phone, trimite-le aici
+        name: user.Name || "Client logat",
+        email: user.Email,
+        phone: user.Phone || "",
+        notes: "", // fără note
+        items: cartItems.map((item) => ({
+          productId: item.product?.id || item.productId,
+          quantity: item.quantity,
+        })),
+      }),
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+      })
+      .then(() => {
+        clearCart();
+        toast.success("Comanda a fost trimisă!");
+      })
+      .catch((err) => {
+        toast.error("Eroare la trimiterea comenzii: " + err.message);
+      });
   }
 
   if (!isCartOpen) return null;

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -162,9 +163,21 @@ func SearchProducts(w http.ResponseWriter, r *http.Request) {
 
 // --- Cart ---
 func getUserOrders(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value(userIDKey).(uint)
+	userID, ok := r.Context().Value(userIDKey).(uint)
+	log.Println("UserID from context:", userID, ok)
+	if !ok {
+		http.Error(w, "Neautorizat", http.StatusUnauthorized)
+		return
+	}
 	var orders []Order
-	DB.Preload("Items.Product").Where("user_id = ?", userID).Find(&orders)
+	// DB.Preload("Items.Product").Where("user_id = ?", &userID).Find(&orders)
+	if err := DB.Preload("Items.Product").Where("user_id = ?", &userID).Find(&orders).Error; err != nil {
+		log.Println("Error fetching orders:", err)
+		http.Error(w, "Eroare la fetch orders", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Orders fetched for user %d: %+v\n", userID, orders)
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(orders)
 }
 
