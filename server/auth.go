@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -18,6 +19,7 @@ type registerReq struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Name     string `json:"name"`
+	Phone    string `json:"phone"`
 }
 
 type loginReq struct {
@@ -29,6 +31,7 @@ type safeUser struct {
 	ID    uint   `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
+	Phone string `json:"phone"`
 }
 
 type authResp struct {
@@ -50,6 +53,16 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if strings.TrimSpace(req.Phone) == "" {
+		httpError(w, http.StatusBadRequest, "Numărul de telefon este obligatoriu")
+		return
+	}
+
+	if !regexp.MustCompile(`^\+?[0-9]{8,15}$`).MatchString(req.Phone) {
+		httpError(w, http.StatusBadRequest, "Număr de telefon invalid")
+		return
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		httpError(w, http.StatusInternalServerError, "Eroare server")
@@ -59,6 +72,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	user := User{
 		Email:        req.Email,
 		Name:         req.Name,
+		Phone:        req.Phone,
 		PasswordHash: string(hash),
 	}
 
@@ -82,6 +96,7 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 			ID:    user.ID,
 			Email: user.Email,
 			Name:  user.Name,
+			Phone: user.Phone,
 		},
 		Token: token,
 	}
@@ -117,6 +132,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 			ID:    user.ID,
 			Email: user.Email,
 			Name:  user.Name,
+			Phone: user.Phone,
 		},
 		Token: token,
 	}

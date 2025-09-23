@@ -38,6 +38,7 @@ type User struct {
 	gorm.Model
 	Email        string `gorm:"uniqueIndex"`
 	Name         string
+	Phone        string     `gorm:"not null;default:''"`
 	PasswordHash string     `json:"-"`
 	Orders       []Order    `gorm:"foreignKey:UserID"`
 	CartItems    []CartItem `gorm:"foreignKey:UserID"`

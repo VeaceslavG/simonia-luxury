@@ -9,6 +9,7 @@ export default function Register({ children }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleRegister(e) {
@@ -19,7 +20,7 @@ export default function Register({ children }) {
       const res = await fetch("http://localhost:8080/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, name, phone }),
       });
 
       const data = await res.json();
@@ -60,6 +61,13 @@ export default function Register({ children }) {
             className="input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="tel"
+            placeholder="Phone"
+            className="input"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <input
             id="password"

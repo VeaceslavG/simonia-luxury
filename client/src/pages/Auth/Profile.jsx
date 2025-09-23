@@ -56,12 +56,15 @@ export default function Profile() {
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>You are not logged in.</p>;
 
+  console.log(user);
+
   return (
     <>
       <div className="profilePageContainer">
         <h2 className="profileTitle">Profilul meu</h2>
-        <p className="profileInfo">Nume: {user.Name}</p>
-        <p className="profileInfo">Email: {user.Email}</p>
+        <p className="profileInfo">Nume: {user?.Name}</p>
+        <p className="profileInfo">Email: {user?.Email}</p>
+        <p className="profileInfo">Phone: {user?.Phone}</p>
 
         <h3 className="sectionProfileTitle">Coșul meu</h3>
         {cartItems.length === 0 ? (
