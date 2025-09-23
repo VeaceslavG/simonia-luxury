@@ -6,10 +6,8 @@ import (
 
 // SeedProducts populates test products
 func SeedProducts() {
-	// Șterge mai întâi elementele din coș care referă produse
+	DB.Exec("DELETE FROM order_items")
 	DB.Exec("DELETE FROM cart_items")
-
-	// Apoi șterge produsele
 	DB.Exec("DELETE FROM products")
 
 	categories := map[string]Product{
