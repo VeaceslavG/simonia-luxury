@@ -36,12 +36,14 @@ type OrderItem struct {
 
 type User struct {
 	gorm.Model
-	Email        string `gorm:"uniqueIndex"`
-	Name         string
-	Phone        string     `gorm:"not null;default:''"`
-	PasswordHash string     `json:"-"`
-	Orders       []Order    `gorm:"foreignKey:UserID"`
-	CartItems    []CartItem `gorm:"foreignKey:UserID"`
+	Email             string `gorm:"uniqueIndex"`
+	Name              string
+	Phone             string     `gorm:"not null;default:''"`
+	PasswordHash      string     `json:"-"`
+	IsVerified        bool       `gorm:"default:false"`
+	VerificationToken string     `json:"-"`
+	Orders            []Order    `gorm:"foreignKey:UserID"`
+	CartItems         []CartItem `gorm:"foreignKey:UserID"`
 }
 
 type CartItem struct {

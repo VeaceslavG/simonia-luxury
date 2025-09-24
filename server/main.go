@@ -43,6 +43,7 @@ func main() {
 	r.Use(enableCORS)
 
 	// --- Auth ---
+	r.HandleFunc("/api/verify", handleVerify).Methods("GET", "OPTIONS")
 	r.HandleFunc("/api/register", handleRegister).Methods("POST", "OPTIONS")
 	r.HandleFunc("/api/login", handleLogin).Methods("POST", "OPTIONS")
 	r.Handle("/api/me", authMiddleware(http.HandlerFunc(handleMe))).Methods("GET", "OPTIONS")

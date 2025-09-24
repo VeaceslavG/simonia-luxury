@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -12,6 +16,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 // --- Structuri request/response ---
@@ -39,6 +44,14 @@ type authResp struct {
 	Token string   `json:"token"`
 }
 
+func generateToken() (string, error) {
+	b := make([]byte, 24)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
+}
+
 // --- Handlers ---
 func handleRegister(w http.ResponseWriter, r *http.Request) {
 	var req registerReq
@@ -63,44 +76,55 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// verificăm dacă email deja există
+	var exists User
+	if err := DB.Where("email = ?", req.Email).First(&exists).Error; err == nil {
+		httpError(w, http.StatusConflict, "Email deja folosit")
+		return
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		httpError(w, http.StatusInternalServerError, "Eroare server")
+		return
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		httpError(w, http.StatusInternalServerError, "Eroare server")
 		return
 	}
 
-	user := User{
-		Email:        req.Email,
-		Name:         req.Name,
-		Phone:        req.Phone,
-		PasswordHash: string(hash),
-	}
-
-	if err := DB.Create(&user).Error; err != nil {
-		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "UNIQUE") {
-			httpError(w, http.StatusConflict, "Email deja folosit")
-			return
-		}
-		httpError(w, http.StatusInternalServerError, "Eroare server")
-		return
-	}
-
-	token, err := issueToken(user.ID, user.Email)
+	token, err := generateToken()
 	if err != nil {
 		httpError(w, http.StatusInternalServerError, "Eroare server")
 		return
 	}
 
-	resp := authResp{
-		User: safeUser{
-			ID:    user.ID,
-			Email: user.Email,
-			Name:  user.Name,
-			Phone: user.Phone,
-		},
-		Token: token,
+	user := User{
+		Email:             req.Email,
+		Name:              req.Name,
+		Phone:             req.Phone,
+		PasswordHash:      string(hash),
+		IsVerified:        false,
+		VerificationToken: token,
 	}
-	okJSON(w, resp)
+
+	if err := DB.Create(&user).Error; err != nil {
+		httpError(w, http.StatusInternalServerError, "Eroare server")
+		return
+	}
+
+	// Trimitem e-mail-ul de confirmare
+	verifyURL := fmt.Sprintf("%s/api/verify?token=%s", getEnv("APP_BASE_URL", "http://localhost:8080"), token)
+	subject := "Confirmă-ți adresa de email"
+	body := fmt.Sprintf("Salut %s,\n\nTe rugăm să confirmi contul tău accesând linkul de mai jos:\n\n%s\n\nLinkul expiră în 24 ore.\n\nMulțumim!", user.Name, verifyURL)
+
+	if err := SendEmail(user.Email, subject, body); err != nil {
+		// nu opri flow-ul — arată mesaj, dar loghează eroarea
+		log.Println("Eroare trimitere email verificare:", err)
+	}
+
+	okJSON(w, map[string]string{
+		"message": "Cont creat. Verifică email-ul pentru confirmare.",
+	})
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -113,6 +137,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	var user User
 	if err := DB.Where("email = ?", strings.ToLower(req.Email)).First(&user).Error; err != nil {
 		httpError(w, http.StatusUnauthorized, "Credențiale invalide")
+		return
+	}
+
+	if !user.IsVerified {
+		httpError(w, http.StatusUnauthorized, "Please verify your email before logging in")
 		return
 	}
 

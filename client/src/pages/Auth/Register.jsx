@@ -11,10 +11,12 @@ export default function Register({ children }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function handleRegister(e) {
     e.preventDefault();
     setLoading(true);
+    setMessage("");
 
     try {
       const res = await fetch("http://localhost:8080/api/register", {
@@ -24,65 +26,74 @@ export default function Register({ children }) {
       });
 
       const data = await res.json();
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Registration failed");
+        throw new Error(data.error || "Registration failed");
       }
 
-      // data = { user: {id, email, name}, token: "JWT..." }
-      await login(data.user, data.token);
+      // Dacă serverul trimite mesaj că user-ul nu e verificat
+      if (data.message && data.message.includes("Verifică email")) {
+        setMessage(data.message);
+      } else if (data.user && data.token) {
+        // fallback: logare automată dacă server-ul nu returnează double opt-in
+        await login(data.user, data.token);
+        navigate("/account");
+      }
 
-      // redirect imediat la profil
-      navigate("/account");
+      // Reset form
+      setEmail("");
+      setPassword("");
+      setName("");
+      setPhone("");
     } catch (err) {
-      alert(err.message);
+      setMessage(err.message);
     }
 
     setLoading(false);
   }
 
   return (
-    <>
-      <div className="profileContainer">
-        <h2 className="registerTitle">Register</h2>
-        <form className="inputForm" onSubmit={handleRegister}>
-          <input
-            id="name"
-            type="text"
-            placeholder="Nume"
-            className="input"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            id="email"
-            type="email"
-            placeholder="Email"
-            className="input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="tel"
-            placeholder="Phone"
-            className="input"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          <input
-            id="password"
-            type="password"
-            placeholder="Password"
-            className="input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button className="submitRegister" type="submit">
-            {loading ? "Registering..." : "Register"}
-          </button>
-        </form>
-        {children}
-      </div>
-    </>
+    <div className="profileContainer">
+      <h2 className="registerTitle">Register</h2>
+      <form className="inputForm" onSubmit={handleRegister}>
+        <input
+          id="name"
+          type="text"
+          placeholder="Nume"
+          className="input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          className="input"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="tel"
+          placeholder="Phone"
+          className="input"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          className="input"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button className="submitRegister" type="submit">
+          {loading ? "Registering..." : "Register"}
+        </button>
+      </form>
+
+      {message && <p className="registerMessage">{message}</p>}
+      {children}
+    </div>
   );
 }
