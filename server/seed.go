@@ -2,14 +2,12 @@ package main
 
 import (
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 // SeedProducts populates test products
 func SeedProducts() {
-	DB.Exec("DELETE FROM order_items")
-	DB.Exec("DELETE FROM cart_items")
-	DB.Exec("DELETE FROM products")
-
 	categories := map[string]Product{
 		"Canapele": {
 			Name:        "Canapea Confort",
@@ -45,7 +43,12 @@ func SeedProducts() {
 		for i := 1; i <= 8; i++ {
 			p := template
 			p.Name = template.Name + " " + strconv.Itoa(i)
-			DB.Create(&p)
+
+			var existing Product
+			if err := DB.Where("name = ? AND category = ?", p.Name, p.Category).First(&existing).Error; err == gorm.ErrRecordNotFound {
+				DB.Create(&p)
+			}
 		}
 	}
+
 }

@@ -6,72 +6,66 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-async function fetchMe(token) {
-  const res = await fetch("http://localhost:8080/api/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Could not fetch user");
-  return await res.json();
-}
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
-  });
-
-  const [token, setToken] = useState(() => localStorage.getItem("authToken"));
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function login(userData, jwtToken) {
-    setToken(jwtToken);
+  async function login(userData) {
     setUser(userData);
-    localStorage.setItem("authToken", jwtToken);
-    localStorage.setItem("user", JSON.stringify(userData));
   }
 
-  function logout() {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
+  async function logout() {
+    try {
+      await fetch("http://localhost:8080/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      document.cookie = "guestCart=; path=/; max-age=0";
+      console.log("🚪 Logout - cleared guest cart cookie");
+    }
   }
 
   useEffect(() => {
-    // dacă nu avem token, nu încercăm să încărcăm user
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-
     async function loadUser() {
       try {
-        const userData = await fetchMe(token);
-        if (!cancelled) {
+        console.log("🔄 Loading user from /api/me...");
+        const res = await fetch("http://localhost:8080/api/me", {
+          credentials: "include",
+        });
+
+        console.log("📄 /api/me response status:", res.status);
+
+        if (res.ok) {
+          const userData = await res.json();
+          console.log("✅ User loaded:", userData);
           setUser(userData);
-          localStorage.setItem("user", JSON.stringify(userData));
+        } else {
+          console.log("❌ /api/me failed with status:", res.status);
+          setUser(null);
         }
       } catch (err) {
-        if (!cancelled) logout();
-        console.error(err);
+        console.error("🚨 Error loading user:", err);
+        setUser(null);
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
     }
-
     loadUser();
+  }, []);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [token]); // ← rulează la schimbarea token-ului
-
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div style={{ padding: "20px", textAlign: "center" }}>
+        <div>Loading authentication...</div>
+      </div>
+    );
+  }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

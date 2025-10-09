@@ -1,17 +1,21 @@
 module server
 
-go 1.23.2
+go 1.24.0
+
+toolchain go1.24.7
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/gorilla/mux v1.8.1
 	github.com/joho/godotenv v1.5.1
 	golang.org/x/crypto v0.31.0
+	golang.org/x/oauth2 v0.31.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.30.2
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.6.0 // indirect

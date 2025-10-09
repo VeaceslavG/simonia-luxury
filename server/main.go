@@ -26,6 +26,7 @@ func enableCORS(next http.Handler) http.Handler {
 }
 
 func main() {
+	godotenv.Load()
 	// Încarcă variabilele din .env
 	if err := godotenv.Load(); err != nil {
 		log.Println("⚠️ Nu am găsit .env, folosim valorile implicite")
@@ -46,7 +47,12 @@ func main() {
 	r.HandleFunc("/api/verify", handleVerify).Methods("GET", "OPTIONS")
 	r.HandleFunc("/api/register", handleRegister).Methods("POST", "OPTIONS")
 	r.HandleFunc("/api/login", handleLogin).Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/logout", handleLogout).Methods("POST")
 	r.Handle("/api/me", authMiddleware(http.HandlerFunc(handleMe))).Methods("GET", "OPTIONS")
+
+	// --- Google Auth ---
+	r.HandleFunc("/api/auth/google/login", handleGoogleLogin)
+	r.HandleFunc("/api/auth/google/callback", handleGoogleCallback)
 
 	// --- Cart & Orders (user-specific) ---
 	r.Handle("/api/cart", authMiddleware(http.HandlerFunc(getCart))).Methods("GET", "OPTIONS")

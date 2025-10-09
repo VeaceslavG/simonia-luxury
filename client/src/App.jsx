@@ -9,6 +9,7 @@ import { CartProvider } from "./context/CartContext";
 import CartModal from "./components/CartModal/CartModal";
 import Products from "./components/Products/Products";
 import SearchResults from "./components/SearchResults/SearchResults";
+import { useEffect } from "react";
 
 import { AuthProvider } from "./context/AuthContext";
 import Register from "./pages/Auth/Register";
@@ -16,10 +17,14 @@ import Login from "./pages/Auth/Login";
 import Profile from "./pages/Auth/Profile";
 import AccountPage from "./pages/AccountPage/AccountPage";
 
-//TODO: Specifying product dimensions at ProductPage
-//TODO: Selecting the color of the product in ProductPage
-
 function App() {
+  useEffect(() => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("cart");
+    localStorage.removeItem("guestCart");
+  }, []);
+
   return (
     <AuthProvider>
       <CartProvider>

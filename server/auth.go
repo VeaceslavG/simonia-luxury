@@ -134,27 +134,51 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("=== LOGIN ATTEMPT ===")
+	log.Println("Email:", req.Email)
+
 	var user User
 	if err := DB.Where("email = ?", strings.ToLower(req.Email)).First(&user).Error; err != nil {
+		log.Println("❌ User not found:", err)
 		httpError(w, http.StatusUnauthorized, "Credențiale invalide")
 		return
 	}
 
+	log.Println("✅ User found:", user.Email, "ID:", user.ID)
+
 	if !user.IsVerified {
+		log.Println("❌ User not verified")
 		httpError(w, http.StatusUnauthorized, "Please verify your email before logging in")
 		return
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)) != nil {
+		log.Println("❌ Invalid password")
 		httpError(w, http.StatusUnauthorized, "Credențiale invalide")
 		return
 	}
 
 	token, err := issueToken(user.ID, user.Email)
 	if err != nil {
+		log.Println("❌ Token generation error:", err)
 		httpError(w, http.StatusInternalServerError, "Eroare server")
 		return
 	}
+
+	log.Println("✅ Login successful, setting authToken cookie for user:", user.Email)
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "authToken",
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // true în producție cu HTTPS
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   24 * 60 * 60,
+	})
+
+	log.Println("🔄 Merging guest cart to user account...")
+	mergeGuestCartToUser(w, r, user.ID)
 
 	resp := authResp{
 		User: safeUser{
@@ -165,23 +189,58 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		},
 		Token: token,
 	}
+
+	log.Println("✅ Login response sent")
 	okJSON(w, resp)
 }
 
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	// șterge cookie-ul
+	http.SetCookie(w, &http.Cookie{
+		Name:     "authToken",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   false, // true doar la HTTPS
+		SameSite: http.SameSiteLaxMode,
+	})
+	okJSON(w, map[string]string{"message": "Logged out"})
+}
+
 func handleMe(w http.ResponseWriter, r *http.Request) {
+	log.Println("=== HANDLE ME CALLED ===")
+
 	userID, ok := r.Context().Value(userIDKey).(uint)
 	if !ok {
-		httpError(w, http.StatusUnauthorized, "token invalid")
+		log.Println("❌ handleMe: userID not found in context")
+		httpError(w, http.StatusUnauthorized, "userID not found in context")
 		return
 	}
 
+	log.Println("handleMe: userID from context:", userID)
+
 	var user User
 	if err := DB.First(&user, userID).Error; err != nil {
+		log.Println("❌ handleMe: user not found in DB:", err)
 		httpError(w, http.StatusUnauthorized, "user not found")
 		return
 	}
 
-	json.NewEncoder(w).Encode(user)
+	log.Println("✅ handleMe: user found:", user.Email)
+
+	safeUser := map[string]interface{}{
+		"id":         user.ID,
+		"email":      user.Email,
+		"name":       user.Name,
+		"phone":      user.Phone,
+		"googleId":   user.GoogleID,
+		"pictureUrl": user.PictureURL,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	log.Println("=== HANDLE ME SUCCESS ===")
+	json.NewEncoder(w).Encode(safeUser)
 }
 
 // --- JWT ---
@@ -199,34 +258,75 @@ func issueToken(userID uint, email string) (string, error) {
 // --- Middleware ---
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bearer := r.Header.Get("Authorization")
-		if bearer == "" || !strings.HasPrefix(bearer, "Bearer ") {
+		log.Println("=== AUTH MIDDLEWARE START ===")
+		log.Println("Request URL:", r.URL.Path)
+		log.Println("Request Method:", r.Method)
+
+		// log all cookies
+		for _, cookie := range r.Cookies() {
+			log.Printf("Cookie: %s = %s\n", cookie.Name, cookie.Value)
+		}
+
+		// citește token-ul din cookie
+		cookie, err := r.Cookie("authToken")
+		if err != nil {
+			log.Println("❌ No authToken cookie found:", err)
 			httpError(w, http.StatusUnauthorized, "Token lipsă")
 			return
 		}
 
-		tokenStr := strings.TrimPrefix(bearer, "Bearer ")
+		log.Println("✅ Found authToken cookie")
+		tokenStr := cookie.Value
+		log.Println("Token length:", len(tokenStr))
+
+		if tokenStr == "" {
+			log.Println("❌ authToken is empty")
+			httpError(w, http.StatusUnauthorized, "Token gol")
+			return
+		}
+
 		tkn, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 			if token.Method != jwt.SigningMethodHS256 {
+				log.Println("❌ Unexpected signing method:", token.Method)
 				return nil, errors.New("metodă de semnare neașteptată")
 			}
 			return []byte(getEnv("JWT_SECRET", "supersecret")), nil
 		})
 
-		if err != nil || !tkn.Valid {
-			httpError(w, http.StatusUnauthorized, "token invalid")
+		if err != nil {
+			log.Println("❌ Token parsing error:", err)
+			httpError(w, http.StatusUnauthorized, "Token parsing error: "+err.Error())
 			return
 		}
 
-		claims := tkn.Claims.(jwt.MapClaims)
+		if !tkn.Valid {
+			log.Println("❌ Token invalid")
+			httpError(w, http.StatusUnauthorized, "Token invalid")
+			return
+		}
+
+		claims, ok := tkn.Claims.(jwt.MapClaims)
+		if !ok {
+			log.Println("❌ Invalid token claims")
+			httpError(w, http.StatusUnauthorized, "Invalid token claims")
+			return
+		}
+
+		log.Println("✅ Token claims:", claims)
+
 		idFloat, ok := claims["sub"].(float64)
 		if !ok {
-			httpError(w, http.StatusUnauthorized, "token invalid")
+			log.Println("❌ Invalid sub claim in token")
+			httpError(w, http.StatusUnauthorized, "Token invalid")
 			return
 		}
+
 		userID := uint(idFloat)
 
+		log.Println("✅ User authenticated, ID:", userID)
+
 		ctx := context.WithValue(r.Context(), userIDKey, userID)
+		log.Println("=== AUTH MIDDLEWARE END ===")
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

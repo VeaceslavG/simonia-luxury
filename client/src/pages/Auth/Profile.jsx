@@ -1,38 +1,61 @@
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
 
 export default function Profile() {
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const [orders, setOrders] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { removeItem } = useCart();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate("/");
+    window.location.reload();
+  }
 
   useEffect(() => {
-    if (!token) {
+    if (!user) {
       setLoading(false);
       return;
     }
 
     async function fetchData() {
       try {
+        setError(null);
         const [ordersRes, cartRes] = await Promise.all([
           fetch("http://localhost:8080/api/orders", {
-            headers: { Authorization: `Bearer ${token}` },
+            method: "GET",
+            credentials: "include",
           }),
           fetch("http://localhost:8080/api/cart", {
-            headers: { Authorization: `Bearer ${token}` },
+            method: "GET",
+            credentials: "include",
           }),
         ]);
 
-        console.log("Orders response:", ordersRes);
-        console.log("Cart response:", cartRes);
+        console.log("Orders response:", ordersRes.status);
+        console.log("Cart response:", cartRes.status);
 
-        if (!ordersRes.ok) throw new Error("Orders fetch failed");
-        if (!cartRes.ok) throw new Error("Cart fetch failed");
+        // Verifică dacă răspunsurile sunt OK
+        if (!ordersRes.ok) {
+          if (ordersRes.status === 401) {
+            throw new Error("Nu ești autentificat");
+          }
+          throw new Error(`Eroare orders: ${ordersRes.status}`);
+        }
+
+        if (!cartRes.ok) {
+          if (cartRes.status === 401) {
+            throw new Error("Nu ești autentificat pentru a vedea coșul");
+          }
+          throw new Error(`Eroare cart: ${cartRes.status}`);
+        }
 
         const ordersData = await ordersRes.json();
         const cartData = await cartRes.json();
@@ -44,27 +67,37 @@ export default function Profile() {
         setCartItems(cartData);
       } catch (err) {
         console.error("Error fetching profile data", err);
-        console.error(err.message);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-  }, [token]);
+  }, [user]);
+
+  const handleRemoveItem = async (itemId) => {
+    try {
+      await removeItem(itemId);
+      setCartItems((prev) => prev.filter((ci) => ci.ID !== itemId));
+    } catch (err) {
+      console.error("Error removing item:", err);
+      setError("Eroare la ștergerea produsului");
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>You are not logged in.</p>;
-
-  console.log(user);
 
   return (
     <>
       <div className="profilePageContainer">
         <h2 className="profileTitle">Profilul meu</h2>
-        <p className="profileInfo">Nume: {user?.Name}</p>
-        <p className="profileInfo">Email: {user?.Email}</p>
-        <p className="profileInfo">Phone: {user?.Phone}</p>
+        {error && <p className="error-message">Eroare: {error}</p>}
+
+        <p className="profileInfo">Nume: {user?.name}</p>
+        <p className="profileInfo">Email: {user?.email}</p>
+        <p className="profileInfo">Phone: {user?.phone}</p>
 
         <h3 className="sectionProfileTitle">Coșul meu</h3>
         {cartItems.length === 0 ? (
@@ -89,12 +122,7 @@ export default function Profile() {
                 </Link>
                 <button
                   className="removeCartItemBtn"
-                  onClick={async () => {
-                    await removeItem(item.ID);
-                    setCartItems((prev) =>
-                      prev.filter((ci) => ci.ID !== item.ID)
-                    );
-                  }}
+                  onClick={() => handleRemoveItem(item.ID)}
                 >
                   <img src={trashIcon} alt="Remove" />
                 </button>
@@ -120,7 +148,7 @@ export default function Profile() {
           </ul>
         )}
 
-        <button onClick={logout}>Logout</button>
+        <button onClick={handleLogout}>Logout</button>
       </div>
     </>
   );

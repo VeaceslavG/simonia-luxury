@@ -42,6 +42,8 @@ type User struct {
 	PasswordHash      string     `json:"-"`
 	IsVerified        bool       `gorm:"default:false"`
 	VerificationToken string     `json:"-"`
+	GoogleID          string     `json:"googleId" gorm:"column:google_id"`
+	PictureURL        string     `json:"pictureUrl" gorm:"column:picture_url"`
 	Orders            []Order    `gorm:"foreignKey:UserID"`
 	CartItems         []CartItem `gorm:"foreignKey:UserID"`
 }

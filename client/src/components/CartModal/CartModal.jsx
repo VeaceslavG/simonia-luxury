@@ -19,7 +19,7 @@ export default function CartModal() {
     getProductId,
   } = useCart();
 
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   async function handleCheckout() {
@@ -30,25 +30,24 @@ export default function CartModal() {
     }
 
     console.log("Checkout data:", {
-      name: user?.Name,
-      email: user?.Email,
-      phone: user?.Phone,
+      name: user?.name,
+      email: user?.email,
+      phone: user?.phone,
     });
 
     fetch("http://localhost:8080/api/orders", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        // dacă în `user` ai name/email/phone, trimite-le aici
-        name: user.Name || "Client logat",
-        email: user.Email,
-        phone: user.Phone || "",
-        notes: "", // fără note
+        name: user.name || "Client logat",
+        email: user.email,
+        phone: user.phone || "",
+        notes: "",
         items: cartItems.map((item) => ({
-          productId: item.product?.id || item.productId,
+          productId: item.product?.ID || item.product?.id || item.productId,
           quantity: item.quantity,
         })),
       }),
@@ -82,20 +81,32 @@ export default function CartModal() {
           <>
             <ul className="cartList">
               {cartItems.map((item, index) => {
-                // Generează o cheie unică bazată pe cartItemId și userID (dacă există)
                 const cartItemId =
-                  getCartItemId(item) || getProductId(item) || index;
+                  getCartItemId(item) ||
+                  getProductId(item) ||
+                  item.tempId ||
+                  index;
                 const uniqueKey = `cart-item-${cartItemId}`;
+
+                // Fallback pentru imagine și nume
+                const productImage =
+                  item.product?.image_url || "/default-image.jpg";
+                const productName =
+                  item.product?.name || `Produs #${item.productId}`;
+                const productPrice = item.product?.price || 0;
 
                 return (
                   <li key={uniqueKey} className="cartItem">
                     <img
-                      src={item.product?.image_url || "/default-image.jpg"}
-                      alt={item.product?.name}
+                      src={productImage}
+                      alt={productName}
+                      onError={(e) => {
+                        e.target.src = "/default-image.jpg";
+                      }}
                     />
                     <div className="cartItemDetails">
-                      <h5>{item.product?.name || "Produs fără nume"}</h5>
-                      <p>{item.product?.price || 0} MDL</p>
+                      <h5>{productName}</h5>
+                      <p>{productPrice} MDL</p>
                       <div className="quantityContainer">
                         <button
                           className="quantityBtn"

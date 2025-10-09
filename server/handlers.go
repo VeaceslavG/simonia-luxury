@@ -197,53 +197,36 @@ func addToCart(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	if input.ProductID == 0 || input.Quantity < 1 {
-		http.Error(w, "productId sau quantity invalid", http.StatusBadRequest)
+
+	// Guest -> Cookies
+	if !ok {
+		items, _ := getGuestCart(r)
+		updated := false
+		for i, it := range items {
+			if it.ProductID == input.ProductID {
+				items[i].Quantity += input.Quantity
+				updated = true
+			}
+		}
+		if !updated {
+			items = append(items, GuestCartItem{ProductID: input.ProductID, Quantity: input.Quantity})
+		}
+		saveGuestCart(w, items)
+		json.NewEncoder(w).Encode(items)
 		return
 	}
 
-	var prod Product
-	if err := DB.First(&prod, input.ProductID).Error; err != nil {
-		http.Error(w, "Produsul nu exsta", http.StatusBadRequest)
-		return
-	}
-
+	// Logged-in -> DB
 	var item CartItem
 	err := DB.Where("user_id = ? AND product_id = ?", userID, input.ProductID).First(&item).Error
-
-	switch {
-	case errors.Is(err, gorm.ErrRecordNotFound):
-		// 4a) NU există → creează unul nou
-		item = CartItem{
-			UserID:    userID,
-			ProductID: input.ProductID,
-			Quantity:  input.Quantity,
-		}
-		if err := DB.Create(&item).Error; err != nil {
-			http.Error(w, "DB error (create)", http.StatusInternalServerError)
-			return
-		}
-
-	case err == nil:
-		// 4b) EXISTĂ → incrementăm cantitatea
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		item = CartItem{UserID: userID, ProductID: input.ProductID, Quantity: input.Quantity}
+		DB.Create(&item)
+	} else {
 		item.Quantity += input.Quantity
-		if err := DB.Save(&item).Error; err != nil {
-			http.Error(w, "DB error (update)", http.StatusInternalServerError)
-			return
-		}
-
-	default:
-		http.Error(w, "DB error (find)", http.StatusInternalServerError)
-		return
+		DB.Save(&item)
 	}
-
-	// Preload Product pentru a avea toate detaliile
-	if err := DB.Preload("Product").First(&item, item.ID).Error; err != nil {
-		http.Error(w, "Failed to load product", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
+	DB.Preload("Product").First(&item, item.ID)
 	json.NewEncoder(w).Encode(item)
 }
 
@@ -297,34 +280,42 @@ func updateCartItem(w http.ResponseWriter, r *http.Request) {
 
 func removeCartItem(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(userIDKey).(uint)
-	if !ok {
-		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
-		return
-	}
-
 	vars := mux.Vars(r)
 	itemID := vars["id"]
 
+	if !ok {
+		// Guest mode → remove from cookie
+		productID, _ := strconv.Atoi(itemID)
+		items, _ := getGuestCart(r)
+		newItems := []GuestCartItem{}
+		for _, it := range items {
+			if int(it.ProductID) != productID {
+				newItems = append(newItems, it)
+			}
+		}
+		saveGuestCart(w, newItems)
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	// Logged-in → DB
 	if err := DB.Where("id = ? AND user_id = ?", itemID, userID).Delete(&CartItem{}).Error; err != nil {
 		http.Error(w, "Failed to remove item from cart", http.StatusInternalServerError)
 		return
 	}
-
 	w.WriteHeader(http.StatusNoContent)
 }
 
 func clearCart(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(userIDKey).(uint)
+
 	if !ok {
-		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
+		saveGuestCart(w, []GuestCartItem{})
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	if err := DB.Where("user_id = ?", userID).Delete(&CartItem{}).Error; err != nil {
-		http.Error(w, "Failed to clear cart", http.StatusInternalServerError)
-		return
-	}
-
+	DB.Where("user_id = ?", userID).Delete(&CartItem{})
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -373,18 +364,88 @@ func syncCart(w http.ResponseWriter, r *http.Request) {
 
 func getCart(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(userIDKey).(uint)
-	if !ok {
-		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
+	if ok {
+		// Logged-in -> DB
+		var cartItems []CartItem
+		if err := DB.Preload("Product").Where("user_id = ?", userID).Find(&cartItems).Error; err != nil {
+			http.Error(w, "Failed to fetch cart", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(cartItems)
 		return
 	}
 
-	var cartItems []CartItem
-	DB.Preload("Product").Where("user_id = ?", userID).Find(&cartItems)
-	if err := DB.Preload("Product").Where("user_id = ?", userID).Find(&cartItems).Error; err != nil {
-		http.Error(w, "Failed to fetch cart", http.StatusInternalServerError)
-		return
+	// Guest -> Cookie
+	items, _ := getGuestCart(r)
+	var result []map[string]interface{}
+	for _, it := range items {
+		var prod Product
+		if err := DB.First(&prod, it.ProductID).Error; err == nil {
+			result = append(result, map[string]interface{}{
+				"ID":       it.ProductID,
+				"product":  prod,
+				"quantity": it.Quantity,
+			})
+		}
 	}
-
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(cartItems)
+	json.NewEncoder(w).Encode(result)
+}
+
+func mergeGuestCartToUser(w http.ResponseWriter, r *http.Request, userID uint) {
+	log.Println("🔄 mergeGuestCartToUser called for user:", userID)
+
+	items, err := getGuestCart(r)
+	if err != nil {
+		log.Println("❌ Error getting guest cart:", err)
+		return
+	}
+
+	log.Printf("📦 Found %d items in guest cart", len(items))
+
+	if len(items) == 0 {
+		log.Println("ℹ️ No guest cart items to merge")
+		return
+	}
+
+	for i, it := range items {
+		log.Printf("🔄 Processing guest item %d: ProductID=%d, Quantity=%d", i, it.ProductID, it.Quantity)
+
+		// Verifică dacă produsul există
+		var product Product
+		if err := DB.First(&product, it.ProductID).Error; err != nil {
+			log.Printf("❌ Product %d not found, skipping", it.ProductID)
+			continue
+		}
+
+		var existing CartItem
+		if err := DB.Where("user_id = ? AND product_id = ?", userID, it.ProductID).First(&existing).Error; err == nil {
+			// Item existent - actualizează cantitatea
+			oldQuantity := existing.Quantity
+			existing.Quantity += it.Quantity
+			if err := DB.Save(&existing).Error; err != nil {
+				log.Println("❌ Error updating existing cart item:", err)
+			} else {
+				log.Printf("✅ Updated existing item: product %d, quantity %d -> %d",
+					it.ProductID, oldQuantity, existing.Quantity)
+			}
+		} else {
+			// Item nou - creează
+			cartItem := CartItem{
+				UserID:    userID,
+				ProductID: it.ProductID,
+				Quantity:  it.Quantity,
+			}
+			if err := DB.Create(&cartItem).Error; err != nil {
+				log.Println("❌ Error creating new cart item:", err)
+			} else {
+				log.Printf("✅ Created new item: product %d, quantity %d", it.ProductID, it.Quantity)
+			}
+		}
+	}
+
+	// Curăță cookie-ul guest cart
+	saveGuestCart(w, []GuestCartItem{})
+	log.Println("✅ Guest cart merged and cleared")
 }

@@ -8,7 +8,7 @@ export default function LogOrRegister({ accIcon }) {
 
   return (
     <div className="accountManagement" onClick={() => navigate("/account")}>
-      {user && <span className="userName ml-2 me-2">{user.Name}</span>}
+      {user && <span className="userName ml-2 me-2">{user?.name}</span>}
       <img className="accIcon" src={accIcon} alt="" />
     </div>
   );
