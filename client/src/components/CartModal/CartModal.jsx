@@ -81,12 +81,10 @@ export default function CartModal() {
           <>
             <ul className="cartList">
               {cartItems.map((item, index) => {
-                const cartItemId =
-                  getCartItemId(item) ||
-                  getProductId(item) ||
-                  item.tempId ||
-                  index;
-                const uniqueKey = `cart-item-${cartItemId}`;
+                const realItemId = getCartItemId(item); // item.ID din database
+                const displayId =
+                  realItemId || getProductId(item) || item.tempId || index;
+                const uniqueKey = `cart-item-${displayId}`;
 
                 // Fallback pentru imagine și nume
                 const productImage =
@@ -111,7 +109,7 @@ export default function CartModal() {
                         <button
                           className="quantityBtn"
                           onClick={() =>
-                            updateQuantity(cartItemId, item.quantity - 1)
+                            updateQuantity(realItemId, item.quantity - 1)
                           }
                           disabled={item.quantity <= 1}
                         >
@@ -124,7 +122,7 @@ export default function CartModal() {
                           value={item.quantity}
                           onChange={(e) =>
                             updateQuantity(
-                              cartItemId,
+                              realItemId,
                               Math.max(1, parseInt(e.target.value) || 1)
                             )
                           }
@@ -134,7 +132,7 @@ export default function CartModal() {
                         <button
                           className="quantityBtn"
                           onClick={() =>
-                            updateQuantity(cartItemId, item.quantity + 1)
+                            updateQuantity(realItemId, item.quantity + 1)
                           }
                         >
                           +
@@ -142,7 +140,7 @@ export default function CartModal() {
                       </div>
                     </div>
                     <img
-                      onClick={() => removeItem(cartItemId)}
+                      onClick={() => removeItem(realItemId)}
                       className="removeButton"
                       src={trashIcon}
                       alt="Delete"

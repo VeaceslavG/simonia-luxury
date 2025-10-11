@@ -272,6 +272,11 @@ export function CartProvider({ children }) {
       });
       console.log("👤✅ Item removed from server");
       setCartVersion((prev) => prev + 1);
+
+      const newCartItems = cartItems.filter(
+        (item) => getCartItemId(item) !== id
+      );
+      setCartItems(newCartItems);
     } catch (err) {
       console.error("❌ Eroare la ștergere server:", err);
     }

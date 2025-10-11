@@ -6,11 +6,10 @@ import trashIcon from "../../assets/cartModal/trashIcon.png";
 
 export default function Profile() {
   const { user, logout } = useAuth();
+  const { cartItems, removeItem } = useCart();
   const [orders, setOrders] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { removeItem } = useCart();
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -43,19 +42,8 @@ export default function Profile() {
         console.log("Cart response:", cartRes.status);
 
         // Verifică dacă răspunsurile sunt OK
-        if (!ordersRes.ok) {
-          if (ordersRes.status === 401) {
-            throw new Error("Nu ești autentificat");
-          }
-          throw new Error(`Eroare orders: ${ordersRes.status}`);
-        }
-
-        if (!cartRes.ok) {
-          if (cartRes.status === 401) {
-            throw new Error("Nu ești autentificat pentru a vedea coșul");
-          }
-          throw new Error(`Eroare cart: ${cartRes.status}`);
-        }
+        if (!ordersRes.ok) throw new Error("Orders fetch failed");
+        if (!cartRes.ok) throw new Error("Cart fetch failed");
 
         const ordersData = await ordersRes.json();
         const cartData = await cartRes.json();
@@ -64,7 +52,6 @@ export default function Profile() {
         console.log("Cart fetched:", cartData);
 
         setOrders(ordersData);
-        setCartItems(cartData);
       } catch (err) {
         console.error("Error fetching profile data", err);
         setError(err.message);
@@ -79,7 +66,6 @@ export default function Profile() {
   const handleRemoveItem = async (itemId) => {
     try {
       await removeItem(itemId);
-      setCartItems((prev) => prev.filter((ci) => ci.ID !== itemId));
     } catch (err) {
       console.error("Error removing item:", err);
       setError("Eroare la ștergerea produsului");
