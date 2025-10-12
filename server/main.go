@@ -34,6 +34,7 @@ func main() {
 
 	// Conectare DB
 	ConnectDB()
+	// DB.Migrator().DropTable(&OrderItem{}, &Order{}, &CartItem{}, &Product{}, &User{})
 	DB.AutoMigrate(&Product{}, &Order{}, &OrderItem{}, &User{}, &CartItem{})
 
 	// Populează produse de test
@@ -54,11 +55,14 @@ func main() {
 	r.HandleFunc("/api/auth/google/login", handleGoogleLogin)
 	r.HandleFunc("/api/auth/google/callback", handleGoogleCallback)
 
-	// --- Cart & Orders (user-specific) ---
-	r.Handle("/api/cart", authMiddleware(http.HandlerFunc(getCart))).Methods("GET", "OPTIONS")
-	r.Handle("/api/orders", authMiddleware(http.HandlerFunc(getUserOrders))).Methods("GET", "OPTIONS")
-	r.HandleFunc("/api/orders", createOrder).Methods("POST")
-	// r.HandleFunc("/api/orders/all", getAllOrders).Methods("GET")
+	// --- Cart & Orders ---
+	// GET orders (necesită autentificare)
+	r.Handle("/api/orders", authMiddleware(requireAuth(http.HandlerFunc(getUserOrders)))).Methods("GET", "OPTIONS")
+	// POST orders (poate fi și pentru utilizatori anonimi)
+	r.Handle("/api/orders", authMiddleware(http.HandlerFunc(createOrder))).Methods("POST", "OPTIONS")
+
+	// --- Debug ---
+	r.HandleFunc("/api/debug/orders", getAllOrders).Methods("GET")
 
 	// --- Produse ---
 	r.HandleFunc("/api/products", createProduct).Methods("POST")
@@ -67,10 +71,11 @@ func main() {
 	r.HandleFunc("/api/products/{id}", GetProductByID).Methods("GET")
 
 	// --- Cart Endpoints ---
+	r.Handle("/api/cart", authMiddleware(http.HandlerFunc(getCart))).Methods("GET", "OPTIONS")
 	r.Handle("/api/cart", authMiddleware(http.HandlerFunc(addToCart))).Methods("POST", "OPTIONS")
+	r.Handle("/api/cart", authMiddleware(http.HandlerFunc(clearCart))).Methods("DELETE", "OPTIONS")
 	r.Handle("/api/cart/item/{id}", authMiddleware(http.HandlerFunc(updateCartItem))).Methods("PUT", "OPTIONS")
 	r.Handle("/api/cart/item/{id}", authMiddleware(http.HandlerFunc(removeCartItem))).Methods("DELETE", "OPTIONS")
-	r.Handle("/api/cart", authMiddleware(http.HandlerFunc(clearCart))).Methods("DELETE", "OPTIONS")
 	r.Handle("/api/cart/sync", authMiddleware(http.HandlerFunc(syncCart))).Methods("POST", "OPTIONS")
 
 	// --- Search ---

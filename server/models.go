@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -15,14 +17,16 @@ type Product struct {
 
 type Order struct {
 	gorm.Model
-	UserID *uint       `json:"userId"`
-	Name   string      `json:"name"`
-	Phone  string      `json:"phone"`
-	Email  string      `json:"email"`
-	Notes  string      `json:"notes"`
-	Status string      `json:"status" gorm:"default:pending"`
-	Total  float64     `json:"total"`
-	Items  []OrderItem `json:"items" gorm:"foreignKey:OrderID"`
+	UserID    *uint       `json:"userId"`
+	CreatedAt time.Time   `json:"CreatedAt"`
+	UpdatedAt time.Time   `json:"UpdatedAt"`
+	Name      string      `json:"name"`
+	Phone     string      `json:"phone"`
+	Email     string      `json:"email"`
+	Notes     string      `json:"notes"`
+	Status    string      `json:"status" gorm:"default:pending"`
+	Total     float64     `json:"total"`
+	Items     []OrderItem `json:"items" gorm:"foreignKey:OrderID"`
 }
 
 type OrderItem struct {
@@ -50,8 +54,8 @@ type User struct {
 
 type CartItem struct {
 	gorm.Model
-	UserID    uint    `json:"userId" gorm:"index;not null"`
-	ProductID uint    `json:"productId" gorm:"index;not null"`
+	UserID    uint    `json:"userId" gorm:"index"`
+	ProductID uint    `json:"productId" gorm:"index"`
 	Quantity  int     `json:"quantity"`
 	Product   Product `json:"product" gorm:"foreignKey:ProductID"`
 }

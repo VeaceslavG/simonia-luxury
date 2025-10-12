@@ -262,16 +262,17 @@ func authMiddleware(next http.Handler) http.Handler {
 		log.Println("Request URL:", r.URL.Path)
 		log.Println("Request Method:", r.Method)
 
-		// log all cookies
+		// Log all cookies for debugging
 		for _, cookie := range r.Cookies() {
 			log.Printf("Cookie: %s = %s\n", cookie.Name, cookie.Value)
 		}
 
-		// citește token-ul din cookie
+		// Încearcă să citești token-ul din cookie
 		cookie, err := r.Cookie("authToken")
 		if err != nil {
-			log.Println("❌ No authToken cookie found:", err)
-			httpError(w, http.StatusUnauthorized, "Token lipsă")
+			log.Println("ℹ️ No authToken cookie found - anonymous user")
+			// NU returna eroare, doar treci mai departe fără userID
+			next.ServeHTTP(w, r)
 			return
 		}
 
@@ -280,11 +281,12 @@ func authMiddleware(next http.Handler) http.Handler {
 		log.Println("Token length:", len(tokenStr))
 
 		if tokenStr == "" {
-			log.Println("❌ authToken is empty")
-			httpError(w, http.StatusUnauthorized, "Token gol")
+			log.Println("ℹ️ authToken is empty - anonymous user")
+			next.ServeHTTP(w, r)
 			return
 		}
 
+		// Parsează token-ul
 		tkn, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 			if token.Method != jwt.SigningMethodHS256 {
 				log.Println("❌ Unexpected signing method:", token.Method)
@@ -295,20 +297,36 @@ func authMiddleware(next http.Handler) http.Handler {
 
 		if err != nil {
 			log.Println("❌ Token parsing error:", err)
-			httpError(w, http.StatusUnauthorized, "Token parsing error: "+err.Error())
+			// Șterge cookie-ul invalid
+			http.SetCookie(w, &http.Cookie{
+				Name:     "authToken",
+				Value:    "",
+				Path:     "/",
+				MaxAge:   -1,
+				HttpOnly: true,
+			})
+			next.ServeHTTP(w, r)
 			return
 		}
 
 		if !tkn.Valid {
 			log.Println("❌ Token invalid")
-			httpError(w, http.StatusUnauthorized, "Token invalid")
+			// Șterge cookie-ul invalid
+			http.SetCookie(w, &http.Cookie{
+				Name:     "authToken",
+				Value:    "",
+				Path:     "/",
+				MaxAge:   -1,
+				HttpOnly: true,
+			})
+			next.ServeHTTP(w, r)
 			return
 		}
 
 		claims, ok := tkn.Claims.(jwt.MapClaims)
 		if !ok {
 			log.Println("❌ Invalid token claims")
-			httpError(w, http.StatusUnauthorized, "Invalid token claims")
+			next.ServeHTTP(w, r)
 			return
 		}
 
@@ -317,17 +335,30 @@ func authMiddleware(next http.Handler) http.Handler {
 		idFloat, ok := claims["sub"].(float64)
 		if !ok {
 			log.Println("❌ Invalid sub claim in token")
-			httpError(w, http.StatusUnauthorized, "Token invalid")
+			next.ServeHTTP(w, r)
 			return
 		}
 
 		userID := uint(idFloat)
-
 		log.Println("✅ User authenticated, ID:", userID)
 
+		// Adaugă userID-ul în context
 		ctx := context.WithValue(r.Context(), userIDKey, userID)
 		log.Println("=== AUTH MIDDLEWARE END ===")
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func requireAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID, ok := r.Context().Value(userIDKey).(uint)
+		if !ok || userID == 0 {
+			log.Println("🚫 Access denied - authentication required for:", r.URL.Path)
+			httpError(w, http.StatusUnauthorized, "Autentificare necesară")
+			return
+		}
+		log.Printf("✅ User %d accessing protected route: %s", userID, r.URL.Path)
+		next.ServeHTTP(w, r)
 	})
 }
 

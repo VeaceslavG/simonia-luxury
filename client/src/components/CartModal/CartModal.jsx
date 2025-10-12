@@ -28,41 +28,49 @@ export default function CartModal() {
       closeCart();
       return;
     }
-
     console.log("Checkout data:", {
       name: user?.name,
       email: user?.email,
       phone: user?.phone,
     });
-
-    fetch("http://localhost:8080/api/orders", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: user.name || "Client logat",
-        email: user.email,
-        phone: user.phone || "",
-        notes: "",
-        items: cartItems.map((item) => ({
-          productId: item.product?.ID || item.product?.id || item.productId,
-          quantity: item.quantity,
-        })),
-      }),
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(await res.text());
-        return res.json();
-      })
-      .then(() => {
-        clearCart();
-        toast.success("Comanda a fost trimisă!");
-      })
-      .catch((err) => {
-        toast.error("Eroare la trimiterea comenzii: " + err.message);
+    try {
+      const response = await fetch("http://localhost:8080/api/orders", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: user.name || "Client logat",
+          email: user.email,
+          phone: user.phone || "",
+          notes: "",
+          items: cartItems.map((item) => ({
+            productId: item.product?.ID || item.product?.id || item.productId,
+            quantity: item.quantity,
+          })),
+        }),
       });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+
+      const newOrder = await response.json();
+
+      clearCart();
+      closeCart();
+      navigate("/account", {
+        state: {
+          orderSuccess: true,
+          newOrderId: newOrder.ID,
+        },
+      });
+      toast.success("Comanda a fost trimisă cu succes!");
+    } catch (err) {
+      console.error("Error creating order:", err);
+      toast.error("Eroare la trimiterea comenzii: " + err.message);
+    }
   }
 
   if (!isCartOpen) return null;

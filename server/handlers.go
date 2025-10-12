@@ -59,9 +59,11 @@ func deleteProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func resetDatabase(w http.ResponseWriter, _ *http.Request) {
-	DB.Exec("DELETE FROM order_items")
-	DB.Exec("DELETE FROM orders")
-	DB.Exec("DELETE FROM products")
+	// DB.Exec("DELETE FROM order_items")
+	// DB.Exec("DELETE FROM cart_items")
+	// DB.Exec("DELETE FROM orders")
+	// DB.Exec("DELETE FROM products")
+	// DB.Exec("DELETE FROM users")
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("✅ Toate produsele și comenzile au fost șterse"))
@@ -79,8 +81,10 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	var userIDPtr *uint
 	if ok {
 		userIDPtr = &userID
+		log.Printf("✅ Creating order for user ID: %d", userID)
 	} else {
 		userIDPtr = nil // utilizator anonim
+		log.Println("⚠️ Creating order for anonymous user")
 	}
 
 	order := Order{
@@ -112,11 +116,18 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	order.Total = total
 
 	if err := DB.Create(&order).Error; err != nil {
+		log.Printf("❌ Error creating order: %v", err)
 		http.Error(w, "Eroare la salvarea comenzii", http.StatusInternalServerError)
 		return
 	}
 
-	DB.Preload("Items.Product").First(&order, order.ID)
+	// Reîncarcă order-ul cu toate datele
+	if err := DB.Preload("Items.Product").First(&order, order.ID).Error; err != nil {
+		log.Printf("❌ Error reloading order: %v", err)
+	}
+
+	log.Printf("✅ Order created successfully: ID=%d, UserID=%v, Total=%.2f",
+		order.ID, order.UserID, order.Total)
 
 	go sendEmail(order)
 
@@ -161,6 +172,18 @@ func SearchProducts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(products)
 }
 
+func getAllOrders(w http.ResponseWriter, r *http.Request) {
+	var orders []Order
+	if err := DB.Preload("Items.Product").Find(&orders).Error; err != nil {
+		http.Error(w, "Error fetching all orders", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("📋 All orders in database: %+v", orders)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(orders)
+}
+
 // --- Cart ---
 func getUserOrders(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(userIDKey).(uint)
@@ -170,13 +193,12 @@ func getUserOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var orders []Order
-	// DB.Preload("Items.Product").Where("user_id = ?", &userID).Find(&orders)
-	if err := DB.Preload("Items.Product").Where("user_id = ?", &userID).Find(&orders).Error; err != nil {
+	if err := DB.Preload("Items.Product").Where("user_id = ?", userID).Order("created_at DESC").Find(&orders).Error; err != nil {
 		log.Println("Error fetching orders:", err)
 		http.Error(w, "Eroare la fetch orders", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("Orders fetched for user %d: %+v\n", userID, orders)
+	log.Printf("Orders fetched for user %d: %d orders found\n", userID, len(orders))
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(orders)
 }

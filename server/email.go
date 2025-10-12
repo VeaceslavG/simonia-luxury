@@ -19,10 +19,6 @@ func sendEmail(order Order) error {
 	smtpPort := "587"
 
 	subject := "Comandă nouă de mobilă"
-	// body := fmt.Sprintf(
-	// 	"Nume: %s\nTelefon: %s\nEmail: %s\nNote: %s",
-	// 	order.Name, order.Phone, order.Email, order.Notes,
-	// )
 
 	var productsList string
 	for _, item := range order.Items {
