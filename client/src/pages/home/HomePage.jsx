@@ -24,7 +24,6 @@ export default function HomePage() {
   const hasHandledState = useRef(false);
 
   useEffect(() => {
-    // Rulăm logica o singură dată pentru a “consuma” location.state
     if (!hasHandledState.current) {
       if (location.state?.selectedCategory) {
         setSelectedCategory(location.state.selectedCategory);

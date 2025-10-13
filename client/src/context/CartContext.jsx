@@ -27,7 +27,7 @@ export function CartProvider({ children }) {
   }
 
   function getCartItemId(item) {
-    return item.id || item.ID || item.cartItemId;
+    return item.id || item.ID || item.cartItemId || item.tempId;
   }
 
   const loadProductDetails = async (items) => {
@@ -53,10 +53,7 @@ export function CartProvider({ children }) {
                 };
               }
             } catch (error) {
-              console.error(
-                `❌ Eroare la încărcarea detaliilor produsului ${item.productId}:`,
-                error
-              );
+              console.error(`Error loading product ${item.productId}:`, error);
             }
           }
 
@@ -65,7 +62,7 @@ export function CartProvider({ children }) {
       );
       return itemsWithDetails;
     } catch (error) {
-      console.error("❌ Eroare la încărcarea detaliilor produselor:", error);
+      console.error("Error loading product details:", error);
       return items;
     }
   };
@@ -79,20 +76,14 @@ export function CartProvider({ children }) {
         ?.split("=")[1];
 
       if (cookieValue) {
-        console.log("📦 Guest cart cookie raw:", cookieValue);
-
         const decodedValue = decodeURIComponent(cookieValue);
-        console.log("📦 Guest cart cookie decoded:", decodedValue);
-
         const items = JSON.parse(decodedValue);
-        console.log("📦 Parsed guest cart items:", items);
-
         // Încarcă detaliile produselor pentru guest items
         const itemsWithDetails = await loadProductDetails(items);
         return itemsWithDetails;
       }
     } catch (err) {
-      console.error("❌ Eroare la parsarea guestCart cookie:", err);
+      console.error("Error parsing guestCart cookie:", err);
       document.cookie = "guestCart=; path=/; max-age=0";
     }
     return [];
@@ -113,10 +104,6 @@ export function CartProvider({ children }) {
         30 * 24 * 60 * 60
       }; SameSite=Lax`;
       document.cookie = cookieString;
-      console.log(
-        "💾 Guest cart saved to cookie (essential data only):",
-        essentialItems
-      );
     } catch (err) {
       console.error("❌ Eroare la salvarea guestCart cookie:", err);
     }
@@ -126,12 +113,10 @@ export function CartProvider({ children }) {
   useEffect(() => {
     async function loadCart() {
       setLoading(true);
-      console.log("🔄 Loading cart, user:", user, "cartVersion:", cartVersion);
 
       if (!user) {
         // Guest - încarcă din cookie cu detaliile produselor
         const guestItems = await getGuestCartFromCookie();
-        console.log("👤 Guest cart loaded with details:", guestItems);
         setCartItems(guestItems || []);
         setLoading(false);
         return;
@@ -139,7 +124,6 @@ export function CartProvider({ children }) {
 
       // User logat - încarcă de pe server (deja are detaliile produselor)
       try {
-        console.log("👤✅ User logged in, loading cart from server");
         const res = await fetch("http://localhost:8080/api/cart", {
           method: "GET",
           credentials: "include",
@@ -150,14 +134,11 @@ export function CartProvider({ children }) {
           console.log("🛒 Server cart loaded:", serverItems);
           setCartItems(serverItems || []);
         } else {
-          console.error(
-            "❌ Eroare la încărcarea coșului de pe server:",
-            res.status
-          );
+          console.error("Error loading cart from server:", res.status);
           setCartItems([]);
         }
       } catch (err) {
-        console.error("❌ Eroare rețea la încărcarea coșului:", err);
+        console.error("Network error loading cart:", err);
         setCartItems([]);
       } finally {
         setLoading(false);
@@ -167,21 +148,16 @@ export function CartProvider({ children }) {
     loadCart();
   }, [user, cartVersion]);
 
-  // Salvează automat coșul pentru guest (doar datele esențiale)
+  // Salvează automat coșul pentru guest
   useEffect(() => {
     if (!user) {
-      console.log(
-        "💾 Auto-saving guest cart to cookie (essential data):",
-        cartItems
-      );
       saveGuestCartToCookie(cartItems);
     }
   }, [cartItems, user]);
 
-  // FORȚEAZĂ reîncărcarea coșului când user-ul se schimbă
+  // Reîncarcă coșul când user-ul se schimbă
   useEffect(() => {
     if (user) {
-      console.log("👤✅ User changed, forcing cart reload");
       setCartVersion((prev) => prev + 1);
     }
   }, [user]);
@@ -189,15 +165,6 @@ export function CartProvider({ children }) {
   // Adaugare produs - cu încărcare detalii pentru guest
   const addItem = async (product, quantity = 1) => {
     if (!product || !quantity) return;
-
-    console.log(
-      "➕ Adding item:",
-      product,
-      "quantity:",
-      quantity,
-      "user:",
-      user
-    );
 
     if (!user) {
       // Guest - adaugă cu detaliile produsului
@@ -214,11 +181,12 @@ export function CartProvider({ children }) {
         const newItem = {
           productId: productId,
           quantity: quantity,
-          tempId: Date.now() + Math.random(),
+          tempId: `guest_${productId}_${Date.now()}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
           product: product, // Salvează detaliile produsului
         };
         newItems.push(newItem);
-        console.log("👤 Added new item with product details:", newItem);
       }
 
       setCartItems(newItems);
@@ -240,26 +208,22 @@ export function CartProvider({ children }) {
       });
 
       if (!res.ok) {
-        console.error("❌ Eroare la adăugarea produsului:", res.status);
+        console.error("Error adding product:", res.status);
         return;
       }
 
-      const newItem = await res.json();
-      console.log("👤✅ Item added to server:", newItem);
-
       setCartVersion((prev) => prev + 1);
     } catch (err) {
-      console.error("❌ Eroare rețea addItem:", err);
+      console.error("Network error addItem:", err);
     }
   };
 
   // Ștergere produs
   const removeItem = async (id) => {
-    console.log("🗑️ Removing item:", id, "user:", user);
-
     if (!user) {
+      // Guest: id poate fi tempId SAU productId
       const newCartItems = cartItems.filter(
-        (item) => item.tempId !== id && item.productId !== id
+        (item) => getCartItemId(item) !== id
       );
       setCartItems(newCartItems);
       return;
@@ -270,15 +234,9 @@ export function CartProvider({ children }) {
         method: "DELETE",
         credentials: "include",
       });
-      console.log("👤✅ Item removed from server");
       setCartVersion((prev) => prev + 1);
-
-      const newCartItems = cartItems.filter(
-        (item) => getCartItemId(item) !== id
-      );
-      setCartItems(newCartItems);
     } catch (err) {
-      console.error("❌ Eroare la ștergere server:", err);
+      console.error("Error deleting from server:", err);
     }
   };
 
@@ -289,13 +247,9 @@ export function CartProvider({ children }) {
       return;
     }
 
-    console.log("✏️ Updating quantity:", id, "to", quantity, "user:", user);
-
     if (!user) {
       const newCartItems = cartItems.map((item) =>
-        item.tempId === id || item.productId === id
-          ? { ...item, quantity }
-          : item
+        getCartItemId(item) === id ? { ...item, quantity } : item
       );
       setCartItems(newCartItems);
       return;
@@ -310,36 +264,30 @@ export function CartProvider({ children }) {
         },
         body: JSON.stringify({ quantity }),
       });
-      console.log("👤✅ Quantity updated on server");
       setCartVersion((prev) => prev + 1);
     } catch (err) {
-      console.error("❌ Eroare la update server:", err);
+      console.error("Error updating quantity on server:", err);
     }
   };
 
   // Golire coș
   const clearCart = async () => {
-    console.log("🧹 Clearing cart, user:", user);
-
     if (!user) {
       setCartItems([]);
       document.cookie = "guestCart=; path=/; max-age=0";
-      console.log("👤 Guest cart cleared");
     } else {
       try {
         await fetch("http://localhost:8080/api/cart", {
           method: "DELETE",
           credentials: "include",
         });
-        console.log("👤✅ Server cart cleared");
         setCartVersion((prev) => prev + 1);
       } catch (err) {
-        console.error("❌ Eroare la golire server:", err);
+        console.error("Error clearing server cart:", err);
       }
     }
   };
 
-  // Subtotal calculat corect pentru ambele cazuri
   const cartSubtotal = cartItems.reduce((total, item) => {
     if (item.product && item.product.price) {
       return total + item.product.price * item.quantity;

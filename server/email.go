@@ -28,9 +28,14 @@ func sendEmail(order Order) error {
 			item.Price*float64(item.Quantity))
 	}
 
+	// ✅ Adaugă logging pentru a verifica datele
+	log.Printf("📧 Email data - Name: %s, Phone: %s, Address: '%s', City: '%s'",
+		order.Name, order.Phone, order.Address, order.City)
+
 	body := fmt.Sprintf(
-		"Nume: %s\nTelefon: %s\nEmail: %s\nNote: %s\n\nProduse:\n%s\nTotal: %.2f MDL",
-		order.Name, order.Phone, order.Email, order.Notes, productsList, order.Total,
+		"Nume: %s\nTelefon: %s\nEmail: %s\nAdresă: %s\nOraș: %s\nNote: %s\n\nProduse:\n%s\nTotal: %.2f MDL",
+		order.Name, order.Phone, order.Email, order.Address, order.City, order.Notes,
+		productsList, order.Total,
 	)
 
 	message := []byte(
@@ -45,6 +50,8 @@ func sendEmail(order Order) error {
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
 	if err != nil {
 		log.Println("⚠️ Eroare la trimiterea email:", err)
+	} else {
+		log.Println("✅ Email trimis cu succes!")
 	}
 	return err
 }

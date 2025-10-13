@@ -18,11 +18,13 @@ type contextKey string
 const userIDKey contextKey = "userID"
 
 type OrderRequest struct {
-	Name  string `json:"name"`
-	Phone string `json:"phone"`
-	Email string `json:"email"`
-	Notes string `json:"notes"`
-	Items []struct {
+	Name    string `json:"name"`
+	Phone   string `json:"phone"`
+	Email   string `json:"email"`
+	Address string `json:"address"`
+	City    string `json:"city"`
+	Notes   string `json:"notes"`
+	Items   []struct {
 		ProductID uint `json:"productId"`
 		Quantity  int  `json:"quantity"`
 	} `json:"items"`
@@ -59,11 +61,11 @@ func deleteProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func resetDatabase(w http.ResponseWriter, _ *http.Request) {
-	// DB.Exec("DELETE FROM order_items")
-	// DB.Exec("DELETE FROM cart_items")
-	// DB.Exec("DELETE FROM orders")
-	// DB.Exec("DELETE FROM products")
-	// DB.Exec("DELETE FROM users")
+	DB.Exec("DELETE FROM order_items")
+	DB.Exec("DELETE FROM cart_items")
+	DB.Exec("DELETE FROM orders")
+	DB.Exec("DELETE FROM products")
+	DB.Exec("DELETE FROM users")
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("✅ Toate produsele și comenzile au fost șterse"))
@@ -77,23 +79,36 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Phone == "" {
+		http.Error(w, "Numărul de telefon este obligatoriu pentru comandă", http.StatusBadRequest)
+		return
+	}
+
 	userID, ok := r.Context().Value(userIDKey).(uint)
 	var userIDPtr *uint
 	if ok {
 		userIDPtr = &userID
 		log.Printf("✅ Creating order for user ID: %d", userID)
+
+		var user User
+		if err := DB.First(&user, userID).Error; err == nil {
+			user.Phone = req.Phone
+			DB.Save(&user)
+		}
 	} else {
-		userIDPtr = nil // utilizator anonim
+		userIDPtr = nil
 		log.Println("⚠️ Creating order for anonymous user")
 	}
 
 	order := Order{
-		UserID: userIDPtr,
-		Name:   req.Name,
-		Phone:  req.Phone,
-		Email:  req.Email,
-		Notes:  req.Notes,
-		Status: "pending",
+		UserID:  userIDPtr,
+		Name:    req.Name,
+		Phone:   req.Phone,
+		Email:   req.Email,
+		Address: req.Address,
+		City:    req.City,
+		Notes:   req.Notes,
+		Status:  "pending",
 	}
 
 	var total float64
@@ -121,18 +136,20 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Reîncarcă order-ul cu toate datele
-	if err := DB.Preload("Items.Product").First(&order, order.ID).Error; err != nil {
+	// Reîncarcă order-ul cu toate datele din baza de date
+	var completeOrder Order
+	if err := DB.Preload("Items.Product").First(&completeOrder, order.ID).Error; err != nil {
 		log.Printf("❌ Error reloading order: %v", err)
+		completeOrder = order
 	}
 
-	log.Printf("✅ Order created successfully: ID=%d, UserID=%v, Total=%.2f",
-		order.ID, order.UserID, order.Total)
+	log.Printf("✅ Sending email for order ID=%d, Address='%s', City='%s'",
+		completeOrder.ID, completeOrder.Address, completeOrder.City)
 
-	go sendEmail(order)
+	go sendEmail(completeOrder)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(order)
+	json.NewEncoder(w).Encode(completeOrder)
 }
 
 func GetProductByID(w http.ResponseWriter, r *http.Request) {

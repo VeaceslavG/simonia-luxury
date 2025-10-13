@@ -1,0 +1,226 @@
+@use "../../variables.scss" as variables;
+@use "../../mixins.scss" as mixins;
+
+.checkoutPage {
+  @include mixins.contentContainer(50px);
+  background-color: #f8fafc;
+  min-height: 50vh;
+
+  .container {
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: variables.$itemBorderRadius;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: variables.$primaryColor;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .checkoutLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ----- ORDER SUMMARY -----
+  .orderSummary {
+    background: #f9f9f9;
+    padding: 25px 30px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    h2 {
+      font-size: 1.4rem;
+      color: darken(variables.$primaryColor, 10%);
+      border-bottom: 2px solid rgba(variables.$primaryColor, 0.15);
+      padding-bottom: 8px;
+    }
+
+    .orderItems {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+
+      .orderItem {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+
+        img {
+          width: 70px;
+          height: 70px;
+          object-fit: cover;
+          border-radius: variables.$itemBorderRadius;
+          border: 1px solid #e0e0e0;
+          margin-right: 15px;
+        }
+
+        .itemDetails {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+          }
+
+          p {
+            font-size: 0.9rem;
+            color: #555;
+          }
+        }
+      }
+    }
+
+    .orderTotal {
+      text-align: right;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding-top: 10px;
+
+      h3 {
+        color: variables.$primaryColor;
+        font-size: 1.3rem;
+      }
+    }
+  }
+
+  // ----- CONTACT FORM -----
+  .contactForm {
+    background: #f9f9f9;
+    padding: 25px 30px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    h2 {
+      font-size: 1.4rem;
+      color: darken(variables.$primaryColor, 10%);
+      border-bottom: 2px solid rgba(variables.$primaryColor, 0.15);
+      padding-bottom: 8px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .formGroup {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        label {
+          font-weight: 500;
+          color: #333;
+        }
+
+        input,
+        textarea {
+          padding: 12px 14px;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          border-radius: 10px;
+          font-size: 1rem;
+          outline: none;
+          background-color: #fff;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+          &:focus {
+            border-color: variables.$primaryColor;
+            box-shadow: 0 0 0 3px rgba(variables.$primaryColor, 0.15);
+          }
+        }
+
+        small {
+          font-size: 0.85rem;
+          color: #777;
+          margin-top: 2px;
+        }
+      }
+
+      .submitOrderBtn {
+        align-self: flex-start;
+        padding: 12px 26px;
+        border: none;
+        border-radius: 12px;
+        background-color: variables.$primaryColor;
+        color: #fff;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.25s ease, transform 0.1s ease;
+
+        &:hover {
+          background-color: darken(variables.$primaryColor, 8%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  // ----- EMPTY CART MESSAGE -----
+  p {
+    font-size: 1rem;
+    color: #555;
+    text-align: center;
+  }
+
+  .continueShoppingBtn {
+    margin: 0 auto;
+    padding: 12px 30px;
+    border: none;
+    border-radius: variables.$itemBorderRadius;
+    background-color: variables.$primaryColor;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background-color: darken(variables.$primaryColor, 8%);
+      transform: translateY(-1px);
+    }
+  }
+}

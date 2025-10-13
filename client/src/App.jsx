@@ -16,6 +16,7 @@ import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
 import Profile from "./pages/Auth/Profile";
 import AccountPage from "./pages/AccountPage/AccountPage";
+import CheckoutPage from "./pages/CheckoutPage/CheckoutPage";
 
 function App() {
   useEffect(() => {
@@ -39,6 +40,7 @@ function App() {
               <Route path="/search-results" element={<SearchResults />} />
               <Route path="/product/:id" element={<ProductPage />} />
               {/* <Route path="/cart" element={<CartPage />} /> */}
+              <Route path="/checkout" element={<CheckoutPage />} />
 
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />

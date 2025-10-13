@@ -2,7 +2,6 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./cartModal.scss";
 
@@ -16,7 +15,6 @@ export default function CartModal() {
     isCartOpen,
     closeCart,
     getCartItemId,
-    getProductId,
   } = useCart();
 
   const { user } = useAuth();
@@ -28,49 +26,11 @@ export default function CartModal() {
       closeCart();
       return;
     }
-    console.log("Checkout data:", {
-      name: user?.name,
-      email: user?.email,
-      phone: user?.phone,
+
+    closeCart();
+    navigate("/checkout", {
+      state: { fromCart: true },
     });
-    try {
-      const response = await fetch("http://localhost:8080/api/orders", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: user.name || "Client logat",
-          email: user.email,
-          phone: user.phone || "",
-          notes: "",
-          items: cartItems.map((item) => ({
-            productId: item.product?.ID || item.product?.id || item.productId,
-            quantity: item.quantity,
-          })),
-        }),
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText);
-      }
-
-      const newOrder = await response.json();
-
-      clearCart();
-      closeCart();
-      navigate("/account", {
-        state: {
-          orderSuccess: true,
-          newOrderId: newOrder.ID,
-        },
-      });
-      toast.success("Comanda a fost trimisă cu succes!");
-    } catch (err) {
-      console.error("Error creating order:", err);
-      toast.error("Eroare la trimiterea comenzii: " + err.message);
-    }
   }
 
   if (!isCartOpen) return null;
@@ -89,12 +49,10 @@ export default function CartModal() {
           <>
             <ul className="cartList">
               {cartItems.map((item, index) => {
-                const realItemId = getCartItemId(item); // item.ID din database
-                const displayId =
-                  realItemId || getProductId(item) || item.tempId || index;
-                const uniqueKey = `cart-item-${displayId}`;
+                // ✅ FOLOSEȘTE getCartItemId PENTRU TOATE OPERAȚIILE
+                const itemId = getCartItemId(item);
+                const uniqueKey = `cart-item-${itemId}-${index}`;
 
-                // Fallback pentru imagine și nume
                 const productImage =
                   item.product?.image_url || "/default-image.jpg";
                 const productName =
@@ -117,7 +75,7 @@ export default function CartModal() {
                         <button
                           className="quantityBtn"
                           onClick={() =>
-                            updateQuantity(realItemId, item.quantity - 1)
+                            updateQuantity(itemId, item.quantity - 1)
                           }
                           disabled={item.quantity <= 1}
                         >
@@ -130,7 +88,7 @@ export default function CartModal() {
                           value={item.quantity}
                           onChange={(e) =>
                             updateQuantity(
-                              realItemId,
+                              itemId,
                               Math.max(1, parseInt(e.target.value) || 1)
                             )
                           }
@@ -140,7 +98,7 @@ export default function CartModal() {
                         <button
                           className="quantityBtn"
                           onClick={() =>
-                            updateQuantity(realItemId, item.quantity + 1)
+                            updateQuantity(itemId, item.quantity + 1)
                           }
                         >
                           +
@@ -148,7 +106,7 @@ export default function CartModal() {
                       </div>
                     </div>
                     <img
-                      onClick={() => removeItem(realItemId)}
+                      onClick={() => removeItem(itemId)}
                       className="removeButton"
                       src={trashIcon}
                       alt="Delete"

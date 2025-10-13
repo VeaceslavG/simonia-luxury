@@ -23,6 +23,8 @@ type Order struct {
 	Name      string      `json:"name"`
 	Phone     string      `json:"phone"`
 	Email     string      `json:"email"`
+	Address   string      `json:"address"`
+	City      string      `json:"city"`
 	Notes     string      `json:"notes"`
 	Status    string      `json:"status" gorm:"default:pending"`
 	Total     float64     `json:"total"`

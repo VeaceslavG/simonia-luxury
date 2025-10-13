@@ -30,30 +30,6 @@
     color: variables.$textColor;
   }
 
-  .colorBtn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    cursor: pointer;
-    position: relative;
-    transition: 0.2s ease;
-  }
-
-  .colorBtn:hover {
-    transform: scale(1.1);
-  }
-
-  .colorBtn.active {
-    border: 3px solid #3e5879;
-  }
-
-  .colorText {
-    color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-  }
-
   .quantityContainer {
     display: flex;
     align-items: center;
