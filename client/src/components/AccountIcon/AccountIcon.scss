@@ -2,14 +2,31 @@
 @use "../../mixins.scss" as mixins;
 
 .accountManagement {
-      .accIcon {
-        @include mixins.icons;
-        margin: 0;
-      }
+  text-align: center;
+  font-size: variables.$textSize;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 5px 10px;
+  border-radius: variables.$itemBorderRadius;
+  max-width: 250px;
+  // width: 100%;
 
-      .accountAction {
-        cursor: pointer;
-        font-size: 14px;
-        opacity: .6;
-      }
-    }
+  .accIcon {
+    @include mixins.icons;
+    margin: 0;
+  }
+
+  .accountAction {
+    cursor: pointer;
+    font-size: 14px;
+    opacity: .6;
+  }
+
+  &:hover {
+     background: rgba(white, 0.1);
+     transform: translateY(-1px);
+     text-shadow: 0 0 5px rgba(white, 0.3);
+   }
+}
+      
+       
