@@ -28,8 +28,6 @@
 - **SMTP** - email services (validation, notifications)
 - **Environment variables** - secure configuration
 
----
-
 ## 🚀 Installation and Local Setup
 
 The project is structured into two main directories:
@@ -101,7 +99,7 @@ FRONTEND_URL=http://localhost:5173
 - Account verification
 - Order confirmation
 
-## Planuri viitoare
+## 🗓️ Planuri viitoare
 
 - Full Admin Panel
 - Improved Product Page
