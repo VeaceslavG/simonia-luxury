@@ -52,6 +52,7 @@ cd server
 go run main.go
 ```
 
+> [!NOTE]
 > Once deployed, the website will be accessible via a public link.
 
 ## 🔐 Environment Variables
