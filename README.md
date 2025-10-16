@@ -81,26 +81,26 @@ FRONTEND_URL=http://localhost:5173
 - Email verification
 - Google Login / Register integration
 
-### Catalog de produse
+### Product Catalog
 
 - View products by category (sofas, corner sofas, armchairs, beds)
 
-### Coș de cumpărături
+### Shopping Cart
 
 - Stored in cookies for guest users
 - Stored in database for logged-in users
 
-### Comenzi
+### Orders
 
 - Place and submit orders
 - View order history in the user account
 
-### E-mailuri automate
+### Automated Emails
 
 - Account verification
 - Order confirmation
 
-## 🗓️ Planuri viitoare
+## 🗓️ Future Plans
 
 - Full Admin Panel
 - Improved Product Page
