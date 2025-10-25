@@ -117,7 +117,9 @@ export default function Products({ selectedCategory, searchQuery }) {
                     e.preventDefault();
                     e.stopPropagation();
                     addItem(product);
-                    toast.success(`${product.name} a fost adăugat în coș!`);
+                    toast.success(
+                      `${product.name} a fost adăugat în lista de comandă!`
+                    );
                   }}
                 />
               </div>

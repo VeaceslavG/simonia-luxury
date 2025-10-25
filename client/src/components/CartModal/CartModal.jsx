@@ -41,10 +41,10 @@ export default function CartModal() {
         <button className="closeButton" onClick={closeCart}>
           ✖
         </button>
-        <h2>Coșul tău</h2>
+        <h2>Modelele mele selectate</h2>
 
         {cartItems.length === 0 ? (
-          <p>Coșul este gol.</p>
+          <p>Nu ai selectat încă niciun model</p>
         ) : (
           <>
             <ul className="cartList">
@@ -117,12 +117,12 @@ export default function CartModal() {
             </ul>
 
             <div className="cartSummary">
-              <p>Total: {cartSubtotal} MDL</p>
+              <p>Estimare totală: {cartSubtotal} MDL</p>
               <button className="checkoutButton" onClick={handleCheckout}>
-                {user ? "Finalizează comanda" : "Loghează-te pentru a finaliza"}
+                {user ? "Trimite cererea" : "Loghează-te pentru a finaliza"}
               </button>
               <button className="clearCartButton" onClick={clearCart}>
-                Golește coșul
+                Anulează selecția
               </button>
             </div>
           </>
