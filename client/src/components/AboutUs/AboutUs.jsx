@@ -6,19 +6,24 @@ export default function AboutUs({ firstPicture, secondPicture }) {
       <div className="aboutUsLeftSide">
         <div className="aboutUsTitle">Despre Simonia Luxury</div>
         <div className="aboutUsSubtitle">
-          Mobilă Moale Premium pentru Eleganța și Confortul Casei Tale
+          Mobilă la comandă de lux pentru eleganța și confortul casei tale
         </div>
         <div className="aboutUsText">
-          Simonia Luxury este o companie dedicată creării de mobilă moale de
-          lux, realizată cu atenție la detalii și materiale de cea mai înaltă
-          calitate. <br />
-          Echipa noastră de specialiști produce canapele, colțare, fotolii și
-          paturi elegante, fiecare piesă fiind concepută pentru a transforma
-          orice locuință într-un spațiu rafinat și confortabil. <br />
-          Oferim servicii complete: consultație personalizată, design unic,
-          producție atentă și montaj profesional direct în casa ta. <br />
-          Alegând Simonia Luxury, te bucuri de un ambient plin de stil, liniște
-          și farmec, creat special pentru tine și familia ta.
+          Simonia Luxury creează mobilă moale de lux realizată exclusiv la
+          comandă, pentru a se potrivi perfect stilului și nevoilor tale.
+          <br />
+          Echipa noastră produce canapele, colțare și paturi personalizate,
+          folosind materiale de cea mai înaltă calitate. Fiecare piesă de
+          mobilier este proiectată special pentru tine, astfel încât să
+          transforme orice locuință într-un spațiu rafinat, confortabil și
+          elegant.
+          <br />
+          Oferim servicii complete: consultanță personalizată, design unic,
+          producție atentă și montaj profesional direct la domiciliu.
+          <br />
+          Alegând Simonia Luxury, beneficiezi de mobilă la comandă, de calitate
+          superioară, care adaugă stil, confort și rafinament fiecărei camere
+          din casa ta.
         </div>
       </div>
       <div className="aboutUsRightSide">

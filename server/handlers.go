@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -97,7 +98,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		userIDPtr = nil
-		log.Println("⚠️ Creating order for anonymous user")
+		log.Println("Creating order for anonymous user")
 	}
 
 	order := Order{
@@ -131,7 +132,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	order.Total = total
 
 	if err := DB.Create(&order).Error; err != nil {
-		log.Printf("❌ Error creating order: %v", err)
+		log.Printf("Error creating order: %v", err)
 		http.Error(w, "Eroare la salvarea comenzii", http.StatusInternalServerError)
 		return
 	}
@@ -139,14 +140,25 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	// Reîncarcă order-ul cu toate datele din baza de date
 	var completeOrder Order
 	if err := DB.Preload("Items.Product").First(&completeOrder, order.ID).Error; err != nil {
-		log.Printf("❌ Error reloading order: %v", err)
+		log.Printf("Error reloading order: %v", err)
 		completeOrder = order
 	}
 
-	log.Printf("✅ Sending email for order ID=%d, Address='%s', City='%s'",
+	log.Printf("Sending email for order ID=%d, Address='%s', City='%s'",
 		completeOrder.ID, completeOrder.Address, completeOrder.City)
 
 	go sendEmail(completeOrder)
+
+	go func(orderID uint) {
+		time.Sleep(5 * time.Second)
+		if err := DB.Model(&Order{}).
+			Where("id = ?", orderID).
+			Update("status", "completed").Error; err != nil {
+			log.Printf("Eroare la actualizarea statusului pentru order #%d: %v", orderID, err)
+		} else {
+			log.Printf("Order #%d marcat ca 'completed'", orderID)
+		}
+	}(completeOrder.ID)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(completeOrder)

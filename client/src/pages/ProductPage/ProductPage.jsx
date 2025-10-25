@@ -99,10 +99,12 @@ export default function ProductPage() {
               className="btn addToCartBtn"
               onClick={() => {
                 addItem({ ...product }, quantity);
-                toast.success(`${product.name} a fost adăugat în coș!`);
+                toast.success(
+                  `${product.name} a fost adăugat în lista de comandă!`
+                );
               }}
             >
-              Adaugă în coș
+              Comandă un model similar
             </button>
           </div>
         </div>

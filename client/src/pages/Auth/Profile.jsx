@@ -94,9 +94,9 @@ export default function Profile() {
         <p className="profileInfo">Email: {user?.email}</p>
         <p className="profileInfo">Phone: {user?.phone}</p>
 
-        <h3 className="sectionProfileTitle">Coșul meu</h3>
+        <h3 className="sectionProfileTitle">Modelele mele selectate</h3>
         {cartItems.length === 0 ? (
-          <p>Coșul este gol</p>
+          <p>Nu ai selectat încă niciun model</p>
         ) : (
           <ul>
             {cartItems.map((item) => (
@@ -126,15 +126,15 @@ export default function Profile() {
           </ul>
         )}
 
-        <h3 className="sectionProfileTitle">Comenzile mele</h3>
+        <h3 className="sectionProfileTitle">Cererile mele personalizate</h3>
         {orders.length === 0 ? (
-          <p>Nu am comenzi</p>
+          <p>Nu am cereri</p>
         ) : (
           <ul>
             {orders.map((order) => (
               <div key={order.ID} className="orderCard">
                 <div className="orderHeader">
-                  <h4>Comanda #{order.ID}</h4>
+                  <h4>Cererea #{order.ID}</h4>
                   <span className="orderDate">
                     {order.CreatedAt
                       ? formatDate(order.CreatedAt)
@@ -142,17 +142,17 @@ export default function Profile() {
                   </span>
                 </div>
                 <div className="orderStatus">
-                  Status:{" "}
+                  Status:
                   <span className={`status ${order.Status}`}>
-                    {order.Status === "pending"
+                    {order.status === "pending"
                       ? "În așteptare"
-                      : order.Status === "completed"
+                      : order.status === "completed"
                       ? "Finalizată"
-                      : order.Status}
+                      : order.status}
                   </span>
                 </div>
                 <div className="orderItems">
-                  <h5>Produse comandate:</h5>
+                  <h5>Modele incluse în cerere:</h5>
                   <ul>
                     {order.items?.map((item) => (
                       <li key={item.ID} className="orderItem">
@@ -177,14 +177,15 @@ export default function Profile() {
                   </ul>
                 </div>
                 <div className="orderTotal">
-                  Total comandă: <strong>{order.total?.toFixed(2)} MDL</strong>
+                  Estimare totală:{" "}
+                  <strong>{order.total?.toFixed(2)} MDL</strong>
                 </div>
               </div>
             ))}
           </ul>
         )}
 
-        <button onClick={handleLogout}>Logout</button>
+        <button onClick={handleLogout}>Ieși din cont</button>
       </div>
     </>
   );

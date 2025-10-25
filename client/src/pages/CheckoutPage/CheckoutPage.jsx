@@ -96,7 +96,9 @@ export default function CheckoutPage() {
 
       clearCart();
 
-      toast.success("Comanda a fost plasată cu succes!");
+      toast.success(
+        "Cererea ta a fost trimisă cu succes! Te vom contacta în curând pentru detalii."
+      );
 
       navigate("/account", {
         state: {
@@ -118,13 +120,16 @@ export default function CheckoutPage() {
         <Nav />
         <div className="checkoutPage">
           <div className="container">
-            <h1>Finalizare Comandă</h1>
-            <p>Coșul tău este gol.</p>
+            <h1>Trimite cererea ta personalizată</h1>
+            <p>
+              Lista ta de modele este goală. Explorează lucrările noastre și
+              selectează modelele care te inspiră.
+            </p>
             <button
               onClick={() => navigate("/")}
               className="continueShoppingBtn"
             >
-              Continuă cumpărăturile
+              Vezi lucrările noastre
             </button>
           </div>
         </div>
@@ -138,12 +143,18 @@ export default function CheckoutPage() {
       <Nav />
       <div className="checkoutPage">
         <div className="container">
-          <h1>Finalizare Comandă</h1>
+          <h1>Trimite cererea ta personalizată</h1>
+
+          <p className="customNotice">
+            Majoritatea modelelor prezentate pe site au fost realizate la
+            comandă. Poți solicita un design asemănător sau unul complet
+            personalizat, adaptat preferințelor tale.
+          </p>
 
           <div className="checkoutLayout">
-            {/* Detalii Comandă */}
+            {/* Detalii cerere */}
             <div className="orderSummary">
-              <h2>Detalii Comandă</h2>
+              <h2>Detalii cerere</h2>
               <div className="orderItems">
                 {cartItems.map((item, index) => (
                   <div key={index} className="orderItem">
@@ -252,7 +263,7 @@ export default function CheckoutPage() {
                   className="submitOrderBtn"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Se procesează..." : "Plasează comanda"}
+                  {isSubmitting ? "Se trimite cererea..." : "Trimite cererea"}
                 </button>
               </form>
             </div>
