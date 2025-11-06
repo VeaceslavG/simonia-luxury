@@ -33,6 +33,18 @@ export default function CartModal() {
     });
   }
 
+  const getFullImageUrl = (imagePath) => {
+    if (!imagePath) return "/default-image.jpg";
+
+    if (imagePath.startsWith("http")) return imagePath;
+
+    if (imagePath.startsWith("/uploads/")) {
+      return `http://localhost:8080${imagePath}`;
+    }
+
+    return imagePath;
+  };
+
   if (!isCartOpen) return null;
 
   return (
@@ -49,12 +61,12 @@ export default function CartModal() {
           <>
             <ul className="cartList">
               {cartItems.map((item, index) => {
-                // ✅ FOLOSEȘTE getCartItemId PENTRU TOATE OPERAȚIILE
                 const itemId = getCartItemId(item);
                 const uniqueKey = `cart-item-${itemId}-${index}`;
 
-                const productImage =
-                  item.product?.image_url || "/default-image.jpg";
+                const productImage = getFullImageUrl(
+                  item.product?.image_urls[0]
+                );
                 const productName =
                   item.product?.name || `Produs #${item.productId}`;
                 const productPrice = item.product?.price || 0;

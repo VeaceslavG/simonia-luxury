@@ -49,7 +49,7 @@ export default function ProductPage() {
     setQuantity(quantity + 1);
   }
 
-  const displayedImage = product.image_url;
+  const displayedImage = `http://localhost:8080${product.image_urls[0]}`;
 
   return (
     <>

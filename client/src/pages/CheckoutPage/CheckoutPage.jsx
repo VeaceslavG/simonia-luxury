@@ -81,7 +81,7 @@ export default function CheckoutPage() {
           city: formData.city,
           notes: formData.notes,
           items: cartItems.map((item) => ({
-            productId: item.product?.ID || item.product?.id || item.productId,
+            productId: item.productId || item.product?.ID,
             quantity: item.quantity,
           })),
         }),
@@ -112,6 +112,18 @@ export default function CheckoutPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getFullImageUrl = (imagePath) => {
+    if (!imagePath) return "/default-image.jpg";
+
+    if (imagePath.startsWith("http")) return imagePath;
+
+    if (imagePath.startsWith("/uploads/")) {
+      return `http://localhost:8080${imagePath}`;
+    }
+
+    return imagePath;
   };
 
   if (cartItems.length === 0) {
@@ -159,7 +171,7 @@ export default function CheckoutPage() {
                 {cartItems.map((item, index) => (
                   <div key={index} className="orderItem">
                     <img
-                      src={item.product?.image_url || "/default-image.jpg"}
+                      src={getFullImageUrl(item.product?.image_urls[0])}
                       alt={item.product?.name}
                       onError={(e) => {
                         e.target.src = "/default-image.jpg";

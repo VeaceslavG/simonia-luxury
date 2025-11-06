@@ -29,15 +29,24 @@ export default function Products({ selectedCategory, searchQuery }) {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        let url = "http://localhost:8080/api/products"; // fallback
+        let url = "http://localhost:8080/api/products";
         if (query) {
           url = `http://localhost:8080/api/search?query=${encodeURIComponent(
             query
           )}`;
         }
+        console.log("🔄 Fetching products from:", url);
+
         const res = await fetch(url);
         if (!res.ok) throw new Error("Eroare la fetch produse");
         const data = await res.json();
+
+        console.log("📦 Products received:", data);
+        if (data.length > 0) {
+          console.log("🔍 First product structure:", data[0]);
+          console.log("📋 First product category:", data[0].category);
+        }
+
         setProducts(data);
       } catch (err) {
         console.error("Eroare fetch produse:", err);
@@ -51,9 +60,13 @@ export default function Products({ selectedCategory, searchQuery }) {
   // Filtrare produse
   const displayedProducts = query
     ? products
-    : products.filter(
-        (product) => product.category.toLowerCase() === activeCategory
-      );
+    : products.filter((product) => {
+        // Verificări de siguranță
+        if (!product.category) return false;
+        if (!product.category.name) return false;
+
+        return product.category.name.toLowerCase() === activeCategory;
+      });
 
   return (
     <div id="products" className="container productsContainer">
@@ -73,16 +86,10 @@ export default function Products({ selectedCategory, searchQuery }) {
             Colțare
           </TabButton>
           <TabButton
-            isSelected={activeCategory === "fotolii"}
-            onClick={() => setActiveCategory("fotolii")}
+            isSelected={activeCategory === "dormitoare"}
+            onClick={() => setActiveCategory("dormitoare")}
           >
-            Fotolii
-          </TabButton>
-          <TabButton
-            isSelected={activeCategory === "paturi"}
-            onClick={() => setActiveCategory("paturi")}
-          >
-            Paturi
+            Dormitoare
           </TabButton>
         </menu>
       )}
@@ -106,7 +113,11 @@ export default function Products({ selectedCategory, searchQuery }) {
               <div className="viewProduct position-relative">
                 <img
                   className="card-img-top productImage"
-                  src={product.image_url}
+                  src={
+                    product.image_urls && product.image_urls.length > 0
+                      ? `http://localhost:8080${product.image_urls[0]}`
+                      : `/images/placeholder.jpg`
+                  }
                   alt={product.name}
                 />
                 <img

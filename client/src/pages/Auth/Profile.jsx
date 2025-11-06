@@ -99,14 +99,14 @@ export default function Profile() {
           <p>Nu ai selectat încă niciun model</p>
         ) : (
           <ul>
-            {cartItems.map((item) => (
-              <li key={item.ID}>
+            {cartItems.map((item, index) => (
+              <li key={`cart-${index}-${item.productId}`}>
                 <Link
-                  to={`/product/${item.product?.ID}`}
+                  to={`/product/${item.productId}`}
                   className="cartProfileItemLink"
                 >
                   <img
-                    src={item.product?.image_url}
+                    src={`http://localhost:8080${item.product?.image_urls[0]}`}
                     alt={item.product?.name || "Product"}
                     className="productProfileImage"
                   />
@@ -136,8 +136,8 @@ export default function Profile() {
                 <div className="orderHeader">
                   <h4>Cererea #{order.ID}</h4>
                   <span className="orderDate">
-                    {order.CreatedAt
-                      ? formatDate(order.CreatedAt)
+                    {order.CreatedAt || order.created_at
+                      ? formatDate(order.CreatedAt || order.created_at)
                       : "Date indisponibile"}
                   </span>
                 </div>
@@ -157,7 +157,7 @@ export default function Profile() {
                     {order.items?.map((item) => (
                       <li key={item.ID} className="orderItem">
                         <img
-                          src={item.product?.image_url}
+                          src={`http://localhost:8080${item.product?.image_urls[0]}`}
                           alt={item.product?.name}
                           className="orderProductImage"
                         />
@@ -178,7 +178,12 @@ export default function Profile() {
                 </div>
                 <div className="orderTotal">
                   Estimare totală:{" "}
-                  <strong>{order.total?.toFixed(2)} MDL</strong>
+                  <strong>
+                    {order.total || order.Total
+                      ? (order.total || order.Total).toFixed(2)
+                      : "0.00"}{" "}
+                    MDL
+                  </strong>
                 </div>
               </div>
             ))}

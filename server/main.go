@@ -38,7 +38,7 @@ func main() {
 	DB.AutoMigrate(&Product{}, &Order{}, &OrderItem{}, &User{}, &CartItem{})
 
 	// Populează produse de test
-	SeedProducts()
+	// SeedProducts()
 
 	// Router
 	r := mux.NewRouter()
@@ -62,10 +62,10 @@ func main() {
 	r.Handle("/api/orders", authMiddleware(http.HandlerFunc(createOrder))).Methods("POST", "OPTIONS")
 
 	// --- Debug ---
-	r.HandleFunc("/api/debug/orders", getAllOrders).Methods("GET")
+	//! r.HandleFunc("/api/debug/orders", getAllOrders).Methods("GET")
 
 	// --- Produse ---
-	r.HandleFunc("/api/products", createProduct).Methods("POST")
+	//! r.HandleFunc("/api/products", createProduct).Methods("POST")
 	r.HandleFunc("/api/products", getProducts).Methods("GET")
 	r.HandleFunc("/api/products/{id}", deleteProduct).Methods("DELETE")
 	r.HandleFunc("/api/products/{id}", GetProductByID).Methods("GET")
@@ -82,10 +82,10 @@ func main() {
 	r.HandleFunc("/api/search", SearchProducts).Methods("GET")
 
 	// --- Reset DB (opțional) ---
-	r.HandleFunc("/api/reset", resetDatabase).Methods("POST")
+	//! r.HandleFunc("/api/reset", resetDatabase).Methods("POST")
 
 	// --- Servește imagini statice ---
-	r.PathPrefix("/images/").Handler(http.StripPrefix("/images/", http.FileServer(http.Dir("./assets/products/"))))
+	r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads/"))))
 
 	// --- Test CORS ---
 	r.HandleFunc("/api/test", func(w http.ResponseWriter, r *http.Request) {

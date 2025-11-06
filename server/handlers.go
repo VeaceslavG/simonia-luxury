@@ -44,7 +44,11 @@ func createProduct(w http.ResponseWriter, r *http.Request) {
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
 	var products []Product
-	DB.Find(&products)
+	if err := DB.Preload("Category").Where("is_active = ?", true).Find(&products).Error; err != nil {
+		http.Error(w, "Eroare la preluarea produselor", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	json.NewEncoder(w).Encode(products)
 }
 
@@ -201,17 +205,17 @@ func SearchProducts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(products)
 }
 
-func getAllOrders(w http.ResponseWriter, r *http.Request) {
-	var orders []Order
-	if err := DB.Preload("Items.Product").Find(&orders).Error; err != nil {
-		http.Error(w, "Error fetching all orders", http.StatusInternalServerError)
-		return
-	}
+// func getAllOrders(w http.ResponseWriter, r *http.Request) {
+// 	var orders []Order
+// 	if err := DB.Preload("Items.Product").Find(&orders).Error; err != nil {
+// 		http.Error(w, "Error fetching all orders", http.StatusInternalServerError)
+// 		return
+// 	}
 
-	log.Printf("📋 All orders in database: %+v", orders)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(orders)
-}
+// 	log.Printf("📋 All orders in database: %+v", orders)
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(orders)
+// }
 
 // --- Cart ---
 func getUserOrders(w http.ResponseWriter, r *http.Request) {
