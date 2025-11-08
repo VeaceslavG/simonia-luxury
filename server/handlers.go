@@ -196,9 +196,14 @@ func SearchProducts(w http.ResponseWriter, r *http.Request) {
 	var products []Product
 
 	if query == "" {
-		DB.Find(&products)
+		DB.Preload("Category").Where("is_active = ?", true).Find(&products)
 	} else {
-		DB.Where("LOWER(name) LIKE ? OR LOWER(category) LIKE ?", "%"+strings.ToLower(query)+"%", "%"+strings.ToLower(query)+"%").Find(&products)
+		searchPattern := "%" + strings.ToLower(query) + "%"
+
+		DB.Preload("Category").
+			Where("(unaccent(LOWER(name)) LIKE unaccent(LOWER(?)) OR unaccent(LOWER(description)) LIKE unaccent(LOWER(?))) AND is_active = ?",
+				searchPattern, searchPattern, true).
+			Find(&products)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

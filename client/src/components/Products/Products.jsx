@@ -39,15 +39,17 @@ export default function Products({ selectedCategory, searchQuery }) {
 
         const res = await fetch(url);
         if (!res.ok) throw new Error("Eroare la fetch produse");
-        const data = await res.json();
 
-        console.log("📦 Products received:", data);
-        if (data.length > 0) {
-          console.log("🔍 First product structure:", data[0]);
-          console.log("📋 First product category:", data[0].category);
+        const data = await res.json();
+        const productsArray = Array.isArray(data) ? data : [];
+
+        console.log("📦 Products received:", productsArray);
+        if (productsArray.length > 0) {
+          console.log("🔍 First product structure:", productsArray[0]);
+          console.log("📋 First product category:", productsArray[0].category);
         }
 
-        setProducts(data);
+        setProducts(productsArray);
       } catch (err) {
         console.error("Eroare fetch produse:", err);
         toast.error("Nu am putut încărca produsele.");

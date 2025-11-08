@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./catalogBtn.scss";
 
 export default function CatalogBtn({ title, arrowIcon, onCategorySelect }) {
-  const categories = ["Canapele", "Coltare", "Fotolii", "Paturi"];
+  const categories = ["Canapele", "Coltare", "Dormitoare"];
   const navigate = useNavigate();
   const location = useLocation();
 
