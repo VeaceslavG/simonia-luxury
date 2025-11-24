@@ -18,6 +18,8 @@ import Profile from "./pages/Auth/Profile";
 import AccountPage from "./pages/AccountPage/AccountPage";
 import CheckoutPage from "./pages/CheckoutPage/CheckoutPage";
 
+import AdminApp from "./admin/AdminApp";
+
 function App() {
   useEffect(() => {
     localStorage.removeItem("user");
@@ -34,7 +36,8 @@ function App() {
           {/* <HeaderIcons /> */}
           <main>
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/admin/*" element={<AdminApp />} />
+              <Route path="/*" element={<HomePage />} />
               <Route path="account" element={<AccountPage />} />
               <Route path="/products" element={<Products />} />
               <Route path="/search-results" element={<SearchResults />} />

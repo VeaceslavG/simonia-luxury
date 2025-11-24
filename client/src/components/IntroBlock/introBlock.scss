@@ -19,7 +19,7 @@
       padding: 0 20px;
 
       .introLeftSection {
-        max-width: 750px;
+        max-width: 700px;
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -30,6 +30,7 @@
 
         .introTitle {
           @include mixins.headerTitle;
+          font-size: 75px;
         }
 
         .introText {

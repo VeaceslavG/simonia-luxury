@@ -10,9 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.7",
     "bootstrap": "^5.3.7",
     "leaflet": "^1.9.4",
+    "ra-data-simple-rest": "^5.12.3",
     "react": "^19.1.0",
+    "react-admin": "^5.12.3",
     "react-burger-menu": "^3.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
