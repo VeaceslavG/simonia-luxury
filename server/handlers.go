@@ -32,16 +32,6 @@ type OrderRequest struct {
 }
 
 // --- Produse ---
-func createProduct(w http.ResponseWriter, r *http.Request) {
-	var product Product
-	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
-		http.Error(w, "Date invalide", http.StatusBadRequest)
-		return
-	}
-	DB.Create(&product)
-	json.NewEncoder(w).Encode(product)
-}
-
 func getProducts(w http.ResponseWriter, r *http.Request) {
 	var products []Product
 	if err := DB.Preload("Category").Where("is_active = ?", true).Find(&products).Error; err != nil {
@@ -63,17 +53,6 @@ func deleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf("Produsul cu ID %s a fost șters", id)))
-}
-
-func resetDatabase(w http.ResponseWriter, _ *http.Request) {
-	DB.Exec("DELETE FROM order_items")
-	DB.Exec("DELETE FROM cart_items")
-	DB.Exec("DELETE FROM orders")
-	DB.Exec("DELETE FROM products")
-	DB.Exec("DELETE FROM users")
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("✅ Toate produsele și comenzile au fost șterse"))
 }
 
 // --- Comenzi ---
@@ -209,18 +188,6 @@ func SearchProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(products)
 }
-
-// func getAllOrders(w http.ResponseWriter, r *http.Request) {
-// 	var orders []Order
-// 	if err := DB.Preload("Items.Product").Find(&orders).Error; err != nil {
-// 		http.Error(w, "Error fetching all orders", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	log.Printf("📋 All orders in database: %+v", orders)
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(orders)
-// }
 
 // --- Cart ---
 func getUserOrders(w http.ResponseWriter, r *http.Request) {

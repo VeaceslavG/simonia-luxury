@@ -16,6 +16,7 @@ type Category struct {
 
 type Product struct {
 	gorm.Model
+	ID           uint           `gorm:"primaryKey" json:"id"`
 	Name         string         `gorm:"not null" json:"name"`
 	Description  string         `json:"description"`
 	Price        float64        `gorm:"type:decimal(10,2);not null" json:"price"`
@@ -33,6 +34,7 @@ type Product struct {
 
 type Order struct {
 	gorm.Model
+	ID        uint           `gorm:"primaryKey" json:"id"`
 	UserID    *uint          `json:"userId"`
 	User      User           `json:"user,omitempty"`
 	Name      string         `gorm:"not null" json:"name"`
@@ -43,7 +45,7 @@ type Order struct {
 	Notes     string         `json:"notes"`
 	Status    string         `gorm:"default:'pending'" json:"status"`
 	Total     float64        `gorm:"type:decimal(10,2);not null" json:"total"`
-	Items     []OrderItem    `json:"items" gorm:"foreignKey:OrderID"`
+	Items     []OrderItem    `json:"items" gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
@@ -51,6 +53,7 @@ type Order struct {
 
 type OrderItem struct {
 	gorm.Model
+	ID        uint      `gorm:"primaryKey" json:"id"`
 	OrderID   uint      `json:"orderId"`
 	ProductID uint      `json:"productId"`
 	Quantity  int       `gorm:"not null" json:"quantity"`
@@ -61,6 +64,7 @@ type OrderItem struct {
 
 type User struct {
 	gorm.Model
+	ID                uint   `gorm:"primaryKey" json:"id"`
 	Email             string `gorm:"uniqueIndex"`
 	Name              string
 	Phone             string     `gorm:"not null;default:''"`

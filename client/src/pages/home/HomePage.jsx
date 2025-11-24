@@ -65,8 +65,8 @@ export default function HomePage() {
     <>
       <Nav onCategorySelect={handleCategorySelect} />
       <IntroBlock
-        introTitle="Mobilă moale la comandă"
-        introText="Mobilă de lux pentru casa ta"
+        introTitle="Mobilă de lux pentru casa ta"
+        introText="Mobilă moale la comandă"
         introImage={headerSofa}
       />
       <Benefits />

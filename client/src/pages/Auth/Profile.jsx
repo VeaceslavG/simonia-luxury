@@ -132,9 +132,9 @@ export default function Profile() {
         ) : (
           <ul>
             {orders.map((order) => (
-              <div key={order.ID} className="orderCard">
+              <div key={order.id} className="orderCard">
                 <div className="orderHeader">
-                  <h4>Cererea #{order.ID}</h4>
+                  <h4>Cererea #{order.id}</h4>
                   <span className="orderDate">
                     {order.CreatedAt || order.created_at
                       ? formatDate(order.CreatedAt || order.created_at)
@@ -155,7 +155,7 @@ export default function Profile() {
                   <h5>Modele incluse în cerere:</h5>
                   <ul>
                     {order.items?.map((item) => (
-                      <li key={item.ID} className="orderItem">
+                      <li key={item.id} className="orderItem">
                         <img
                           src={`http://localhost:8080${item.product?.image_urls[0]}`}
                           alt={item.product?.name}
