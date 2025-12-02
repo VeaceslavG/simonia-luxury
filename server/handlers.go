@@ -398,8 +398,19 @@ func getCart(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to fetch cart", http.StatusInternalServerError)
 			return
 		}
+
+		var result []map[string]interface{}
+		for _, item := range cartItems {
+			result = append(result, map[string]interface{}{
+				"id":        item.ID,
+				"productId": item.ProductID,
+				"quantity":  item.Quantity,
+				"product":   item.Product,
+			})
+		}
+
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(cartItems)
+		json.NewEncoder(w).Encode(result)
 		return
 	}
 
@@ -410,9 +421,11 @@ func getCart(w http.ResponseWriter, r *http.Request) {
 		var prod Product
 		if err := DB.First(&prod, it.ProductID).Error; err == nil {
 			result = append(result, map[string]interface{}{
-				"ID":       it.ProductID,
-				"product":  prod,
-				"quantity": it.Quantity,
+				"id":        it.ProductID,
+				"productId": it.ProductID,
+				"quantity":  it.Quantity,
+				"product":   prod,
+				"tempId":    fmt.Sprintf("guest-%d", it.ProductID),
 			})
 		}
 	}

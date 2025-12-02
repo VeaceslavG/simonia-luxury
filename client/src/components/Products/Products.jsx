@@ -4,6 +4,7 @@ import TabButton from "../TabButton";
 import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify";
 import cartProductIcon from "../../assets/products/cart.png";
+import defaultImage from "../../assets/default_image.png";
 import "react-toastify/dist/ReactToastify.css";
 import "./products.scss";
 
@@ -118,7 +119,7 @@ export default function Products({ selectedCategory, searchQuery }) {
                   src={
                     product.image_urls && product.image_urls.length > 0
                       ? `http://localhost:8080${product.image_urls[0]}`
-                      : `/images/placeholder.jpg`
+                      : defaultImage
                   }
                   alt={product.name}
                 />

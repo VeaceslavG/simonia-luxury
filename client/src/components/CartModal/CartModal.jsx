@@ -2,6 +2,7 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
+import defaultImage from "../../assets/default_image.png";
 import "react-toastify/dist/ReactToastify.css";
 import "./cartModal.scss";
 
@@ -34,7 +35,7 @@ export default function CartModal() {
   }
 
   const getFullImageUrl = (imagePath) => {
-    if (!imagePath) return "/default-image.jpg";
+    if (!imagePath) return defaultImage;
 
     if (imagePath.startsWith("http")) return imagePath;
 
@@ -43,6 +44,28 @@ export default function CartModal() {
     }
 
     return imagePath;
+  };
+
+  const getProductImage = (item) => {
+    if (!item.product || !item.product.image_urls) {
+      return defaultImage;
+    }
+
+    let imageArray = [];
+    if (typeof item.product.image_urls === "string") {
+      imageArray = item.product.image_urls
+        .split(",")
+        .filter((url) => url.trim());
+    } else if (Array.isArray(item.product.image_urls)) {
+      imageArray = item.product.image_urls.filter((url) => url);
+    }
+
+    const firstImage = imageArray[0]?.trim();
+    if (firstImage) {
+      return getFullImageUrl(firstImage);
+    }
+
+    return defaultImage;
   };
 
   if (!isCartOpen) return null;
@@ -64,9 +87,7 @@ export default function CartModal() {
                 const itemId = getCartItemId(item);
                 const uniqueKey = `cart-item-${itemId}-${index}`;
 
-                const productImage = getFullImageUrl(
-                  item.product?.image_urls[0]
-                );
+                const productImage = getProductImage(item);
                 const productName =
                   item.product?.name || `Produs #${item.productId}`;
                 const productPrice = item.product?.price || 0;
@@ -77,7 +98,7 @@ export default function CartModal() {
                       src={productImage}
                       alt={productName}
                       onError={(e) => {
-                        e.target.src = "/default-image.jpg";
+                        e.target.src = defaultImage;
                       }}
                     />
                     <div className="cartItemDetails">

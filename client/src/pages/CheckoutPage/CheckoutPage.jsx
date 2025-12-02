@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import defaultImage from "../../assets/default_image.png";
 import "./checkoutPage.scss";
 
 export default function CheckoutPage() {
@@ -126,6 +127,29 @@ export default function CheckoutPage() {
     return imagePath;
   };
 
+  const getProductImage = (item) => {
+    if (!item.product || !item.product.image_urls) {
+      return defaultImage;
+    }
+
+    // Procesează image_urls similar cu ProductPage
+    let imageArray = [];
+    if (typeof item.product.image_urls === "string") {
+      imageArray = item.product.image_urls
+        .split(",")
+        .filter((url) => url.trim());
+    } else if (Array.isArray(item.product.image_urls)) {
+      imageArray = item.product.image_urls.filter((url) => url);
+    }
+
+    const firstImage = imageArray[0]?.trim();
+    if (firstImage) {
+      return getFullImageUrl(firstImage);
+    }
+
+    return defaultImage;
+  };
+
   if (cartItems.length === 0) {
     return (
       <>
@@ -168,26 +192,30 @@ export default function CheckoutPage() {
             <div className="orderSummary">
               <h2>Detalii cerere</h2>
               <div className="orderItems">
-                {cartItems.map((item, index) => (
-                  <div key={index} className="orderItem">
-                    <img
-                      src={getFullImageUrl(item.product?.image_urls[0])}
-                      alt={item.product?.name}
-                      onError={(e) => {
-                        e.target.src = "/default-image.jpg";
-                      }}
-                    />
-                    <div className="itemDetails">
-                      <h4>
-                        {item.product?.name || `Produs #${item.productId}`}
-                      </h4>
-                      <p>Cantitate: {item.quantity}</p>
-                      <p>
-                        Preț: {item.product?.price * item.quantity || 0} MDL
-                      </p>
+                {cartItems.map((item, index) => {
+                  const productImage = getProductImage(item);
+
+                  return (
+                    <div key={index} className="orderItem">
+                      <img
+                        src={productImage}
+                        alt={item.product?.name}
+                        onError={(e) => {
+                          e.target.src = defaultImage;
+                        }}
+                      />
+                      <div className="itemDetails">
+                        <h4>
+                          {item.product?.name || `Produs #${item.productId}`}
+                        </h4>
+                        <p>Cantitate: {item.quantity}</p>
+                        <p>
+                          Preț: {item.product?.price * item.quantity || 0} MDL
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="orderTotal">

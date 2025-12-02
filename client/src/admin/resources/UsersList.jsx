@@ -3,7 +3,6 @@ import {
   Datagrid,
   TextField,
   BooleanField,
-  EditButton,
   EmailField,
   DateField,
 } from "react-admin";
@@ -18,7 +17,6 @@ export default function UsersList(props) {
         <TextField source="phone" />
         <BooleanField source="is_verified" />
         <DateField source="created_at" showTime />
-        <EditButton />
       </Datagrid>
     </List>
   );

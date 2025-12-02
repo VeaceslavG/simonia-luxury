@@ -3,6 +3,7 @@ import { useCart } from "../../context/CartContext";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
+import defaultImage from "../../assets/default_image.png";
 
 export default function Profile() {
   const { user, logout } = useAuth();
@@ -49,8 +50,8 @@ export default function Profile() {
       const ordersData = await ordersRes.json();
       const cartData = await cartRes.json();
 
-      console.log("✅ Orders fetched:", ordersData);
-      console.log("✅ Cart fetched:", cartData);
+      console.log("Orders fetched:", ordersData);
+      console.log("Cart fetched:", cartData);
 
       setOrders(ordersData);
     } catch (err) {
@@ -81,6 +82,29 @@ export default function Profile() {
     return new Date(dateString).toLocaleDateString("ro-RO", options);
   };
 
+  const getProductImage = (item) => {
+    if (!item.product || !item.product.image_urls) {
+      return "/default-image.jpg";
+    }
+
+    // Procesează image_urls similar cu ProductPage
+    let imageArray = [];
+    if (typeof item.product.image_urls === "string") {
+      imageArray = item.product.image_urls
+        .split(",")
+        .filter((url) => url.trim());
+    } else if (Array.isArray(item.product.image_urls)) {
+      imageArray = item.product.image_urls.filter((url) => url);
+    }
+
+    const firstImage = imageArray[0]?.trim();
+    if (firstImage) {
+      return `http://localhost:8080${item.product?.image_urls[0]}`;
+    }
+
+    return defaultImage;
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>You are not logged in.</p>;
 
@@ -99,30 +123,37 @@ export default function Profile() {
           <p>Nu ai selectat încă niciun model</p>
         ) : (
           <ul>
-            {cartItems.map((item, index) => (
-              <li key={`cart-${index}-${item.productId}`}>
-                <Link
-                  to={`/product/${item.productId}`}
-                  className="cartProfileItemLink"
-                >
-                  <img
-                    src={`http://localhost:8080${item.product?.image_urls[0]}`}
-                    alt={item.product?.name || "Product"}
-                    className="productProfileImage"
-                  />
-                  <span>
-                    {item.product?.name} - {item.quantity} x{" "}
-                    {item.product?.price} MDL
-                  </span>
-                </Link>
-                <button
-                  className="removeCartItemBtn"
-                  onClick={() => handleRemoveItem(item.ID)}
-                >
-                  <img src={trashIcon} alt="Remove" />
-                </button>
-              </li>
-            ))}
+            {cartItems.map((item, index) => {
+              const productImage = getProductImage(item);
+
+              return (
+                <li key={`cart-${index}-${item.productId}`}>
+                  <Link
+                    to={`/product/${item.productId}`}
+                    className="cartProfileItemLink"
+                  >
+                    <img
+                      src={productImage}
+                      alt={item.product?.name || "Product"}
+                      onError={(e) => {
+                        e.target.src = defaultImage;
+                      }}
+                      className="productProfileImage"
+                    />
+                    <span>
+                      {item.product?.name} - {item.quantity} x{" "}
+                      {item.product?.price} MDL
+                    </span>
+                  </Link>
+                  <button
+                    className="removeCartItemBtn"
+                    onClick={() => handleRemoveItem(item.ID)}
+                  >
+                    <img src={trashIcon} alt="Remove" />
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
 
@@ -154,26 +185,33 @@ export default function Profile() {
                 <div className="orderItems">
                   <h5>Modele incluse în cerere:</h5>
                   <ul>
-                    {order.items?.map((item) => (
-                      <li key={item.id} className="orderItem">
-                        <img
-                          src={`http://localhost:8080${item.product?.image_urls[0]}`}
-                          alt={item.product?.name}
-                          className="orderProductImage"
-                        />
-                        <div className="orderItemDetails">
-                          <span className="productName">
-                            {item.product?.name}
+                    {order.items?.map((item) => {
+                      const productImage = getProductImage(item);
+
+                      return (
+                        <li key={item.id} className="orderItem">
+                          <img
+                            src={productImage}
+                            alt={item.product?.name}
+                            onError={(e) => {
+                              e.target.src = defaultImage;
+                            }}
+                            className="orderProductImage"
+                          />
+                          <div className="orderItemDetails">
+                            <span className="productName">
+                              {item.product?.name}
+                            </span>
+                            <span className="productQuantity">
+                              {item.quantity} x {item.price} MDL
+                            </span>
+                          </div>
+                          <span className="itemTotal">
+                            {(item.quantity * item.price).toFixed(2)} MDL
                           </span>
-                          <span className="productQuantity">
-                            {item.quantity} x {item.price} MDL
-                          </span>
-                        </div>
-                        <span className="itemTotal">
-                          {(item.quantity * item.price).toFixed(2)} MDL
-                        </span>
-                      </li>
-                    ))}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
                 <div className="orderTotal">

@@ -5,6 +5,7 @@ import {
   NumberField,
   EditButton,
   FunctionField,
+  DeleteButton,
 } from "react-admin";
 
 export default function OrdersList(props) {
@@ -24,6 +25,7 @@ export default function OrdersList(props) {
         <NumberField source="total" />
         <TextField source="status" />
         <EditButton />
+        <DeleteButton />
       </Datagrid>
     </List>
   );
