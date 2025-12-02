@@ -8,6 +8,7 @@ import {
   FunctionField,
   CreateButton,
   TopToolbar,
+  DeleteWithConfirmButton,
 } from "react-admin";
 
 const ListActions = () => (
@@ -29,6 +30,7 @@ export default function ProductsList(props) {
         <NumberField source="price" />
         <BooleanField source="is_active" />
         <EditButton />
+        <DeleteWithConfirmButton />
       </Datagrid>
     </List>
   );

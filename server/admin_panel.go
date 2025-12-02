@@ -340,20 +340,61 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Produsul nu a fost găsit", http.StatusNotFound)
 		return
 	}
-	var newProduct Product
-	if err := json.NewDecoder(r.Body).Decode(&newProduct); err != nil {
+	var updateData map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
 		http.Error(w, "Date invalide", http.StatusBadRequest)
 		return
 	}
 
-	if newProduct.Price <= 0 {
-		http.Error(w, "Pretul trebuie sa fie mai mare decat 0", http.StatusBadRequest)
+	if price, exists := updateData["price"]; exists {
+		if priceFloat, ok := price.(float64); ok && priceFloat <= 0 {
+			http.Error(w, "Pretul trebuie sa fie mai mare decat 0", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if err := DB.Model(&product).Updates(updateData).Error; err != nil {
+		http.Error(w, "Eroare la actualizare", http.StatusInternalServerError)
 		return
 	}
 
-	DB.Model(&product).Updates(newProduct)
+	DB.Preload("Category").First(&product, product.ID)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(product)
+}
+
+func updateOrder(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	var order Order
+
+	if err := DB.First(&order, id).Error; err != nil {
+		http.Error(w, "Comanda nu a fost gasita", http.StatusNotFound)
+		return
+	}
+
+	var updateData map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
+		http.Error(w, "Date ivalide", http.StatusBadRequest)
+		return
+	}
+
+	allowedFields := []string{"status", "name", "phone", "email", "address", "city", "notes"}
+	updateMap := make(map[string]interface{})
+
+	for _, field := range allowedFields {
+		if value, exists := updateData[field]; exists {
+			updateMap[field] = value
+		}
+	}
+
+	if err := DB.Model(&order).Updates(updateMap).Error; err != nil {
+		http.Error(w, "Eroare la actualzarea comenzii", http.StatusInternalServerError)
+		return
+	}
+
+	DB.Preload("Items.Product").First(&order, order.ID)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(order)
 }
 
 func deleteAdminProduct(w http.ResponseWriter, r *http.Request) {
@@ -368,7 +409,12 @@ func deleteAdminProduct(w http.ResponseWriter, r *http.Request) {
 func deleteAdminOrder(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
-	// Începe o tranzacție
+	var order Order
+	if err := DB.First(&order, id).Error; err != nil {
+		http.Error(w, "Order not found", http.StatusNotFound)
+		return
+	}
+
 	tx := DB.Begin()
 
 	// Șterge mai întâi order items

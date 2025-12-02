@@ -27,7 +27,18 @@ export function CartProvider({ children }) {
   }
 
   function getCartItemId(item) {
-    return item.id || item.ID || item.cartItemId || item.tempId;
+    if (item.id !== undefined && item.id !== null) {
+      return item.id.toString();
+    }
+
+    if (item.ID !== undefined && item.ID !== null) {
+      return item.ID.toString();
+    }
+
+    if (item.tempId) return item.tempId;
+    if (item.productId) return `guest-${item.productId}`;
+
+    return `item-${Date.now()}`;
   }
 
   const loadProductDetails = async (items) => {
@@ -96,7 +107,7 @@ export function CartProvider({ children }) {
       const essentialItems = items.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
-        tempId: item.tempId,
+        tempId: item.tempId || `guest-${item.productId}`,
       }));
 
       const cookieValue = encodeURIComponent(JSON.stringify(essentialItems));
@@ -132,7 +143,17 @@ export function CartProvider({ children }) {
         if (res.ok) {
           const serverItems = await res.json();
           console.log("🛒 Server cart loaded:", serverItems);
-          setCartItems(serverItems || []);
+
+          const normalizedItems = serverItems.map((item) => {
+            const consistentId = item.id || item.ID || `cart-${item.productId}`;
+            return {
+              ...item,
+              id: consistentId,
+              productId: item.productId || item.product?.id || item.product?.ID,
+            };
+          });
+
+          setCartItems(normalizedItems || []);
         } else {
           console.error("Error loading cart from server:", res.status);
           setCartItems([]);
@@ -169,30 +190,34 @@ export function CartProvider({ children }) {
     if (!user) {
       // Guest - adaugă cu detaliile produsului
       const productId = product.id || product.ID;
-      const newItems = [...cartItems];
-      const existingIndex = newItems.findIndex(
-        (item) => item.productId === productId
-      );
+      const stableTempId = product.id || product.ID;
 
-      if (existingIndex !== -1) {
-        newItems[existingIndex].quantity += quantity;
-        console.log("👤 Updated existing item:", newItems[existingIndex]);
-      } else {
-        const newItem = {
-          productId: productId,
-          quantity: quantity,
-          tempId: `guest_${productId}_${Date.now()}_${Math.random()
-            .toString(36)
-            .substr(2, 9)}`,
-          product: product, // Salvează detaliile produsului
-        };
-        newItems.push(newItem);
-      }
+      setCartItems((prevItems) => {
+        const newItems = [...prevItems];
+        const existingIndex = newItems.findIndex(
+          (item) => getCartItemId(item) === stableTempId
+        );
 
-      setCartItems(newItems);
+        if (existingIndex !== -1) {
+          const newItems = [...prevItems];
+          newItems[existingIndex] = {
+            ...newItems[existingIndex],
+            quantity: newItems[existingIndex].quantity + quantity,
+          };
+          return newItems;
+        } else {
+          const newItem = {
+            productId: productId,
+            quantity: quantity,
+            tempId: stableTempId,
+            product: product,
+            id: stableTempId,
+          };
+          return [...prevItems, newItem];
+        }
+      });
       return;
     }
-
     // User logat - salvează pe server
     try {
       const res = await fetch("http://localhost:8080/api/cart", {
@@ -248,10 +273,11 @@ export function CartProvider({ children }) {
     }
 
     if (!user) {
-      const newCartItems = cartItems.map((item) =>
-        getCartItemId(item) === id ? { ...item, quantity } : item
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          getCartItemId(item) === id ? { ...item, quantity } : item
+        )
       );
-      setCartItems(newCartItems);
       return;
     }
 

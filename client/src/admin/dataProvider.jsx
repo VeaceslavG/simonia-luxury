@@ -91,6 +91,27 @@ export const dataProvider = {
       data: transformId(response.data),
     }));
   },
+
+  delete: (resource, params) => {
+    return fetch(`http://localhost:8080/api/admin/${resource}/${params.id}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 204) {
+          return { data: { id: params.id } };
+        } else {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Delete failed:", resource, params.id, error);
+        throw error;
+      });
+  },
 };
 
 export default dataProvider;
