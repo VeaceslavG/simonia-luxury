@@ -4,6 +4,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./orderModal.scss";
 
 export default function OrderModal({ isOpen, onClose }) {
+  const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -20,7 +22,7 @@ export default function OrderModal({ isOpen, onClose }) {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/api/orders", {
+      const response = await fetch(`${API}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

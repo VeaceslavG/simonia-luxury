@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -10,9 +11,18 @@ import (
 
 // Middleware CORS
 func enableCORS(next http.Handler) http.Handler {
+	allowedOrigin := os.Getenv("FRONTEND_URL")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		origin := r.Header.Get("Origin")
+
+		if allowedOrigin == "*" {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+		} else if origin != "" && origin == allowedOrigin {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		} else {
+		}
+
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Range, Content-Range, X-Total-Count, Sort, Filter")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Expose-Headers", "Content-Range, X-Total-Count")
@@ -108,6 +118,11 @@ func main() {
 		w.Write([]byte("CORS funcționează!"))
 	}).Methods("GET", "OPTIONS")
 
-	log.Println("🚀 Serverul pornește pe :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("🚀 Serverul pornește pe :%s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }

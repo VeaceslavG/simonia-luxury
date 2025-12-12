@@ -2,8 +2,10 @@ import googleIcon from "../../assets/auth/google.png";
 import "./googleButton.scss";
 
 export default function GoogleButton() {
+  const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/api/auth/google/login";
+    window.location.href = `${API}/api/auth/google/login`;
   };
 
   return (

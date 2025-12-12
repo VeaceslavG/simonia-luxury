@@ -9,6 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./products.scss";
 
 export default function Products({ selectedCategory, searchQuery }) {
+  const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const { addItem } = useCart();
   const location = useLocation();
 
@@ -30,12 +32,8 @@ export default function Products({ selectedCategory, searchQuery }) {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        let url = "http://localhost:8080/api/products";
-        if (query) {
-          url = `http://localhost:8080/api/search?query=${encodeURIComponent(
-            query
-          )}`;
-        }
+        let url = `${API}/api/products`;
+        if (query) url = `${API}/api/search?query=${encodeURIComponent(query)}`;
         console.log("🔄 Fetching products from:", url);
 
         const res = await fetch(url);
@@ -118,7 +116,7 @@ export default function Products({ selectedCategory, searchQuery }) {
                   className="card-img-top productImage"
                   src={
                     product.image_urls && product.image_urls.length > 0
-                      ? `http://localhost:8080${product.image_urls[0]}`
+                      ? `${API}${product.image_urls[0]}`
                       : defaultImage
                   }
                   alt={product.name}

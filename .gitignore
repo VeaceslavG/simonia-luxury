@@ -1,6 +1,6 @@
 # === Environment files ===
 .env
-.env.*
+*.env
 
 # === Logs ===
 logs/

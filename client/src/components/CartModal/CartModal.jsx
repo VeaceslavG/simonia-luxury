@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./cartModal.scss";
 
 export default function CartModal() {
+  const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const {
     cartItems,
     removeItem,
@@ -40,7 +42,7 @@ export default function CartModal() {
     if (imagePath.startsWith("http")) return imagePath;
 
     if (imagePath.startsWith("/uploads/")) {
-      return `http://localhost:8080${imagePath}`;
+      return `${API}${imagePath}`;
     }
 
     return imagePath;

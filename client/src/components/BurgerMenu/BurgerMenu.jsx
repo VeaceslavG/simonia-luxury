@@ -30,7 +30,6 @@ export default function BurgerMenu({ onCategorySelect }) {
     catalog: [
       { text: "Canapele", href: "/canapele", category: "canapele" },
       { text: "Colțare", href: "/coltare", category: "coltare" },
-      { text: "Fotolii", href: "/fotolii", category: "fotolii" },
       { text: "Paturi", href: "/paturi", category: "paturi" },
     ],
     menu: [
