@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import GoogleButton from "../../components/GoogleButton/GoogleButton";
+import { API_URL } from "../../config/api";
 
 export default function Login({ children }) {
   const { login } = useAuth();
@@ -18,7 +19,7 @@ export default function Login({ children }) {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/login", {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

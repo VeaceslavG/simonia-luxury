@@ -5,10 +5,9 @@ import trashIcon from "../../assets/cartModal/trashIcon.png";
 import defaultImage from "../../assets/default_image.png";
 import "react-toastify/dist/ReactToastify.css";
 import "./cartModal.scss";
+import { API_URL } from "../../config/api";
 
 export default function CartModal() {
-  const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
-
   const {
     cartItems,
     removeItem,
@@ -42,7 +41,7 @@ export default function CartModal() {
     if (imagePath.startsWith("http")) return imagePath;
 
     if (imagePath.startsWith("/uploads/")) {
-      return `${API}${imagePath}`;
+      return `${API_URL}${imagePath}`;
     }
 
     return imagePath;

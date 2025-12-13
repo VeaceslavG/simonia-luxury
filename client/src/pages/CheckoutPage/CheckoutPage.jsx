@@ -7,6 +7,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import defaultImage from "../../assets/default_image.png";
 import "./checkoutPage.scss";
+import { API_URL } from "../../config/api";
 
 export default function CheckoutPage() {
   const { cartItems, cartSubtotal, clearCart } = useCart();
@@ -68,7 +69,7 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/orders", {
+      const response = await fetch(`${API_URL}/api/orders`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -120,11 +121,9 @@ export default function CheckoutPage() {
 
     if (imagePath.startsWith("http")) return imagePath;
 
-    if (imagePath.startsWith("/uploads/")) {
-      return `http://localhost:8080${imagePath}`;
-    }
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 
-    return imagePath;
+    return `${API_URL}${cleanPath}`;
   };
 
   const getProductImage = (item) => {

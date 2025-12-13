@@ -7,10 +7,9 @@ import cartProductIcon from "../../assets/products/cart.png";
 import defaultImage from "../../assets/default_image.png";
 import "react-toastify/dist/ReactToastify.css";
 import "./products.scss";
+import { API_URL } from "../../config/api";
 
 export default function Products({ selectedCategory, searchQuery }) {
-  const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
-
   const { addItem } = useCart();
   const location = useLocation();
 
@@ -32,8 +31,9 @@ export default function Products({ selectedCategory, searchQuery }) {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        let url = `${API}/api/products`;
-        if (query) url = `${API}/api/search?query=${encodeURIComponent(query)}`;
+        let url = `${API_URL}/api/products`;
+        if (query)
+          url = `${API_URL}/api/search?query=${encodeURIComponent(query)}`;
         console.log("🔄 Fetching products from:", url);
 
         const res = await fetch(url);
@@ -115,8 +115,10 @@ export default function Products({ selectedCategory, searchQuery }) {
                 <img
                   className="card-img-top productImage"
                   src={
-                    product.image_urls && product.image_urls.length > 0
-                      ? `${API}${product.image_urls[0]}`
+                    product.image_urls?.[0]
+                      ? `${API_URL}${
+                          product.image_urls[0].startsWith("/") ? "" : "/"
+                        }${product.image_urls[0]}`
                       : defaultImage
                   }
                   alt={product.name}

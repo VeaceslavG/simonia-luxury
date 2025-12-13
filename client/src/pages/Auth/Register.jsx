@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import GoogleButton from "../../components/GoogleButton/GoogleButton";
+import { API_URL } from "../../config/api";
 
 export default function Register({ children }) {
   const { login } = useAuth();
@@ -20,7 +21,7 @@ export default function Register({ children }) {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/register", {
+      const res = await fetch(`${API_URL}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name, phone }),

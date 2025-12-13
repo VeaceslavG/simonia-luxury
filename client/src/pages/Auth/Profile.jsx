@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
 import defaultImage from "../../assets/default_image.png";
+import { API_URL } from "../../config/api";
 
 export default function Profile() {
   const { user, logout } = useAuth();
@@ -34,11 +35,11 @@ export default function Profile() {
       console.log("🔄 Fetching orders...");
 
       const [ordersRes, cartRes] = await Promise.all([
-        fetch("http://localhost:8080/api/orders", {
+        fetch(`${API_URL}/api/orders`, {
           method: "GET",
           credentials: "include",
         }),
-        fetch("http://localhost:8080/api/cart", {
+        fetch(`${API_URL}/api/cart`, {
           method: "GET",
           credentials: "include",
         }),
@@ -99,10 +100,13 @@ export default function Profile() {
 
     const firstImage = imageArray[0]?.trim();
     if (firstImage) {
-      return `http://localhost:8080${item.product?.image_urls[0]}`;
+      const cleanPath = firstImage.startsWith("/")
+        ? firstImage
+        : `/${firstImage}`;
+      return `${API_URL}${cleanPath}`;
+    } else {
+      return defaultImage;
     }
-
-    return defaultImage;
   };
 
   if (loading) return <p>Loading...</p>;

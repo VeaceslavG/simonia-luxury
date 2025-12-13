@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { API_URL } from "../config/api";
 
 const CartContext = createContext(null);
 
@@ -54,7 +55,7 @@ export function CartProvider({ children }) {
           if (item.productId) {
             try {
               const response = await fetch(
-                `http://localhost:8080/api/products/${item.productId}`
+                `${API_URL}/api/products/${item.productId}`
               );
               if (response.ok) {
                 const productDetails = await response.json();
@@ -135,7 +136,7 @@ export function CartProvider({ children }) {
 
       // User logat - încarcă de pe server (deja are detaliile produselor)
       try {
-        const res = await fetch("http://localhost:8080/api/cart", {
+        const res = await fetch(`${API_URL}/api/cart`, {
           method: "GET",
           credentials: "include",
         });
@@ -220,7 +221,7 @@ export function CartProvider({ children }) {
     }
     // User logat - salvează pe server
     try {
-      const res = await fetch("http://localhost:8080/api/cart", {
+      const res = await fetch(`${API_URL}/api/cart`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -255,7 +256,7 @@ export function CartProvider({ children }) {
     }
 
     try {
-      await fetch(`http://localhost:8080/api/cart/item/${id}`, {
+      await fetch(`${API_URL}/api/cart/item/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -282,7 +283,7 @@ export function CartProvider({ children }) {
     }
 
     try {
-      await fetch(`http://localhost:8080/api/cart/item/${id}`, {
+      await fetch(`${API_URL}/api/cart/item/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -303,7 +304,7 @@ export function CartProvider({ children }) {
       document.cookie = "guestCart=; path=/; max-age=0";
     } else {
       try {
-        await fetch("http://localhost:8080/api/cart", {
+        await fetch(`${API_URL}/api/cart`, {
           method: "DELETE",
           credentials: "include",
         });

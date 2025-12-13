@@ -10,6 +10,8 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import defaultImage from "../../assets/default_image.png";
 
+import { API_URL } from "../../config/api";
+
 export default function ProductPage() {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
@@ -25,7 +27,7 @@ export default function ProductPage() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:8080/api/products/${id}`);
+        const res = await fetch(`${API_URL}/api/products/${id}`);
         if (!res.ok) throw new Error("Eroare la încărcarea produsului");
         const data = await res.json();
         setProduct(data);
@@ -54,11 +56,13 @@ export default function ProductPage() {
     if (firstImage) {
       if (String(firstImage).startsWith("http")) {
         return firstImage;
-      } else if (firstImage.startsWith("/")) {
-        return `http://localhost:8080${firstImage}`;
-      } else {
-        return `http://localhost:8080/${firstImage}`;
       }
+
+      const cleanPath = firstImage.startsWith("/")
+        ? firstImage
+        : `/${firstImage}`;
+
+      return `${API_URL}${cleanPath}`;
     }
 
     return defaultImage;
