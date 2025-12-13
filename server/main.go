@@ -12,15 +12,13 @@ import (
 // Middleware CORS
 func enableCORS(next http.Handler) http.Handler {
 	allowedOrigin := os.Getenv("FRONTEND_URL")
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 
-		if allowedOrigin == "*" {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-		} else if origin != "" && origin == allowedOrigin {
+		if origin != "" && origin == allowedOrigin {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
-		} else {
 		}
 
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Range, Content-Range, X-Total-Count, Sort, Filter")
@@ -119,6 +117,9 @@ func main() {
 	}).Methods("GET", "OPTIONS")
 
 	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = os.Getenv("PORT")
+	}
 	if port == "" {
 		port = "8080"
 	}
