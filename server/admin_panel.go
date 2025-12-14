@@ -11,6 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/lib/pq"
 )
 
 // admin login
@@ -373,7 +374,22 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		update["is_available"] = v
 	}
 	if v, ok := payload["image_urls"]; ok {
-		update["image_urls"] = v
+
+		switch val := v.(type) {
+
+		case string:
+			// vine un singur URL → îl punem în array
+			update["image_urls"] = pq.StringArray{val}
+
+		case []interface{}:
+			urls := []string{}
+			for _, u := range val {
+				if s, ok := u.(string); ok {
+					urls = append(urls, s)
+				}
+			}
+			update["image_urls"] = pq.StringArray(urls)
+		}
 	}
 
 	if category, ok := payload["category"].(map[string]interface{}); ok {
