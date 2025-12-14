@@ -43,6 +43,26 @@ const transformId = (data) => {
   };
 };
 
+const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_URL}/api/admin/upload`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error("Upload failed");
+  }
+
+  return response.json();
+};
+
 export const dataProvider = {
   ...baseDataProvider,
 
@@ -76,18 +96,36 @@ export const dataProvider = {
       }));
   },
 
-  update: (resource, params) => {
-    return baseDataProvider.update(resource, params).then((response) => ({
+  update: async (resource, params) => {
+    if (params.data.image?.rawFile) {
+      const { url } = await uploadImage(params.data.image.rawFile);
+
+      params.data.image_urls = [url];
+      delete params.data.image;
+    }
+
+    const response = await baseDataProvider.update(resource, params);
+
+    return {
       ...response,
       data: transformId(response.data),
-    }));
+    };
   },
 
-  create: (resource, params) => {
-    return baseDataProvider.create(resource, params).then((response) => ({
+  create: async (resource, params) => {
+    if (params.data.image?.rawFile) {
+      const { url } = await uploadImage(params.data.image.rawFile);
+
+      params.data.image_urls = [url];
+      delete params.data.image;
+    }
+
+    const response = await baseDataProvider.create(resource, params);
+
+    return {
       ...response,
       data: transformId(response.data),
-    }));
+    };
   },
 
   delete: (resource, params) => {

@@ -8,6 +8,8 @@ import {
   SelectInput,
   required,
   minValue,
+  ImageInput,
+  ImageField,
 } from "react-admin";
 
 export const ProductEdit = (props) => (
@@ -31,7 +33,9 @@ export const ProductEdit = (props) => (
       </ReferenceInput>
 
       <TextInput source="dimensions" />
-      <TextInput source="image_urls" fullWidth />
+      <ImageInput source="image" label="Replace image" accept="image/*">
+        <ImageField source="src" />
+      </ImageInput>
       <TextInput source="delivery_time" />
       <BooleanInput source="is_available" label="Available" />
       <BooleanInput source="is_active" label="Active" />

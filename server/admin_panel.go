@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -332,6 +334,42 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(product)
+}
+
+func adminUpload(w http.ResponseWriter, r *http.Request) {
+	r.ParseMultipartForm(10 << 20)
+
+	file, handler, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "File missing", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	os.MkdirAll("./uploads/products", os.ModePerm)
+
+	filename := fmt.Sprintf(
+		"%d_%s",
+		time.Now().Unix(),
+		handler.Filename,
+	)
+
+	dst, err := os.Create("./uploads/products/" + filename)
+	if err != nil {
+		http.Error(w, "Cannot save file", http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		http.Error(w, "Upload failed", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"url": "/uploads/products/" + filename,
+	})
 }
 
 func updateProduct(w http.ResponseWriter, r *http.Request) {

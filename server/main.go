@@ -90,6 +90,7 @@ func main() {
 	protectedAdmin.Use(adminAuth)
 
 	// Admin Products
+	protectedAdmin.HandleFunc("/upload", adminUpload).Methods("POST", "OPTIONS")
 	protectedAdmin.HandleFunc("/products", getAdminProducts).Methods("GET", "OPTIONS")
 	protectedAdmin.HandleFunc("/products", createAdminProduct).Methods("POST", "OPTIONS")
 	protectedAdmin.HandleFunc("/products/{id}", getAdminProduct).Methods("GET", "OPTIONS")
