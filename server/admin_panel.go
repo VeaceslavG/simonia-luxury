@@ -335,30 +335,60 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 
 func updateProduct(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
+
 	var product Product
 	if err := DB.First(&product, id).Error; err != nil {
 		http.Error(w, "Produsul nu a fost găsit", http.StatusNotFound)
 		return
 	}
-	var updateData map[string]interface{}
-	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
+
+	var payload map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		http.Error(w, "Date invalide", http.StatusBadRequest)
 		return
 	}
 
-	if price, exists := updateData["price"]; exists {
-		if priceFloat, ok := price.(float64); ok && priceFloat <= 0 {
-			http.Error(w, "Pretul trebuie sa fie mai mare decat 0", http.StatusBadRequest)
+	update := map[string]interface{}{}
+
+	if v, ok := payload["name"]; ok {
+		update["name"] = v
+	}
+	if v, ok := payload["description"]; ok {
+		update["description"] = v
+	}
+	if v, ok := payload["price"]; ok {
+		if price, ok := v.(float64); ok && price <= 0 {
+			http.Error(w, "Pret invalid", http.StatusBadRequest)
 			return
+		}
+		update["price"] = v
+	}
+	if v, ok := payload["dimensions"]; ok {
+		update["dimensions"] = v
+	}
+	if v, ok := payload["is_active"]; ok {
+		update["is_active"] = v
+	}
+	if v, ok := payload["is_available"]; ok {
+		update["is_available"] = v
+	}
+	if v, ok := payload["image_urls"]; ok {
+		update["image_urls"] = v
+	}
+
+	if category, ok := payload["category"].(map[string]interface{}); ok {
+		if categoryID, ok := category["id"].(float64); ok {
+			update["category_id"] = categoryID
 		}
 	}
 
-	if err := DB.Model(&product).Updates(updateData).Error; err != nil {
+	if err := DB.Model(&product).Updates(update).Error; err != nil {
 		http.Error(w, "Eroare la actualizare", http.StatusInternalServerError)
 		return
 	}
 
 	DB.Preload("Category").First(&product, product.ID)
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(product)
 }
