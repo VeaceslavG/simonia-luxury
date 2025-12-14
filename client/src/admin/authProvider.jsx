@@ -1,7 +1,9 @@
+import { API_URL } from "../config/api";
+
 const authProvider = {
   login: async ({ username, password }) => {
     try {
-      const response = await fetch("http://localhost:8080/api/admin/login", {
+      const response = await fetch(`${API_URL}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -35,7 +37,7 @@ const authProvider = {
     localStorage.removeItem("adminToken");
 
     try {
-      await fetch("http://localhost:8080/api/admin/logout", {
+      await fetch(`${API_URL}/api/admin/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -55,7 +57,7 @@ const authProvider = {
     }
 
     try {
-      const res = await fetch("http://localhost:8080/api/admin/me", {
+      const res = await fetch(`${API_URL}/api/admin/me`, {
         method: "GET",
         credentials: "include",
         headers: {

@@ -1,6 +1,7 @@
 // dataProvider.js
 import { fetchUtils } from "react-admin";
 import simpleRestProvider from "ra-data-simple-rest";
+import { API_URL } from "../config/api";
 
 const httpClient = (url, options = {}) => {
   if (!options.headers) {
@@ -26,10 +27,7 @@ const httpClient = (url, options = {}) => {
     });
 };
 
-const baseDataProvider = simpleRestProvider(
-  "http://localhost:8080/api/admin",
-  httpClient
-);
+const baseDataProvider = simpleRestProvider(`${API_URL}/api/admin`, httpClient);
 
 // ID -> id
 const transformId = (data) => {
@@ -93,7 +91,7 @@ export const dataProvider = {
   },
 
   delete: (resource, params) => {
-    return fetch(`http://localhost:8080/api/admin/${resource}/${params.id}`, {
+    return fetch(`${API_URL}/api/admin/${resource}/${params.id}`, {
       method: "DELETE",
       credentials: "include",
       headers: {
