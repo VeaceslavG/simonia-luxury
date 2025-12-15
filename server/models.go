@@ -64,18 +64,19 @@ type OrderItem struct {
 
 type User struct {
 	gorm.Model
-	ID                uint       `gorm:"primaryKey" json:"id"`
-	Email             string     `gorm:"uniqueIndex" json:"email"`
-	Name              string     `json:"name"`
-	Phone             string     `gorm:"not null;default:''" json:"phone"`
-	PasswordHash      string     `json:"-"`
-	IsVerified        bool       `gorm:"default:false" json:"is_verified"`
-	CreatedAt         time.Time  `json:"created_at"`
-	VerificationToken string     `json:"-"`
-	GoogleID          string     `json:"googleId" gorm:"column:google_id"`
-	PictureURL        string     `json:"pictureUrl" gorm:"column:picture_url"`
-	Orders            []Order    `gorm:"foreignKey:UserID"`
-	CartItems         []CartItem `gorm:"foreignKey:UserID"`
+	ID                    uint      `gorm:"primaryKey" json:"id"`
+	Email                 string    `gorm:"uniqueIndex" json:"email"`
+	Name                  string    `json:"name"`
+	Phone                 string    `gorm:"not null;default:''" json:"phone"`
+	PasswordHash          string    `json:"-"`
+	IsVerified            bool      `gorm:"default:false" json:"is_verified"`
+	CreatedAt             time.Time `json:"created_at"`
+	VerificationToken     string    `json:"-"`
+	VerificationExpiresAt time.Time
+	GoogleID              string     `json:"googleId" gorm:"column:google_id"`
+	PictureURL            string     `json:"pictureUrl" gorm:"column:picture_url"`
+	Orders                []Order    `gorm:"foreignKey:UserID"`
+	CartItems             []CartItem `gorm:"foreignKey:UserID"`
 }
 
 type CartItem struct {

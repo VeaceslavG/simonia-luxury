@@ -33,8 +33,13 @@ export const ProductCreate = (props) => (
       </ReferenceInput>
 
       <TextInput source="dimensions" />
-      <ImageInput source="image" label="Product image" accept="image/*">
-        <ImageField source="src" />
+      <ImageInput
+        source="image_urls"
+        label="Product image"
+        multiple
+        accept="image/*"
+      >
+        <ImageField source="src" title="title" />
       </ImageInput>
       <TextInput source="delivery_time" />
       <BooleanInput

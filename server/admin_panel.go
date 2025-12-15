@@ -27,7 +27,11 @@ type AdminClaims struct {
 	jwt.RegisteredClaims
 }
 
-var adminJWTKey = []byte("JWT_SECRET_ADMIN")
+var adminJWTKey []byte
+
+func init() {
+	adminJWTKey = []byte(os.Getenv("JWT_SECRET_ADMIN"))
+}
 
 func adminLogin(w http.ResponseWriter, r *http.Request) {
 	var creds AdminCredentials
@@ -66,11 +70,8 @@ func adminLogin(w http.ResponseWriter, r *http.Request) {
 		Expires:  expirationTime,
 		HttpOnly: true,
 		Path:     "/",
-		SameSite: http.SameSiteLaxMode,
-	})
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": tokenString,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 }
 
@@ -78,10 +79,12 @@ func adminLogout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "admin_token",
 		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
 		Expires:  time.Now().Add(-time.Hour),
 		HttpOnly: true,
-		Path:     "/",
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	w.Header().Set("Content-Type", "application/json")

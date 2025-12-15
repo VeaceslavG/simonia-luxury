@@ -32,8 +32,8 @@ func handleVerify(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // true dacă folosești HTTPS
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 	if err := DB.Save(&user).Error; err != nil {
 		httpError(w, http.StatusInternalServerError, "Could not verify email")

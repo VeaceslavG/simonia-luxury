@@ -60,8 +60,8 @@ func saveGuestCart(w http.ResponseWriter, items []GuestCartItem) {
 		Value:    cookieValue,
 		Path:     "/",
 		MaxAge:   30 * 24 * 3600,
-		HttpOnly: false,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 }

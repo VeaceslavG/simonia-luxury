@@ -40,8 +40,7 @@ type safeUser struct {
 }
 
 type authResp struct {
-	User  safeUser `json:"user"`
-	Token string   `json:"token"`
+	User safeUser `json:"user"`
 }
 
 func generateToken() (string, error) {
@@ -99,12 +98,13 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := User{
-		Email:             req.Email,
-		Name:              req.Name,
-		Phone:             req.Phone,
-		PasswordHash:      string(hash),
-		IsVerified:        false,
-		VerificationToken: token,
+		Email:                 req.Email,
+		Name:                  req.Name,
+		Phone:                 req.Phone,
+		PasswordHash:          string(hash),
+		IsVerified:            false,
+		VerificationToken:     token,
+		VerificationExpiresAt: time.Now().Add(24 * time.Hour),
 	}
 
 	if err := DB.Create(&user).Error; err != nil {
@@ -172,8 +172,8 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // true în producție cu HTTPS
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   24 * 60 * 60,
 	})
 
@@ -187,7 +187,6 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 			Name:  user.Name,
 			Phone: user.Phone,
 		},
-		Token: token,
 	}
 
 	log.Println("✅ Login response sent")
@@ -202,8 +201,8 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
-		Secure:   false, // true doar la HTTPS
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 	okJSON(w, map[string]string{"message": "Logged out"})
 }
@@ -252,6 +251,9 @@ func issueToken(userID uint, email string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		panic("JWT_SECRET not set")
+	}
 	return token.SignedString([]byte(secret))
 }
 
@@ -292,7 +294,11 @@ func authMiddleware(next http.Handler) http.Handler {
 				log.Println("❌ Unexpected signing method:", token.Method)
 				return nil, errors.New("metodă de semnare neașteptată")
 			}
-			return []byte(getEnv("JWT_SECRET", "supersecret")), nil
+			secret := os.Getenv("JWT_SECRET")
+			if secret == "" {
+				return nil, errors.New("JWT_SECRET not set")
+			}
+			return []byte(secret), nil
 		})
 
 		if err != nil {
@@ -304,6 +310,8 @@ func authMiddleware(next http.Handler) http.Handler {
 				Path:     "/",
 				MaxAge:   -1,
 				HttpOnly: true,
+				Secure:   true,
+				SameSite: http.SameSiteNoneMode,
 			})
 			next.ServeHTTP(w, r)
 			return
@@ -318,6 +326,8 @@ func authMiddleware(next http.Handler) http.Handler {
 				Path:     "/",
 				MaxAge:   -1,
 				HttpOnly: true,
+				Secure:   true,
+				SameSite: http.SameSiteNoneMode,
 			})
 			next.ServeHTTP(w, r)
 			return

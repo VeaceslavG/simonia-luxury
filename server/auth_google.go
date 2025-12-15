@@ -88,8 +88,8 @@ func generateStateOauthCookie(w http.ResponseWriter) string {
 		Value:    state,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   60 * 10,
 	})
 
@@ -261,8 +261,8 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		Value:    jwtToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 	userID := user.ID
 	mergeGuestCartToUser(w, r, userID)

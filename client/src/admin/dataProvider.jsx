@@ -97,14 +97,29 @@ export const dataProvider = {
   },
 
   update: async (resource, params) => {
-    if (params.data.image?.rawFile) {
-      const { url } = await uploadImage(params.data.image.rawFile);
+    const data = { ...params.data };
 
-      params.data.image_urls = [url];
-      delete params.data.image;
+    let finalImages = [];
+
+    if (Array.isArray(data.image_urls)) {
+      for (const img of data.image_urls) {
+        if (img.rawFile) {
+          // imagine nouă → upload
+          const { url } = await uploadImage(img.rawFile);
+          finalImages.push(url);
+        } else if (img.src) {
+          // imagine existentă → păstrează
+          finalImages.push(img.src);
+        }
+      }
+
+      data.image_urls = finalImages;
     }
 
-    const response = await baseDataProvider.update(resource, params);
+    const response = await baseDataProvider.update(resource, {
+      ...params,
+      data,
+    });
 
     return {
       ...response,
@@ -113,14 +128,25 @@ export const dataProvider = {
   },
 
   create: async (resource, params) => {
-    if (params.data.image?.rawFile) {
-      const { url } = await uploadImage(params.data.image.rawFile);
+    const data = { ...params.data };
 
-      params.data.image_urls = [url];
-      delete params.data.image;
+    if (Array.isArray(data.image_urls)) {
+      const uploadedUrls = [];
+
+      for (const img of data.image_urls) {
+        if (img.rawFile) {
+          const { url } = await uploadImage(img.rawFile);
+          uploadedUrls.push(url);
+        }
+      }
+
+      data.image_urls = uploadedUrls;
     }
 
-    const response = await baseDataProvider.create(resource, params);
+    const response = await baseDataProvider.create(resource, {
+      ...params,
+      data,
+    });
 
     return {
       ...response,

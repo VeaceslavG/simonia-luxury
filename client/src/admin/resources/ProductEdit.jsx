@@ -33,8 +33,13 @@ export const ProductEdit = (props) => (
       </ReferenceInput>
 
       <TextInput source="dimensions" />
-      <ImageInput source="image" label="Replace image" accept="image/*">
-        <ImageField source="src" />
+      <ImageInput
+        source="image_urls"
+        label="Replace image"
+        multiple
+        accept="image/*"
+      >
+        <ImageField source="src" title="title" />
       </ImageInput>
       <TextInput source="delivery_time" />
       <BooleanInput source="is_available" label="Available" />
