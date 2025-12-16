@@ -210,10 +210,6 @@ func getUserOrders(w http.ResponseWriter, r *http.Request) {
 
 func addToCart(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(userIDKey).(uint)
-	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
 
 	var input struct {
 		ProductID uint `json:"productId"`
@@ -259,10 +255,6 @@ func addToCart(w http.ResponseWriter, r *http.Request) {
 
 func updateCartItem(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(userIDKey).(uint)
-	if !ok {
-		http.Error(w, "User ID not found in context", http.StatusUnauthorized)
-		return
-	}
 
 	vars := mux.Vars(r)
 	itemIDStr := vars["id"]
@@ -272,8 +264,6 @@ func updateCartItem(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Invalid item ID", http.StatusBadRequest)
 	}
-
-	itemID := uint(itemIDInt)
 
 	var req struct {
 		Quantity int `json:"quantity"`
@@ -289,8 +279,36 @@ func updateCartItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Guest
+	if !ok {
+		items, _ := getGuestCart(r)
+		found := false
+
+		for i, it := range items {
+			if int(it.ProductID) == itemIDInt {
+				items[i].Quantity = req.Quantity
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			http.Error(w, "Cart item not found", http.StatusNotFound)
+			return
+		}
+
+		saveGuestCart(w, items)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(items)
+		return
+	}
+
+	// user logat
+	itemID := uint(itemIDInt)
+
 	var cartItem CartItem
-	if err := DB.Where("id = ? AND user_id = ?", itemID, userID).First(&cartItem).Error; err != nil {
+	if err := DB.Where("id = ? AND user_id = ?", itemID, userID).
+		First(&cartItem).Error; err != nil {
 		http.Error(w, "Cart item not found", http.StatusNotFound)
 		return
 	}
@@ -399,7 +417,7 @@ func getCart(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var result []map[string]interface{}
+		result := []map[string]interface{}{}
 		for _, item := range cartItems {
 			result = append(result, map[string]interface{}{
 				"id":        item.ID,
@@ -416,7 +434,7 @@ func getCart(w http.ResponseWriter, r *http.Request) {
 
 	// Guest -> Cookie
 	items, _ := getGuestCart(r)
-	var result []map[string]interface{}
+	result := []map[string]interface{}{}
 	for _, it := range items {
 		var prod Product
 		if err := DB.First(&prod, it.ProductID).Error; err == nil {

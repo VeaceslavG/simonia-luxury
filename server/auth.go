@@ -177,9 +177,6 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   24 * 60 * 60,
 	})
 
-	log.Println("🔄 Merging guest cart to user account...")
-	mergeGuestCartToUser(w, r, user.ID)
-
 	resp := authResp{
 		User: safeUser{
 			ID:    user.ID,
@@ -260,7 +257,6 @@ func issueToken(userID uint, email string) (string, error) {
 // --- Middleware ---
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("=== AUTH MIDDLEWARE START ===")
 		log.Println("Request URL:", r.URL.Path)
 		log.Println("Request Method:", r.Method)
 
@@ -352,9 +348,13 @@ func authMiddleware(next http.Handler) http.Handler {
 		userID := uint(idFloat)
 		log.Println("✅ User authenticated, ID:", userID)
 
+		items, _ := getGuestCart(r)
+		if len(items) > 0 {
+			mergeGuestCartToUser(w, r, userID)
+		}
+
 		// Adaugă userID-ul în context
 		ctx := context.WithValue(r.Context(), userIDKey, userID)
-		log.Println("=== AUTH MIDDLEWARE END ===")
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

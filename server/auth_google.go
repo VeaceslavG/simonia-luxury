@@ -264,8 +264,6 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
 	})
-	userID := user.ID
-	mergeGuestCartToUser(w, r, userID)
 	frontendURL := getEnv("FRONTEND_URL", "http://localhost:5173")
 	http.Redirect(w, r, frontendURL+"/account", http.StatusSeeOther)
 }
