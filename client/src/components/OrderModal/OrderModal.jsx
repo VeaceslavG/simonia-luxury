@@ -33,9 +33,9 @@ export default function OrderModal({ isOpen, onClose }) {
 
       const response = await fetch(`${API_URL}/api/orders`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(orderData),
       });
