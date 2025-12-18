@@ -167,6 +167,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("✅ Login successful, setting authToken cookie for user:", user.Email)
 
+	items, _ := getGuestCart(r)
+	if len(items) > 0 {
+		mergeGuestCartToUser(w, r, user.ID)
+	}
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "authToken",
 		Value:    token,
@@ -347,11 +352,6 @@ func authMiddleware(next http.Handler) http.Handler {
 
 		userID := uint(idFloat)
 		log.Println("✅ User authenticated, ID:", userID)
-
-		items, _ := getGuestCart(r)
-		if len(items) > 0 {
-			mergeGuestCartToUser(w, r, userID)
-		}
 
 		// Adaugă userID-ul în context
 		ctx := context.WithValue(r.Context(), userIDKey, userID)

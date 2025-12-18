@@ -255,6 +255,16 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusInternalServerError, "Token issue failed")
 		return
 	}
+
+	// migrare cos
+	guestItems, _ := getGuestCart(r)
+	if len(guestItems) > 0 {
+		log.Printf("Found %d items in guest cart for Google user ID %d",
+			len(guestItems), user.ID)
+
+		mergeGuestCartToUser(w, r, user.ID)
+	}
+
 	// send JWT to frontend (cookie)
 	http.SetCookie(w, &http.Cookie{
 		Name:     "authToken",
@@ -263,6 +273,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
+		MaxAge:   24 * 60 * 60,
 	})
 	frontendURL := getEnv("FRONTEND_URL", "http://localhost:5173")
 	http.Redirect(w, r, frontendURL+"/account", http.StatusSeeOther)

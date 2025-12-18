@@ -8,14 +8,14 @@ import (
 )
 
 type Category struct {
-	gorm.Model
+	ID        uint      `gorm:"primaryKey" json:"id"`
 	Name      string    `gorm:"unique;not null" json:"name"`
-	CreatedAt time.Time `json:"created_at"`
 	Products  []Product `json:"products,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Product struct {
-	gorm.Model
 	ID           uint           `gorm:"primaryKey" json:"id"`
 	Name         string         `gorm:"not null" json:"name"`
 	Description  string         `json:"description"`
@@ -33,7 +33,6 @@ type Product struct {
 }
 
 type Order struct {
-	gorm.Model
 	ID        uint           `gorm:"primaryKey" json:"id"`
 	UserID    *uint          `json:"userId"`
 	User      User           `json:"user,omitempty"`
@@ -52,7 +51,6 @@ type Order struct {
 }
 
 type OrderItem struct {
-	gorm.Model
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	OrderID   uint      `json:"orderId"`
 	ProductID uint      `json:"productId"`
@@ -63,7 +61,6 @@ type OrderItem struct {
 }
 
 type User struct {
-	gorm.Model
 	ID                    uint      `gorm:"primaryKey" json:"id"`
 	Email                 string    `gorm:"uniqueIndex" json:"email"`
 	Name                  string    `json:"name"`
@@ -71,6 +68,7 @@ type User struct {
 	PasswordHash          string    `json:"-"`
 	IsVerified            bool      `gorm:"default:false" json:"is_verified"`
 	CreatedAt             time.Time `json:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at"`
 	VerificationToken     string    `json:"-"`
 	VerificationExpiresAt time.Time
 	GoogleID              string     `json:"googleId" gorm:"column:google_id"`
@@ -80,11 +78,11 @@ type User struct {
 }
 
 type CartItem struct {
-	gorm.Model
-	UserID    uint      `json:"userId" gorm:"index"`
-	ProductID uint      `json:"productId" gorm:"index"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	UserID    uint      `gorm:"index" json:"userId"`
+	ProductID uint      `gorm:"index" json:"productId"`
 	Quantity  int       `gorm:"not null;default:1" json:"quantity"`
-	Product   Product   `json:"product" gorm:"foreignKey:ProductID"`
+	Product   Product   `json:"product"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

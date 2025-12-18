@@ -21,13 +21,23 @@ export default function OrderModal({ isOpen, onClose }) {
     e.preventDefault();
 
     try {
+      const orderData = {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        address: "",
+        city: "",
+        notes: formData.notes,
+        items: [],
+      };
+
       const response = await fetch(`${API_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(formData), // doar datele introduse în formular
+        body: JSON.stringify(orderData),
       });
 
       if (response.ok) {

@@ -130,7 +130,15 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Sending email for order ID=%d, Address='%s', City='%s'",
 		completeOrder.ID, completeOrder.Address, completeOrder.City)
 
-	go sendEmail(completeOrder)
+	go func(order Order) {
+		if err := sendEmail(order); err != nil {
+			log.Printf("CRITICAL: Failed to send email for order #%d: %v", order.ID, err)
+
+			DB.Model(&Order{}).Where("id = ?", order.ID).
+				Update("email_sent", false).
+				Update("email_error", err.Error())
+		}
+	}(completeOrder)
 
 	go func(orderID uint) {
 		time.Sleep(5 * time.Second)
