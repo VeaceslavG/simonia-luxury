@@ -160,12 +160,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	token, err := issueToken(user.ID, user.Email)
 	if err != nil {
-		log.Println("❌ Token generation error:", err)
+		log.Println("Token generation error:", err)
 		httpError(w, http.StatusInternalServerError, "Eroare server")
 		return
 	}
 
-	log.Println("✅ Login successful, setting authToken cookie for user:", user.Email)
+	log.Println("Login successful, setting authToken cookie for user:", user.Email)
 
 	items, _ := getGuestCart(r)
 	if len(items) > 0 {

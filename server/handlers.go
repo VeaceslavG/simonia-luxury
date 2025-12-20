@@ -460,58 +460,79 @@ func getCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func mergeGuestCartToUser(w http.ResponseWriter, r *http.Request, userID uint) {
-	log.Println("🔄 mergeGuestCartToUser called for user:", userID)
+	log.Println("mergeGuestCartToUser CALLED!")
+	log.Printf("UserID: %d", userID)
+	log.Printf("Request URL: %s", r.URL.Path)
 
+	// 1. Get guest cart
 	items, err := getGuestCart(r)
 	if err != nil {
-		log.Println("❌ Error getting guest cart:", err)
+		log.Printf("Error getting guest cart: %v", err)
 		return
 	}
 
-	log.Printf("📦 Found %d items in guest cart", len(items))
+	log.Printf("Guest cart items count: %d", len(items))
+
+	// 2. DEBUG: Log each item
+	for i, item := range items {
+		log.Printf("Item %d: ProductID=%d, Quantity=%d", i+1, item.ProductID, item.Quantity)
+
+		// Verify product exists
+		var product Product
+		if err := DB.First(&product, item.ProductID).Error; err != nil {
+			log.Printf("Product %d not found in DB!", item.ProductID)
+			continue
+		}
+		log.Printf("Product %d exists: %s", item.ProductID, product.Name)
+	}
 
 	if len(items) == 0 {
-		log.Println("ℹ️ No guest cart items to merge")
+		log.Println("No items to migrate")
 		return
 	}
 
-	for i, it := range items {
-		log.Printf("🔄 Processing guest item %d: ProductID=%d, Quantity=%d", i, it.ProductID, it.Quantity)
-
-		// Verifică dacă produsul există
+	// 3. Migrate each item
+	migratedCount := 0
+	for _, item := range items {
+		// Check if product exists
 		var product Product
-		if err := DB.First(&product, it.ProductID).Error; err != nil {
-			log.Printf("❌ Product %d not found, skipping", it.ProductID)
+		if err := DB.First(&product, item.ProductID).Error; err != nil {
+			log.Printf("Skipping product %d - not found", item.ProductID)
 			continue
 		}
 
+		// Check if already in user's cart
 		var existing CartItem
-		if err := DB.Where("user_id = ? AND product_id = ?", userID, it.ProductID).First(&existing).Error; err == nil {
-			// Item existent - actualizează cantitatea
-			oldQuantity := existing.Quantity
-			existing.Quantity += it.Quantity
+		if err := DB.Where("user_id = ? AND product_id = ?", userID, item.ProductID).
+			First(&existing).Error; err == nil {
+			// Update existing
+			oldQty := existing.Quantity
+			existing.Quantity += item.Quantity
 			if err := DB.Save(&existing).Error; err != nil {
-				log.Println("❌ Error updating existing cart item:", err)
+				log.Printf("Error updating cart item: %v", err)
 			} else {
-				log.Printf("✅ Updated existing item: product %d, quantity %d -> %d",
-					it.ProductID, oldQuantity, existing.Quantity)
+				log.Printf("Updated: product %d, %d -> %d",
+					item.ProductID, oldQty, existing.Quantity)
+				migratedCount++
 			}
 		} else {
-			// Item nou - creează
+			// Create new
 			cartItem := CartItem{
 				UserID:    userID,
-				ProductID: it.ProductID,
-				Quantity:  it.Quantity,
+				ProductID: item.ProductID,
+				Quantity:  item.Quantity,
 			}
 			if err := DB.Create(&cartItem).Error; err != nil {
-				log.Println("❌ Error creating new cart item:", err)
+				log.Printf("Error creating cart item: %v", err)
 			} else {
-				log.Printf("✅ Created new item: product %d, quantity %d", it.ProductID, it.Quantity)
+				log.Printf("Created: product %d, quantity %d",
+					item.ProductID, item.Quantity)
+				migratedCount++
 			}
 		}
 	}
 
-	// Curăță cookie-ul guest cart
+	// 4. Clear guest cart
 	saveGuestCart(w, []GuestCartItem{})
-	log.Println("✅ Guest cart merged and cleared")
+	log.Printf("MIGRATION COMPLETE: %d/%d items migrated", migratedCount, len(items))
 }
