@@ -151,7 +151,7 @@ export default function Profile() {
                   </Link>
                   <button
                     className="removeCartItemBtn"
-                    onClick={() => handleRemoveItem(item.ID)}
+                    onClick={() => handleRemoveItem(item.id)}
                   >
                     <img src={trashIcon} alt="Remove" />
                   </button>
