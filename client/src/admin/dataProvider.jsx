@@ -9,13 +9,6 @@ const httpClient = (url, options = {}) => {
   }
   options.credentials = "include";
 
-  const adminToken = localStorage.getItem("adminToken");
-  if (adminToken) {
-    options.headers.set("Authorization", `Bearer ${adminToken}`);
-  } else {
-    console.error("No admin token found for req");
-  }
-
   return fetchUtils
     .fetchJson(url, options)
     .then((response) => {
@@ -50,9 +43,6 @@ const uploadImage = async (file) => {
   const response = await fetch(`${API_URL}/api/admin/upload`, {
     method: "POST",
     credentials: "include",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-    },
     body: formData,
   });
 
@@ -158,9 +148,6 @@ export const dataProvider = {
     return fetch(`${API_URL}/api/admin/${resource}/${params.id}`, {
       method: "DELETE",
       credentials: "include",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-      },
     })
       .then((response) => {
         if (response.status === 204) {
