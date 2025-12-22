@@ -337,6 +337,12 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 		product.IsActive = true
 	}
 
+	var cat Category
+	if err := DB.First(&cat, product.CategoryID).Error; err != nil {
+		http.Error(w, "Category does not exist", http.StatusBadRequest)
+		return
+	}
+
 	if err := DB.Create(&product).Error; err != nil {
 		http.Error(w, "Eroare la creare", http.StatusInternalServerError)
 		return
