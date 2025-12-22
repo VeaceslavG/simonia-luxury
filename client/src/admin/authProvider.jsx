@@ -16,15 +16,7 @@ const authProvider = {
         throw new Error("Invalid admin credentials");
       }
 
-      const data = await response.json();
-
-      if (data.token) {
-        localStorage.setItem("adminToken", data.token);
-        console.log("💾 Token saved to localStorage");
-      } else {
-        console.error("No token in response!");
-        throw new Error("No token received");
-      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       return Promise.resolve();
     } catch (error) {
@@ -34,8 +26,6 @@ const authProvider = {
   },
 
   logout: async () => {
-    localStorage.removeItem("adminToken");
-
     try {
       await fetch(`${API_URL}/api/admin/logout`, {
         method: "POST",
@@ -49,38 +39,27 @@ const authProvider = {
   },
 
   checkAuth: async () => {
-    // check token
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
-      console.log("No admin token found in localStorage");
-      return Promise.reject();
-    }
-
     try {
       const res = await fetch(`${API_URL}/api/admin/me`, {
         method: "GET",
         credentials: "include",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
-      if (!res.ok) {
-        localStorage.removeItem("adminToken");
+      if (res.ok) {
+        console.log("Admin auth check passed");
+        return Promise.resolve();
+      } else {
+        console.log("Admin auth check failed:", res.status);
         return Promise.reject();
       }
-
-      return Promise.resolve();
     } catch (error) {
       console.error("Auth check error:", error);
-      localStorage.removeItem("adminToken");
       return Promise.reject();
     }
   },
 
   checkError: (error) => {
-    const status = error.status;
+    const status = error?.status || error?.response?.status;
     if (status === 401 || status === 403) {
-      localStorage.removeItem("adminToken");
       return Promise.reject();
     }
     return Promise.resolve();

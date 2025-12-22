@@ -73,6 +73,12 @@ func adminLogin(w http.ResponseWriter, r *http.Request) {
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
 	})
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message":  "Login successful",
+		"username": creds.Username,
+	})
 }
 
 func adminLogout(w http.ResponseWriter, r *http.Request) {
@@ -399,11 +405,29 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		update["description"] = v
 	}
 	if v, ok := payload["price"]; ok {
-		if price, ok := v.(float64); ok && price <= 0 {
+		switch price := v.(type) {
+		case float64:
+			if price <= 0 {
+				http.Error(w, "Pret invalid", http.StatusBadRequest)
+				return
+			}
+			update["price"] = price
+		case int:
+			if float64(price) <= 0 {
+				http.Error(w, "Pret invalid", http.StatusBadRequest)
+				return
+			}
+			update["price"] = float64(price)
+		case int64:
+			if float64(price) <= 0 {
+				http.Error(w, "Pret invalid", http.StatusBadRequest)
+				return
+			}
+			update["price"] = float64(price)
+		default:
 			http.Error(w, "Pret invalid", http.StatusBadRequest)
 			return
 		}
-		update["price"] = v
 	}
 	if v, ok := payload["dimensions"]; ok {
 		update["dimensions"] = v
