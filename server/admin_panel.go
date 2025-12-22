@@ -109,9 +109,12 @@ func adminAuth(next http.Handler) http.Handler {
 
 		authHeader := r.Header.Get("Authorization")
 		if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
-			tokenString = strings.TrimPrefix(authHeader, "Bearer ")
-			tokenString = strings.TrimSpace(tokenString)
-			log.Println("Found Bearer token in header:", tokenString[:10]+"...")
+			tokenString = strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+			if len(tokenString) > 10 {
+				log.Println("Found Bearer token in header:", tokenString[:10]+"...")
+			} else {
+				log.Println("Found Bearer token in header (short):", tokenString)
+			}
 		} else {
 			cookie, err := r.Cookie("admin_token")
 			if err == nil && cookie.Value != "" {
