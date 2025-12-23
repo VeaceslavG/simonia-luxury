@@ -64,10 +64,23 @@ export const dataProvider = {
   },
 
   getOne: (resource, params) => {
-    return baseDataProvider.getOne(resource, params).then((response) => ({
-      ...response,
-      data: transformId(response.data),
-    }));
+    return baseDataProvider.getOne(resource, params).then((response) => {
+      const data = transformId(response.data);
+
+      if (resource === "products") {
+        if (Array.isArray(data.image_urls)) {
+          data.image_urls = data.image_urls.map((url, index) => ({
+            src: url,
+            title: `Image ${index + 1}`,
+          }));
+        }
+
+        if (data.category?.id) {
+          data.category_id = data.category.id;
+        }
+      }
+      return { ...response, data };
+    });
   },
 
   getMany: (resource, params) => {
@@ -89,21 +102,28 @@ export const dataProvider = {
   update: async (resource, params) => {
     const data = { ...params.data };
 
-    let finalImages = [];
-
-    if (Array.isArray(data.image_urls)) {
-      for (const img of data.image_urls) {
-        if (img.rawFile) {
-          // imagine nouă → upload
-          const { url } = await uploadImage(img.rawFile);
-          finalImages.push(url);
-        } else if (img.src) {
-          // imagine existentă → păstrează
-          finalImages.push(img.src);
-        }
+    if (resource === "products") {
+      if (data.category?.id) {
+        data.category_id = data.category.id;
+        delete data.category;
       }
+      if (Array.isArray(data.image_urls)) {
+        const finalImages = [];
 
-      data.image_urls = finalImages;
+        for (const img of data.image_urls) {
+          if (img.rawFile) {
+            // imagine nouă → upload
+            const { url } = await uploadImage(img.rawFile);
+            finalImages.push(url);
+          } else if (img.src) {
+            // imagine existentă → păstrează
+            finalImages.push(img.src);
+          } else if (typeof img === "string") {
+            finalImages.push(img);
+          }
+        }
+        data.image_urls = finalImages;
+      }
     }
 
     const response = await baseDataProvider.update(resource, {
@@ -120,17 +140,24 @@ export const dataProvider = {
   create: async (resource, params) => {
     const data = { ...params.data };
 
-    if (Array.isArray(data.image_urls)) {
-      const uploadedUrls = [];
-
-      for (const img of data.image_urls) {
-        if (img.rawFile) {
-          const { url } = await uploadImage(img.rawFile);
-          uploadedUrls.push(url);
-        }
+    if (resource === "products") {
+      if (data.category?.id) {
+        data.category_id = data.category.id;
+        delete data.category;
       }
 
-      data.image_urls = uploadedUrls;
+      if (Array.isArray(data.image_urls)) {
+        const uploadedUrls = [];
+
+        for (const img of data.image_urls) {
+          if (img.rawFile) {
+            const { url } = await uploadImage(img.rawFile);
+            uploadedUrls.push(url);
+          }
+        }
+
+        data.image_urls = uploadedUrls;
+      }
     }
 
     const response = await baseDataProvider.create(resource, {
@@ -148,18 +175,7 @@ export const dataProvider = {
     return fetch(`${API_URL}/api/admin/${resource}/${params.id}`, {
       method: "DELETE",
       credentials: "include",
-    })
-      .then((response) => {
-        if (response.status === 204) {
-          return { data: { id: params.id } };
-        } else {
-          throw new Error(`HTTP Error: ${response.status}`);
-        }
-      })
-      .catch((error) => {
-        console.error("Delete failed:", resource, params.id, error);
-        throw error;
-      });
+    }).then(() => ({ data: { id: params.id } }));
   },
 };
 

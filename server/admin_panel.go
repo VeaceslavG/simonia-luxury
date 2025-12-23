@@ -287,7 +287,7 @@ func getAdminProducts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Execute query
-	if err := DB.Order(sortField + " " + sortOrder).Offset(offset).Limit(limit).Find(&products).Error; err != nil {
+	if err := DB.Preload("Category").Order(sortField + " " + sortOrder).Offset(offset).Limit(limit).Find(&products).Error; err != nil {
 		http.Error(w, "Eroare la preluarea produselor", http.StatusInternalServerError)
 		return
 	}
@@ -304,7 +304,7 @@ func getAdminProducts(w http.ResponseWriter, r *http.Request) {
 func getAdminProduct(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	var product Product
-	if err := DB.First(&product, id).Error; err != nil {
+	if err := DB.Preload("Category").First(&product, id).Error; err != nil {
 		http.Error(w, "Produsul nu a fost găsit", http.StatusNotFound)
 		return
 	}
@@ -330,10 +330,10 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if product.IsAvailable == false && product.IsAvailable != true {
+	if !product.IsAvailable {
 		product.IsAvailable = true
 	}
-	if product.IsActive == false && product.IsActive != true {
+	if !product.IsActive {
 		product.IsActive = true
 	}
 
@@ -385,6 +385,7 @@ func adminUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"url": "/uploads/products/" + filename,
 	})
@@ -466,10 +467,29 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if category, ok := payload["category"].(map[string]interface{}); ok {
-		if categoryID, ok := category["id"].(float64); ok {
-			update["category_id"] = categoryID
+	if v, ok := payload["category_id"]; ok {
+		var catID uint
+
+		switch id := v.(type) {
+		case float64:
+			catID = uint(id)
+		case int:
+			catID = uint(id)
+		case int64:
+			catID = uint(id)
+		default:
+			http.Error(w, "Category ID invalid", http.StatusBadRequest)
+			return
 		}
+
+		var count int64
+		DB.Model(&Category{}).Where("id = ?", catID).Count(&count)
+		if count == 0 {
+			http.Error(w, "Categoria nu există", http.StatusBadRequest)
+			return
+		}
+
+		update["category_id"] = catID
 	}
 
 	if err := DB.Model(&product).Updates(update).Error; err != nil {
