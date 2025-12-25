@@ -147,7 +147,9 @@ export default function Profile() {
                     <span>
                       {item.product?.name} - {item.quantity} x{" "}
                       {(
-                        (item.product?.price_cents ?? item.price ?? 0) / 100
+                        (item.product?.price_cents ??
+                          item.product?.price ??
+                          0) / 100
                       ).toFixed(2)}{" "}
                       MDL
                     </span>
@@ -212,8 +214,9 @@ export default function Profile() {
                             <span className="productQuantity">
                               {item.quantity} x{" "}
                               {(
-                                (item.product?.price_cents ?? item.price ?? 0) /
-                                100
+                                (item.product?.price_cents ??
+                                  item.product?.price ??
+                                  0) / 100
                               ).toFixed(2)}{" "}
                               MDL
                             </span>
@@ -221,7 +224,9 @@ export default function Profile() {
                           <span className="itemTotal">
                             {(
                               item.quantity *
-                              ((item.product?.price_cents ?? item.price ?? 0) /
+                              ((item.product?.price_cents ??
+                                item.product?.price ??
+                                0) /
                                 100)
                             ).toFixed(2)}{" "}
                             MDL

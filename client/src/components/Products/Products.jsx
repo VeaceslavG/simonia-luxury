@@ -140,7 +140,7 @@ export default function Products({ selectedCategory, searchQuery }) {
               <div className="card-body">
                 <span className="card-title productName">{product.name}</span>
                 <span className="card-text productPrice">
-                  {((product.product?.price_cents ?? 0) / 100).toFixed(2)} MDL
+                  {((product.price_cents ?? 0) / 100).toFixed(2)} MDL
                 </span>
               </div>
             </div>

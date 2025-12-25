@@ -294,7 +294,7 @@ func getAdminProducts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i := range products {
-		products[i].Price = float64(products[i].PriceCents) / 100
+		products[i].Price = float64(products[i].PriceCents) / 100.0
 	}
 
 	// Set headers for React Admin
@@ -334,13 +334,10 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if product.Price <= 0 {
+	if product.PriceCents <= 0 {
 		http.Error(w, "Pretul trebuie sa fie mai mare decat 0", http.StatusBadRequest)
 		return
 	}
-
-	product.PriceCents = int64(math.Round(product.Price * 100))
-	product.Price = 0
 
 	if !product.IsAvailable {
 		product.IsAvailable = true
@@ -426,33 +423,27 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 	if v, ok := payload["description"]; ok {
 		update["description"] = v
 	}
-	if v, ok := payload["price"]; ok {
-		var priceLei float64
+	if v, ok := payload["price_cents"]; ok {
+		var cents int64
 
 		switch price := v.(type) {
 		case float64:
-			priceLei = float64(price)
+			cents = int64(math.Round(price))
 		case int:
-			priceLei = float64(price)
+			cents = int64(price)
 		case int64:
-			priceLei = float64(price)
+			cents = int64(price)
 		default:
 			http.Error(w, "Pret invalid", http.StatusBadRequest)
 			return
 		}
 
-		if priceLei <= 0 {
+		if cents <= 0 {
 			http.Error(w, "Pret invalid", http.StatusBadRequest)
 			return
 		}
 
-		update["price_cents"] = int64(math.Round(priceLei * 100))
-
-		delete(update, "price")
-
-		DB.Model(&product).Updates(update)
-
-		product.Price = float64(product.PriceCents) / 100
+		update["price_cents"] = cents
 	}
 	if v, ok := payload["dimensions"]; ok {
 		update["dimensions"] = v
