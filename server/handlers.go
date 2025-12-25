@@ -95,7 +95,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 		Status:  "pending",
 	}
 
-	var total float64
+	var totalCents int64
 	for _, item := range req.Items {
 		var product Product
 		if err := DB.First(&product, item.ProductID).Error; err != nil {
@@ -103,16 +103,19 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		total := product.PriceCents * int64(item.Quantity)
+		totalCents += total
+
 		order.Items = append(order.Items, OrderItem{
-			ProductID: item.ProductID,
-			Quantity:  item.Quantity,
-			Price:     product.Price,
+			ProductID:  item.ProductID,
+			Quantity:   item.Quantity,
+			PriceCents: product.PriceCents,
 		})
 
-		total += product.Price * float64(item.Quantity)
 	}
 
-	order.Total = total
+	order.TotalCents = totalCents
+	order.Total = float64(totalCents) / 100
 
 	if err := DB.Create(&order).Error; err != nil {
 		log.Printf("Error creating order: %v", err)

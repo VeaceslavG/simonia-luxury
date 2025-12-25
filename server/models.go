@@ -19,7 +19,8 @@ type Product struct {
 	ID           uint           `gorm:"primaryKey" json:"id"`
 	Name         string         `gorm:"not null" json:"name"`
 	Description  string         `json:"description"`
-	Price        float64        `gorm:"type:decimal(10,2);not null" json:"price"`
+	Price        float64        `gorm:"-" json:"price"`
+	PriceCents   int64          `gorm:"not null" json:"price_cents"`
 	CategoryID   uint           `json:"category_id"`
 	Category     Category       `json:"category" gorm:"foreignKey:CategoryID"`
 	Dimensions   string         `json:"dimensions"`
@@ -33,31 +34,33 @@ type Product struct {
 }
 
 type Order struct {
-	ID        uint           `gorm:"primaryKey" json:"id"`
-	UserID    *uint          `json:"userId"`
-	User      User           `json:"user,omitempty"`
-	Name      string         `gorm:"not null" json:"name"`
-	Phone     string         `gorm:"not null" json:"phone"`
-	Email     string         `json:"email"`
-	Address   string         `gorm:"not null" json:"address"`
-	City      string         `gorm:"not null" json:"city"`
-	Notes     string         `json:"notes"`
-	Status    string         `gorm:"default:'pending'" json:"status"`
-	Total     float64        `gorm:"type:decimal(10,2);not null" json:"total"`
-	Items     []OrderItem    `json:"items" gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	ID         uint           `gorm:"primaryKey" json:"id"`
+	UserID     *uint          `json:"userId"`
+	User       User           `json:"user,omitempty"`
+	Name       string         `gorm:"not null" json:"name"`
+	Phone      string         `gorm:"not null" json:"phone"`
+	Email      string         `json:"email"`
+	Address    string         `gorm:"not null" json:"address"`
+	City       string         `gorm:"not null" json:"city"`
+	Notes      string         `json:"notes"`
+	Status     string         `gorm:"default:'pending'" json:"status"`
+	Total      float64        `gorm:"-" json:"total"`
+	TotalCents int64          `gorm:"not null" json:"total_cents"`
+	Items      []OrderItem    `json:"items" gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE"`
+	CreatedAt  time.Time      `json:"created_at"`
+	UpdatedAt  time.Time      `json:"updated_at"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 type OrderItem struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	OrderID   uint      `json:"orderId"`
-	ProductID uint      `json:"productId"`
-	Quantity  int       `gorm:"not null" json:"quantity"`
-	Price     float64   `gorm:"type:decimal(10,2);not null" json:"price"`
-	CreatedAt time.Time `json:"created_at"`
-	Product   Product   `json:"product" gorm:"foreignKey:ProductID"`
+	ID         uint      `gorm:"primaryKey" json:"id"`
+	OrderID    uint      `json:"orderId"`
+	ProductID  uint      `json:"productId"`
+	Quantity   int       `gorm:"not null" json:"quantity"`
+	Price      float64   `gorm:"-" json:"price"`
+	PriceCents int64     `gorm:"not null" json:"price_cents"`
+	CreatedAt  time.Time `json:"created_at"`
+	Product    Product   `json:"product" gorm:"foreignKey:ProductID"`
 }
 
 type User struct {

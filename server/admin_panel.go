@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -292,6 +293,10 @@ func getAdminProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for i := range products {
+		products[i].Price = float64(products[i].PriceCents) / 100
+	}
+
 	// Set headers for React Admin
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Expose-Headers", "Content-Range")
@@ -304,10 +309,14 @@ func getAdminProducts(w http.ResponseWriter, r *http.Request) {
 func getAdminProduct(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	var product Product
+
 	if err := DB.Preload("Category").First(&product, id).Error; err != nil {
 		http.Error(w, "Produsul nu a fost găsit", http.StatusNotFound)
 		return
 	}
+
+	product.Price = float64(product.PriceCents) / 100
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(product)
 }
@@ -330,6 +339,9 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	product.PriceCents = int64(math.Round(product.Price * 100))
+	product.Price = 0
+
 	if !product.IsAvailable {
 		product.IsAvailable = true
 	}
@@ -343,7 +355,7 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := DB.Create(&product).Error; err != nil {
+	if err := DB.Omit("Price").Create(&product).Error; err != nil {
 		http.Error(w, "Eroare la creare", http.StatusInternalServerError)
 		return
 	}
@@ -415,29 +427,32 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		update["description"] = v
 	}
 	if v, ok := payload["price"]; ok {
+		var priceLei float64
+
 		switch price := v.(type) {
 		case float64:
-			if price <= 0 {
-				http.Error(w, "Pret invalid", http.StatusBadRequest)
-				return
-			}
-			update["price"] = price
+			priceLei = float64(price)
 		case int:
-			if float64(price) <= 0 {
-				http.Error(w, "Pret invalid", http.StatusBadRequest)
-				return
-			}
-			update["price"] = float64(price)
+			priceLei = float64(price)
 		case int64:
-			if float64(price) <= 0 {
-				http.Error(w, "Pret invalid", http.StatusBadRequest)
-				return
-			}
-			update["price"] = float64(price)
+			priceLei = float64(price)
 		default:
 			http.Error(w, "Pret invalid", http.StatusBadRequest)
 			return
 		}
+
+		if priceLei <= 0 {
+			http.Error(w, "Pret invalid", http.StatusBadRequest)
+			return
+		}
+
+		update["price_cents"] = int64(math.Round(priceLei * 100))
+
+		delete(update, "price")
+
+		DB.Model(&product).Updates(update)
+
+		product.Price = float64(product.PriceCents) / 100
 	}
 	if v, ok := payload["dimensions"]; ok {
 		update["dimensions"] = v
@@ -492,10 +507,14 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		update["category_id"] = catID
 	}
 
+	delete(update, "price")
+
 	if err := DB.Model(&product).Updates(update).Error; err != nil {
 		http.Error(w, "Eroare la actualizare", http.StatusInternalServerError)
 		return
 	}
+
+	product.Price = float64(product.PriceCents) / 100
 
 	DB.Preload("Category").First(&product, product.ID)
 

@@ -408,12 +408,20 @@ export function CartProvider({ children }) {
     }
   };
 
-  const cartSubtotal = cartItems.reduce((total, item) => {
-    if (item.product && item.product.price) {
-      return total + item.product.price * item.quantity;
-    }
-    return total;
+  const cartSubtotalCents = cartItems.reduce((total, item) => {
+    if (!item.product) return total;
+
+    const priceCents =
+      typeof item.product.price_cents === "number"
+        ? item.product.price_cents
+        : typeof item.product.price === "number"
+        ? Math.round(item.product.price * 100)
+        : 0;
+
+    return total + priceCents * item.quantity;
   }, 0);
+
+  const cartSubtotal = cartSubtotalCents / 100;
 
   const value = {
     cartItems,
