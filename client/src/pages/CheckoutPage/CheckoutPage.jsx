@@ -209,7 +209,10 @@ export default function CheckoutPage() {
                         </h4>
                         <p>Cantitate: {item.quantity}</p>
                         <p>
-                          Preț: {item.product?.price * item.quantity || 0} MDL
+                          Preț:{" "}
+                          {((item.product?.price_cents ?? 0) / 100).toFixed(2) *
+                            item.quantity || 0}{" "}
+                          MDL
                         </p>
                       </div>
                     </div>

@@ -27,7 +27,11 @@ export default function ProductsList(props) {
           label="Category"
           render={(record) => record.category?.name || ""}
         />
-        <NumberField source="price" />
+        <NumberField
+          source="price_cents"
+          label="Price (MDL)"
+          render={(record) => (record.price_cents / 100).toFixed(2)}
+        />
         <BooleanField source="is_active" />
         <EditButton />
         <DeleteWithConfirmButton />

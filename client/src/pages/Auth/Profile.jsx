@@ -146,7 +146,10 @@ export default function Profile() {
                     />
                     <span>
                       {item.product?.name} - {item.quantity} x{" "}
-                      {item.product?.price} MDL
+                      {(
+                        (item.product?.price_cents ?? item.price ?? 0) / 100
+                      ).toFixed(2)}{" "}
+                      MDL
                     </span>
                   </Link>
                   <button
@@ -207,11 +210,21 @@ export default function Profile() {
                               {item.product?.name}
                             </span>
                             <span className="productQuantity">
-                              {item.quantity} x {item.price} MDL
+                              {item.quantity} x{" "}
+                              {(
+                                (item.product?.price_cents ?? item.price ?? 0) /
+                                100
+                              ).toFixed(2)}{" "}
+                              MDL
                             </span>
                           </div>
                           <span className="itemTotal">
-                            {(item.quantity * item.price).toFixed(2)} MDL
+                            {(
+                              item.quantity *
+                              ((item.product?.price_cents ?? item.price ?? 0) /
+                                100)
+                            ).toFixed(2)}{" "}
+                            MDL
                           </span>
                         </li>
                       );

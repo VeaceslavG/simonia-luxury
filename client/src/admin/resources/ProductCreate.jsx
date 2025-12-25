@@ -18,7 +18,10 @@ export const ProductCreate = (props) => (
       <TextInput source="name" fullWidth validate={[required()]} />
       <TextInput source="description" multiline fullWidth />
       <NumberInput
-        source="price"
+        source="price_cents"
+        label="Price (MDL)"
+        format={(v) => v / 100}
+        parse={(v) => Math.round(v * 100)}
         validate={[required(), minValue(0.01)]}
         min={0.01}
         step={0.01}

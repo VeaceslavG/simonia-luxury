@@ -99,7 +99,9 @@ export default function ProductPage() {
 
           <div className="col-md-6 d-flex flex-column justify-content-center">
             <h1 className="productName mb-3">{product.name}</h1>
-            <p className="productPrice mb-3">{product.price} MDL</p>
+            <p className="productPrice mb-3">
+              {((product.product?.price_cents ?? 0) / 100).toFixed(2)} MDL
+            </p>
             <p className="productDescription mb-4">
               {product.description ||
                 "Aici se află descrierea produsului selectat de dumneavoastră."}

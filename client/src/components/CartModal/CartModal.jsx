@@ -91,7 +91,9 @@ export default function CartModal() {
                 const productImage = getProductImage(item);
                 const productName =
                   item.product?.name || `Produs #${item.productId}`;
-                const productPrice = item.product?.price || 0;
+                const productPrice = (
+                  (item.product?.price_cents ?? 0) / 100
+                ).toFixed(2);
 
                 return (
                   <li key={uniqueKey} className="cartItem">
