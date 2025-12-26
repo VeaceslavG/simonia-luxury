@@ -27,9 +27,10 @@ export default function ProductsList(props) {
           render={(record) => record.category?.name || ""}
         />
         <FunctionField
-          source="price_cents"
           label="Price (MDL)"
-          render={(record) => (record.price_cents / 100).toFixed(2)}
+          render={(record) =>
+            record.price != null ? record.price.toFixed(2) : "-"
+          }
         />
         <BooleanField source="is_active" />
         <EditButton />

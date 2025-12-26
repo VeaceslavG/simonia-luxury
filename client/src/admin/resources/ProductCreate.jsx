@@ -2,6 +2,7 @@ import {
   Create,
   SimpleForm,
   TextInput,
+  NumberInput,
   BooleanInput,
   ReferenceInput,
   SelectInput,
@@ -16,7 +17,7 @@ export const ProductCreate = (props) => (
     <SimpleForm>
       <TextInput source="name" fullWidth validate={[required()]} />
       <TextInput source="description" multiline fullWidth />
-      <TextInput
+      <NumberInput
         source="price"
         label="Price (MDL)"
         validate={[required(), minValue(0.01)]}
