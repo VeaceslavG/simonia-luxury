@@ -19,7 +19,6 @@ type Product struct {
 	ID           uint           `gorm:"primaryKey" json:"id"`
 	Name         string         `gorm:"not null" json:"name"`
 	Description  string         `json:"description"`
-	Price        float64        `gorm:"-" json:"price"`
 	PriceCents   int64          `gorm:"not null" json:"price_cents"`
 	CategoryID   uint           `json:"category_id"`
 	Category     Category       `json:"category" gorm:"foreignKey:CategoryID"`
@@ -31,6 +30,40 @@ type Product struct {
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+type ProductCreateRequest struct {
+	Name        string   `json:"name" validate:"required"`
+	Description string   `json:"description"`
+	Price       float64  `json:"price" validate:"required,gt=0"`
+	CategoryID  uint     `json:"category_id" validate:"required"`
+	ImageURLs   []string `json:"image_urls"`
+	Dimensions  string   `json:"dimensions"`
+	IsActive    bool     `json:"is_active"`
+	IsAvailable bool     `json:"is_available"`
+}
+
+type ProductUpdateRequest struct {
+	Name        *string   `json:"name"`
+	Description *string   `json:"description"`
+	Price       *float64  `json:"price"`
+	CategoryID  *uint     `json:"category_id"`
+	ImageURLs   *[]string `json:"image_urls"`
+	Dimensions  *string   `json:"dimensions"`
+	IsActive    *bool     `json:"is_active"`
+	IsAvailable *bool     `json:"is_available"`
+}
+
+type ProductResponse struct {
+	ID          uint     `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Price       float64  `json:"price"`
+	CategoryID  uint     `json:"category_id"`
+	ImageURLs   []string `json:"image_urls"`
+	Dimensions  string   `json:"dimensions"`
+	IsActive    bool     `json:"is_active"`
+	IsAvailable bool     `json:"is_available"`
 }
 
 type Order struct {

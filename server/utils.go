@@ -18,3 +18,17 @@ func SendEmail(to, subject, body string) error {
 		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
 		from, []string{to}, []byte(msg))
 }
+
+func productToResponse(p Product) ProductResponse {
+	return ProductResponse{
+		ID:          p.ID,
+		Name:        p.Name,
+		Description: p.Description,
+		Price:       float64(p.PriceCents) / 100,
+		CategoryID:  p.CategoryID,
+		ImageURLs:   p.ImageURLs,
+		Dimensions:  p.Dimensions,
+		IsActive:    p.IsActive,
+		IsAvailable: p.IsAvailable,
+	}
+}

@@ -293,8 +293,9 @@ func getAdminProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for i := range products {
-		products[i].Price = float64(products[i].PriceCents) / 100.0
+	response := make([]ProductResponse, 0, len(products))
+	for _, p := range products {
+		response = append(response, productToResponse(p))
 	}
 
 	// Set headers for React Admin
@@ -303,7 +304,7 @@ func getAdminProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Range", fmt.Sprintf("products %d-%d/%d", start, end, total))
 
 	// Return data in React Admin format
-	json.NewEncoder(w).Encode(products)
+	json.NewEncoder(w).Encode(response)
 }
 
 func getAdminProduct(w http.ResponseWriter, r *http.Request) {
@@ -315,44 +316,47 @@ func getAdminProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product.Price = float64(product.PriceCents) / 100
-
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(product)
+	json.NewEncoder(w).Encode(productToResponse(product))
 }
 
 func createAdminProduct(w http.ResponseWriter, r *http.Request) {
-	var product Product
+	var req ProductCreateRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Date invalide", http.StatusBadRequest)
 		return
 	}
 
-	if product.Name == "" {
+	if req.Name == "" {
 		http.Error(w, "Numele produsului este obligatoriu", http.StatusBadRequest)
 		return
 	}
 
-	if product.PriceCents <= 0 {
+	if req.Price <= 0 {
 		http.Error(w, "Pretul trebuie sa fie mai mare decat 0", http.StatusBadRequest)
 		return
 	}
 
-	if !product.IsAvailable {
-		product.IsAvailable = true
-	}
-	if !product.IsActive {
-		product.IsActive = true
-	}
+	priceCents := int64(math.Round(req.Price * 100))
 
 	var cat Category
-	if err := DB.First(&cat, product.CategoryID).Error; err != nil {
+	if err := DB.First(&cat, req.CategoryID).Error; err != nil {
 		http.Error(w, "Category does not exist", http.StatusBadRequest)
 		return
 	}
 
-	if err := DB.Omit("Price").Create(&product).Error; err != nil {
+	product := Product{
+		Name:        req.Name,
+		Description: req.Description,
+		PriceCents:  priceCents,
+		CategoryID:  req.CategoryID,
+		IsActive:    req.IsActive,
+		IsAvailable: req.IsAvailable,
+		ImageURLs:   pq.StringArray(req.ImageURLs),
+	}
+
+	if err := DB.Create(&product).Error; err != nil {
 		http.Error(w, "Eroare la creare", http.StatusInternalServerError)
 		return
 	}
@@ -360,7 +364,7 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 	DB.Preload("Category").First(&product, product.ID)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(product)
+	json.NewEncoder(w).Encode(productToResponse(product))
 }
 
 func adminUpload(w http.ResponseWriter, r *http.Request) {
@@ -409,108 +413,44 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var payload map[string]interface{}
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+	var req ProductUpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Date invalide", http.StatusBadRequest)
 		return
 	}
 
-	update := map[string]interface{}{}
-
-	if v, ok := payload["name"]; ok {
-		update["name"] = v
+	if req.Name != nil {
+		product.Name = *req.Name
 	}
-	if v, ok := payload["description"]; ok {
-		update["description"] = v
+	if req.Description != nil {
+		product.Description = *req.Description
 	}
-	if v, ok := payload["price_cents"]; ok {
-		var cents int64
-
-		switch price := v.(type) {
-		case float64:
-			cents = int64(math.Round(price))
-		case int:
-			cents = int64(price)
-		case int64:
-			cents = int64(price)
-		default:
-			http.Error(w, "Pret invalid", http.StatusBadRequest)
-			return
-		}
-
-		if cents <= 0 {
-			http.Error(w, "Pret invalid", http.StatusBadRequest)
-			return
-		}
-
-		update["price_cents"] = cents
+	if req.Price != nil {
+		product.PriceCents = int64(math.Round(*req.Price * 100))
 	}
-	if v, ok := payload["dimensions"]; ok {
-		update["dimensions"] = v
+	if req.Dimensions != nil {
+		product.Dimensions = *req.Dimensions
 	}
-	if v, ok := payload["is_active"]; ok {
-		update["is_active"] = v
+	if req.IsActive != nil {
+		product.IsActive = *req.IsActive
 	}
-	if v, ok := payload["is_available"]; ok {
-		update["is_available"] = v
+	if req.IsAvailable != nil {
+		product.IsAvailable = *req.IsAvailable
 	}
-	if v, ok := payload["image_urls"]; ok {
-
-		switch val := v.(type) {
-
-		case string:
-			// vine un singur URL → îl punem în array
-			update["image_urls"] = pq.StringArray{val}
-
-		case []interface{}:
-			urls := []string{}
-			for _, u := range val {
-				if s, ok := u.(string); ok {
-					urls = append(urls, s)
-				}
-			}
-			update["image_urls"] = pq.StringArray(urls)
-		}
+	if req.ImageURLs != nil {
+		product.ImageURLs = pq.StringArray(*req.ImageURLs)
+	}
+	if req.CategoryID != nil {
+		product.CategoryID = *req.CategoryID
 	}
 
-	if v, ok := payload["category_id"]; ok {
-		var catID uint
-
-		switch id := v.(type) {
-		case float64:
-			catID = uint(id)
-		case int:
-			catID = uint(id)
-		case int64:
-			catID = uint(id)
-		default:
-			http.Error(w, "Category ID invalid", http.StatusBadRequest)
-			return
-		}
-
-		var count int64
-		DB.Model(&Category{}).Where("id = ?", catID).Count(&count)
-		if count == 0 {
-			http.Error(w, "Categoria nu există", http.StatusBadRequest)
-			return
-		}
-
-		update["category_id"] = catID
-	}
-
-	delete(update, "price")
-
-	if err := DB.Model(&product).Updates(update).Error; err != nil {
+	if err := DB.Save(&product).Error; err != nil {
 		http.Error(w, "Eroare la actualizare", http.StatusInternalServerError)
 		return
 	}
 
-	product.Price = float64(product.PriceCents) / 100
-
 	DB.Preload("Category").First(&product, product.ID)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(product)
+	json.NewEncoder(w).Encode(productToResponse(product))
 }
 
 func updateOrder(w http.ResponseWriter, r *http.Request) {
@@ -689,6 +629,16 @@ func getAllOrders(w http.ResponseWriter, r *http.Request) {
 		Find(&orders).Error; err != nil {
 		http.Error(w, "Error fetching all orders", http.StatusInternalServerError)
 		return
+	}
+
+	for i := range orders {
+		var total int64
+		for j := range orders[i].Items {
+			orders[i].Items[j].Price =
+				float64(orders[i].Items[j].PriceCents) / 100
+			total += orders[i].Items[j].PriceCents * int64(orders[i].Items[j].Quantity)
+		}
+		orders[i].Total = float64(total) / 100
 	}
 
 	// Set headers for React Admin
