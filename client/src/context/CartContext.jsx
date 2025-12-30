@@ -30,10 +30,16 @@ export function CartProvider({ children }) {
     item.product?.id || item.product?.ID || item.productId;
 
   const getCartItemId = (item) => {
-    if (item.id != null) return item.id.toString();
-    if (item.ID != null) return item.ID.toString();
-    if (item.tempId) return item.tempId;
+    if (user) {
+      if (item.id && item.id.toString().startsWith("guest-")) {
+        return item.id.toString();
+      }
+      return `server-${item.id || item.ID}`;
+    }
+
     if (item.productId) return `guest-${item.productId}`;
+    if (item.tempId) return item.tempId;
+
     return null;
   };
 
@@ -109,7 +115,7 @@ export function CartProvider({ children }) {
       setCartItems(
         items.map((i) => ({
           ...i,
-          id: i.id || i.ID || `cart-${i.productId}`,
+          id: i.id || i.ID,
           productId: i.productId || i.product?.id || i.product?.ID,
         }))
       );
@@ -213,37 +219,43 @@ export function CartProvider({ children }) {
   };
 
   const removeItem = async (id) => {
-    if (!user) {
-      setCartItems((items) => items.filter((i) => getCartItemId(i) !== id));
-      return;
+    setCartItems((items) => items.filter((i) => getCartItemId(i) !== id));
+
+    if (!user) return;
+
+    const realId = id.replace("server-", "");
+
+    try {
+      await fetch(`${API_URL}/api/cart/item/${realId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+    } catch {
+      setCartVersion((v) => v + 1);
     }
-
-    await fetch(`${API_URL}/api/cart/item/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-
-    setCartVersion((v) => v + 1);
   };
 
   const updateQuantity = async (id, quantity) => {
     if (quantity < 1) return removeItem(id);
 
-    if (!user) {
-      setCartItems((items) =>
-        items.map((i) => (getCartItemId(i) === id ? { ...i, quantity } : i))
-      );
-      return;
+    setCartItems((items) =>
+      items.map((i) => (getCartItemId(i) === id ? { ...i, quantity } : i))
+    );
+
+    if (!user) return;
+
+    const realId = id.replace("server-", "");
+
+    try {
+      await fetch(`${API_URL}/api/cart/item/${realId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quantity }),
+      });
+    } catch {
+      setCartVersion((v) => v + 1);
     }
-
-    await fetch(`${API_URL}/api/cart/item/${id}`, {
-      method: "PUT",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ quantity }),
-    });
-
-    setCartVersion((v) => v + 1);
   };
 
   const clearCart = async () => {
