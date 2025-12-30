@@ -29,10 +29,11 @@ export default function SearchBar() {
     <div className="search-bar-wrapper">
       <form onSubmit={handleSearch} className="search-bar">
         <input
+          className="searchInput"
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Caută produse..."
+          placeholder="Caută..."
         />
         <button type="submit">Caută</button>
       </form>

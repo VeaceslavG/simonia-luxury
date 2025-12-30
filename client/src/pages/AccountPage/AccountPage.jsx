@@ -8,8 +8,18 @@ import { useAuth } from "../../context/AuthContext";
 import "./accountPage.scss";
 
 export default function AccountPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [mode, setMode] = useState("login");
+
+  if (loading && !user) {
+    return (
+      <>
+        <Nav />
+        <p style={{ textAlign: "center" }}>Loading...</p>
+        <Footer />
+      </>
+    );
+  }
 
   if (user) {
     return (

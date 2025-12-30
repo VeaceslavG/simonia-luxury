@@ -13,11 +13,14 @@ export default function IntroBlock({ introTitle, introText, introImage }) {
 
   return (
     <div className="introBlockContainer">
-      <div className="introBlockBG">
+      <div
+        style={{ "--background-image-url": `url(${introImage})` }}
+        className="introBlockBG"
+      >
         <div className="introBlock">
           <div className="introLeftSection">
-            <span className="introTitle">{introTitle}</span>
-            <span className="introText">{introText}</span>
+            <h1 className="introTitle">{introTitle}</h1>
+            <h3 className="introText">{introText}</h3>
             <div className="introBlockBtns">
               <Button
                 className="orderBtn"
@@ -34,9 +37,6 @@ export default function IntroBlock({ introTitle, introText, introImage }) {
                 onClick={() => handleExploreBtnClick("products")}
               />
             </div>
-          </div>
-          <div className="introImageContainer">
-            <img className="introImage" src={introImage} alt="Furniture" />
           </div>
         </div>
       </div>

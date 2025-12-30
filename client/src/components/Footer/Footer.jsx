@@ -1,49 +1,47 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
 import "./footer.scss";
-import logo from "../../assets/footer/logoBlue.png";
+// import logo from "../../assets/footer/logoBlue.png";
 
 export default function Footer() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  // const navigate = useNavigate();
+  // const location = useLocation();
 
-  const [copied, setCopied] = useState(false);
+  // const [copied, setCopied] = useState(false);
 
-  const phoneNumber = "+373 602 85 786";
+  // const phoneNumber = "+373 602 85 786";
 
-  function handleCopy() {
-    navigator.clipboard
-      .writeText(phoneNumber)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
-      });
-  }
+  // function handleCopy() {
+  //   navigator.clipboard
+  //     .writeText(phoneNumber)
+  //     .then(() => {
+  //       setCopied(true);
+  //       setTimeout(() => setCopied(false), 2000);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Failed to copy: ", err);
+  //     });
+  // }
 
-  function handleMenuClick(sectionId) {
-    if (location.pathname === "/") {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      navigate(`/#${sectionId}`);
-    }
-  }
+  // function handleMenuClick(sectionId) {
+  //   if (location.pathname === "/") {
+  //     const section = document.getElementById(sectionId);
+  //     if (section) {
+  //       section.scrollIntoView({ behavior: "smooth" });
+  //     }
+  //   } else {
+  //     navigate(`/#${sectionId}`);
+  //   }
+  // }
 
-  const facebookAcc = "https://www.facebook.com/simonia.luxury";
-  const instagramAcc = "https://www.instagram.com/simonia_luxury/";
-  const tiktokAcc =
-    "https://www.tiktok.com/@simonialuxury?is_from_webapp=1&sender_device=pc";
-  const googleMapsLocation = "https://maps.app.goo.gl/7rYtqFcwhD9t1dTK9";
+  // const facebookAcc = "https://www.facebook.com/simonia.luxury";
+  // const instagramAcc = "https://www.instagram.com/simonia_luxury/";
+  // const tiktokAcc =
+  //   "https://www.tiktok.com/@simonialuxury?is_from_webapp=1&sender_device=pc";
+  // const googleMapsLocation = "https://maps.app.goo.gl/7rYtqFcwhD9t1dTK9";
 
   return (
     <div className="footerBg">
       <footer className="footerContainer">
-        <div className="footerTop">
+        {/* <div className="footerTop">
           <div className="footerLogo">
             <img src={logo} alt="Simonia Luxury Logo" />
           </div>
@@ -122,7 +120,7 @@ export default function Footer() {
               Disponibili online până la ora 21:00
             </span>
           </div>
-        </div>
+        </div> */}
 
         <div className="footerBottom">
           <div className="footerDeveloper">

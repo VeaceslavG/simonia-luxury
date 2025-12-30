@@ -2,8 +2,7 @@
 @use "../../mixins.scss" as mixins;
 
 .search-bar-wrapper {
-  width: 100%;
-  max-width: 600px;
+  max-width: 350px;
   margin: 0 auto;
 
   .search-bar {
@@ -17,7 +16,7 @@
       height: 36px;
       padding: 0.75rem 1rem;
       font-size: variables.$textSize;
-      border: 1px solid #D8C4B6;
+      border: none;
       outline: none;
       border-radius: variables.$itemBorderRadius;
       transition: border-color 0.2s ease-in-out;
@@ -70,4 +69,17 @@
 
 .custom-toast-progress {
   background: #ff4d4f;
+}
+
+@media (max-width: 1240px) {
+  .search-bar-wrapper {
+    .search-bar {
+      .searchInput {
+        width: 150px;
+      }
+      .submit {
+        // padding: 0 
+      }
+    }
+  }
 }

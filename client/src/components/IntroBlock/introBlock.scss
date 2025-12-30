@@ -5,10 +5,14 @@
   margin: 0 auto;
 
   .introBlockBG {
-    background-color: #F5EFE7;
-    max-height: 750px;
-    height: 100%;
-    padding: 40px 0;
+    background-image: var(--background-image-url);
+    background-repeat: no-repeat;
+    background-size: 65%;
+    background-position: right center;
+    min-height: 100vh;
+    color: white;
+    overflow: hidden;
+    position: relative;
 
     .introBlock {
       overflow: visible;
@@ -16,16 +20,16 @@
       align-items: center;
       justify-content: space-between;
       @include mixins.headerWidth;
-      padding: 0 20px;
+      padding-left: 20px;
+      height: 100vh;
 
       .introLeftSection {
-        max-width: 700px;
+        z-index: 2;
+        max-width: 550px;
         width: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        max-height: 500px;
-        height: 100%;
+        vertical-align: center;
         gap: 24px;
 
         .introTitle {
@@ -44,16 +48,16 @@
           flex-wrap: wrap;
 
           .orderBtn {
-            @include mixins.button(variables.$primaryColor, #F5EFE7);
+            @include mixins.button(variables.$navBackgroundColor, #fff);
 
             &:hover {
-              background-color: darken(variables.$primaryColor, 5%);
+              background-color: darken(variables.$navBackgroundColor, 5%);
             }
           }
 
           .exploreBtn {
-            @include mixins.button(transparent, variables.$primaryColor);
-            border: 1px solid variables.$primaryColor;
+            @include mixins.button(transparent, variables.$navBackgroundColor);
+            border: 1px solid variables.$navBackgroundColor;
 
             &:hover {
               background-color: rgba(variables.$primaryColor, 0.05);
@@ -62,23 +66,41 @@
           }
         }
       }
-
-      .introImageContainer {
-        max-width: 1000px;
-
-        .introImage {
-          object-fit: cover;
-          width: 100%;
-        }
-      }
     }
   }
 
+  // @media (min-width: 1190px) and (max-width: 2000px) {
+  //   .introBlockBG {
+  //     background-size: 75%;
+
+  //     .introBlock {
+  //     }
+  //   }
+  // }
+
   @media (max-width: 1189px) {
     .introBlockBG {
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      padding: 0;
+      display: flex;
+      align-items: center;
+
       .introBlock {
+        height: auto;
+        padding: 0;
+        justify-content: center;
+        
         .introLeftSection {
-          max-width: 100%;
+          background-color: rgba(255, 255, 255, 0.5);
+          backdrop-filter: blur(10px);
+          padding: 20px;
+          border-radius: variables.$itemBorderRadius;
+          align-items: center;
+          text-align: center;
+          display: flex;
+          max-width: 90%;
 
           .introTitle {
             font-size: 65px;
@@ -94,35 +116,28 @@
   // Tablets (<=998px)
   @media (max-width: 998px) {
     .introBlockBG {
-      margin-top: 70px;
+      background-size: cover;
+      background-position: center;
+
       .introBlock {
+        padding-right: 0;
         flex-direction: column;
         text-align: center;
         gap: 2rem;
 
         .introLeftSection {
-          max-width: 100%;
           align-items: center;
 
           .introTitle {
-            font-size: 36px;
+            font-size: 42px;
           }
 
           .introText {
-            font-size: variables.$textSize;
+            font-size: 20px;
           }
 
           .introBlockBtns {
             justify-content: center;
-          }
-        }
-
-        .introImageContainer {
-          max-width: 75%;
-
-          .introImage {
-            width: 100%;
-            height: auto;
           }
         }
       }
@@ -156,16 +171,8 @@
             }
           }
         }
-
-        .introImageContainer {
-          max-width: 100%;
-
-          .introImage {
-            width: 100%;
-            height: auto;
-          }
-        }
       }
     }
   }
 }
+

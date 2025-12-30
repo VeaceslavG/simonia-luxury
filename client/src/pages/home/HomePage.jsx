@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import headerSofa from "../../assets/header/sofaBlue.png";
+import headerSofa from "../../assets/header/background.jpg";
 import coltarEx from "../../assets/aboutUs/coltarEx.jpg";
 import patEx from "../../assets/aboutUs/patEx.jpg";
 
@@ -66,7 +66,7 @@ export default function HomePage() {
       <Nav onCategorySelect={handleCategorySelect} />
       <IntroBlock
         introTitle="Mobilă de lux pentru casa ta"
-        introText="Mobilă moale la comandă"
+        introText="Descoperă mobilier elegant, perfect pentru o locuință stilată și confortabilă"
         introImage={headerSofa}
       />
       <Benefits />

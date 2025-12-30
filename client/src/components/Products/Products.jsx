@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import TabButton from "../TabButton";
 import { useCart } from "../../context/CartContext";
@@ -34,7 +34,6 @@ export default function Products({ selectedCategory, searchQuery }) {
         let url = `${API_URL}/api/products`;
         if (query)
           url = `${API_URL}/api/search?query=${encodeURIComponent(query)}`;
-        console.log("🔄 Fetching products from:", url);
 
         const res = await fetch(url);
         if (!res.ok) throw new Error("Eroare la fetch produse");
@@ -42,15 +41,8 @@ export default function Products({ selectedCategory, searchQuery }) {
         const data = await res.json();
         const productsArray = Array.isArray(data) ? data : [];
 
-        console.log("📦 Products received:", productsArray);
-        if (productsArray.length > 0) {
-          console.log("🔍 First product structure:", productsArray[0]);
-          console.log("📋 First product category:", productsArray[0].category);
-        }
-
         setProducts(productsArray);
-      } catch (err) {
-        console.error("Eroare fetch produse:", err);
+      } catch {
         toast.error("Nu am putut încărca produsele.");
       }
     }
@@ -59,15 +51,14 @@ export default function Products({ selectedCategory, searchQuery }) {
   }, [query]);
 
   // Filtrare produse
-  const displayedProducts = query
-    ? products
-    : products.filter((product) => {
-        // Verificări de siguranță
-        if (!product.category) return false;
-        if (!product.category.name) return false;
+  const displayedProducts = useMemo(() => {
+    if (query) return products;
 
-        return product.category.name.toLowerCase() === activeCategory;
-      });
+    return products.filter((product) => {
+      if (!product?.category?.name) return false;
+      return product.category.name.toLowerCase() === activeCategory;
+    });
+  }, [products, query, activeCategory]);
 
   return (
     <div id="products" className="container productsContainer">
@@ -113,6 +104,8 @@ export default function Products({ selectedCategory, searchQuery }) {
             <div className="card h-100 productCard">
               <div className="viewProduct position-relative">
                 <img
+                  loading="lazy"
+                  decoding="async"
                   className="card-img-top productImage"
                   src={
                     product.image_urls?.[0]
@@ -124,6 +117,8 @@ export default function Products({ selectedCategory, searchQuery }) {
                   alt={product.name}
                 />
                 <img
+                  loading="lazy"
+                  decoding="async"
                   className="cartProductIcon"
                   src={cartProductIcon}
                   alt=""

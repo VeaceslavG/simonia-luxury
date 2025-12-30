@@ -18,7 +18,6 @@ export default function Profile() {
   async function handleLogout() {
     await logout();
     navigate("/");
-    window.location.reload();
   }
 
   useEffect(() => {
@@ -26,37 +25,28 @@ export default function Profile() {
       setLoading(false);
       return;
     }
+
+    const cached = localStorage.getItem("orders");
+    if (cached) {
+      setOrders(JSON.parse(cached));
+      setLoading(false);
+    }
+
     fetchData();
   }, [user, location.state?.orderSuccess]);
 
   async function fetchData() {
     try {
-      setError(null);
-      console.log("🔄 Fetching orders...");
+      const res = await fetch(`${API_URL}/api/orders`, {
+        credentials: "include",
+      });
 
-      const [ordersRes, cartRes] = await Promise.all([
-        fetch(`${API_URL}/api/orders`, {
-          method: "GET",
-          credentials: "include",
-        }),
-        fetch(`${API_URL}/api/cart`, {
-          method: "GET",
-          credentials: "include",
-        }),
-      ]);
+      if (!res.ok) throw new Error("Orders fetch failed");
 
-      if (!ordersRes.ok) throw new Error("Orders fetch failed");
-      if (!cartRes.ok) throw new Error("Cart fetch failed");
-
-      const ordersData = await ordersRes.json();
-      const cartData = await cartRes.json();
-
-      console.log("Orders fetched:", ordersData);
-      console.log("Cart fetched:", cartData);
-
+      const ordersData = await res.json();
       setOrders(ordersData);
+      localStorage.setItem("orders", JSON.stringify(ordersData));
     } catch (err) {
-      console.error("Error fetching profile data", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -109,7 +99,7 @@ export default function Profile() {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading && !orders.length) return <p>Loading...</p>;
   if (!user) return <p>You are not logged in.</p>;
 
   return (

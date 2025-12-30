@@ -6,8 +6,9 @@
   overflow: visible;
 
   .navFirstSectionBG {
+    padding: 10px 0;
     background-color: variables.$navBackgroundColor;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
     
     @media (min-width: 996px) {
       position: fixed;
@@ -18,16 +19,15 @@
       
       &.scrolled {
         background-color: #1b2b46;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 5px 50px #0d1627;
         
         .navFirstSection {
-          height: 45px;
+          height: 40px;
         }
       }
     }
 
     .navFirstSection {
-      // background-color: variables.$navBackgroundColor;
       background-size: cover;
       margin: 0 auto;
       height: 50px;
@@ -47,31 +47,9 @@
         height: 2px;
         background: rgba(white, 0);
       }
-    
-      &:hover::after {
-        background: rgba(white, 0.2);
-      }
-    
-      .phoneNumber {
-        text-align: center;
-        font-weight: bold;
-        font-size: variables.$textSize;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        padding: 5px 10px;
-        border-radius: variables.$itemBorderRadius;
-        max-width: 150px;
-        width: 100%;
-      
-        &:hover {
-          background: rgba(white, 0.1);
-          transform: translateY(-1px);
-          text-shadow: 0 0 5px rgba(white, 0.3);
-        }
-      } 
 
       .menuItems {
-        max-width: 780px;
+        max-width: 650px;
         width: 100%;
         @include mixins.positioning;
       
@@ -141,19 +119,28 @@
   }
 
   .navSecondSection {
-    padding: 0 20px;
-    padding-top: 50px;
-    @include mixins.headerWidth;
-    @include mixins.positioning;
-    position: relative;
-    background: white;
-
     .mobile-cart-icon {
       display: none;
     }
 
     .mobile-burger-menu {
       display: none;
+    }
+  }
+}
+
+@media (max-width: 1240px) {
+  .navContainer {
+    .navFirstSectionBG {
+      .navFirstSection {
+        .menuItems {
+          .menu-item {
+            .menuTitle {
+              font-size: 14px;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -184,6 +171,7 @@
 
       .mobileCartIcon {
         display: block;
+        color: #000;
       }
 
       .logoContainer {
@@ -209,7 +197,7 @@
         display: block;
         order: 3;
         flex: 0 0 auto;
-        z-index: 10;
+        z-index: 1;
       }
     }
   }

@@ -134,26 +134,18 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("=== LOGIN ATTEMPT ===")
-	log.Println("Email:", req.Email)
-
 	var user User
 	if err := DB.Where("email = ?", strings.ToLower(req.Email)).First(&user).Error; err != nil {
-		log.Println("❌ User not found:", err)
 		httpError(w, http.StatusUnauthorized, "Credențiale invalide")
 		return
 	}
 
-	log.Println("✅ User found:", user.Email, "ID:", user.ID)
-
 	if !user.IsVerified {
-		log.Println("❌ User not verified")
 		httpError(w, http.StatusUnauthorized, "Please verify your email before logging in")
 		return
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)) != nil {
-		log.Println("❌ Invalid password")
 		httpError(w, http.StatusUnauthorized, "Credențiale invalide")
 		return
 	}
@@ -164,8 +156,6 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusInternalServerError, "Eroare server")
 		return
 	}
-
-	log.Println("Login successful, setting authToken cookie for user:", user.Email)
 
 	items, _ := getGuestCart(r)
 	if len(items) > 0 {
@@ -190,8 +180,6 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 			Phone: user.Phone,
 		},
 	}
-
-	log.Println("✅ Login response sent")
 	okJSON(w, resp)
 }
 
@@ -210,25 +198,17 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleMe(w http.ResponseWriter, r *http.Request) {
-	log.Println("=== HANDLE ME CALLED ===")
-
 	userID, ok := r.Context().Value(userIDKey).(uint)
 	if !ok {
-		log.Println("❌ handleMe: userID not found in context")
 		httpError(w, http.StatusUnauthorized, "userID not found in context")
 		return
 	}
 
-	log.Println("handleMe: userID from context:", userID)
-
 	var user User
 	if err := DB.First(&user, userID).Error; err != nil {
-		log.Println("❌ handleMe: user not found in DB:", err)
 		httpError(w, http.StatusUnauthorized, "user not found")
 		return
 	}
-
-	log.Println("✅ handleMe: user found:", user.Email)
 
 	safeUser := map[string]interface{}{
 		"id":         user.ID,
@@ -240,7 +220,6 @@ func handleMe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	log.Println("=== HANDLE ME SUCCESS ===")
 	json.NewEncoder(w).Encode(safeUser)
 }
 
@@ -262,29 +241,22 @@ func issueToken(userID uint, email string) (string, error) {
 // --- Middleware ---
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Request URL:", r.URL.Path)
-		log.Println("Request Method:", r.Method)
-
 		// Log all cookies for debugging
-		for _, cookie := range r.Cookies() {
-			log.Printf("Cookie: %s = %s\n", cookie.Name, cookie.Value)
-		}
+		// for _, cookie := range r.Cookies() {
+		// 	log.Printf("Cookie: %s = %s\n", cookie.Name, cookie.Value)
+		// }
 
 		// Încearcă să citești token-ul din cookie
 		cookie, err := r.Cookie("authToken")
 		if err != nil {
-			log.Println("ℹ️ No authToken cookie found - anonymous user")
 			// NU returna eroare, doar treci mai departe fără userID
 			next.ServeHTTP(w, r)
 			return
 		}
 
-		log.Println("✅ Found authToken cookie")
 		tokenStr := cookie.Value
-		log.Println("Token length:", len(tokenStr))
 
 		if tokenStr == "" {
-			log.Println("ℹ️ authToken is empty - anonymous user")
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -292,7 +264,6 @@ func authMiddleware(next http.Handler) http.Handler {
 		// Parsează token-ul
 		tkn, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 			if token.Method != jwt.SigningMethodHS256 {
-				log.Println("❌ Unexpected signing method:", token.Method)
 				return nil, errors.New("metodă de semnare neașteptată")
 			}
 			secret := os.Getenv("JWT_SECRET")
@@ -303,7 +274,6 @@ func authMiddleware(next http.Handler) http.Handler {
 		})
 
 		if err != nil {
-			log.Println("❌ Token parsing error:", err)
 			// Șterge cookie-ul invalid
 			http.SetCookie(w, &http.Cookie{
 				Name:     "authToken",
@@ -319,7 +289,6 @@ func authMiddleware(next http.Handler) http.Handler {
 		}
 
 		if !tkn.Valid {
-			log.Println("❌ Token invalid")
 			// Șterge cookie-ul invalid
 			http.SetCookie(w, &http.Cookie{
 				Name:     "authToken",
@@ -336,22 +305,17 @@ func authMiddleware(next http.Handler) http.Handler {
 
 		claims, ok := tkn.Claims.(jwt.MapClaims)
 		if !ok {
-			log.Println("❌ Invalid token claims")
 			next.ServeHTTP(w, r)
 			return
 		}
 
-		log.Println("✅ Token claims:", claims)
-
 		idFloat, ok := claims["sub"].(float64)
 		if !ok {
-			log.Println("❌ Invalid sub claim in token")
 			next.ServeHTTP(w, r)
 			return
 		}
 
 		userID := uint(idFloat)
-		log.Println("✅ User authenticated, ID:", userID)
 
 		// Adaugă userID-ul în context
 		ctx := context.WithValue(r.Context(), userIDKey, userID)
@@ -363,11 +327,9 @@ func requireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID, ok := r.Context().Value(userIDKey).(uint)
 		if !ok || userID == 0 {
-			log.Println("🚫 Access denied - authentication required for:", r.URL.Path)
 			httpError(w, http.StatusUnauthorized, "Autentificare necesară")
 			return
 		}
-		log.Printf("✅ User %d accessing protected route: %s", userID, r.URL.Path)
 		next.ServeHTTP(w, r)
 	})
 }

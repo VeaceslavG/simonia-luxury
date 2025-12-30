@@ -5,37 +5,36 @@
   display: flex;
   align-items: center;
 
-  .icon-group {
-    @include mixins.positioning;
-
-    .icon {
-      @include mixins.icons;
-      cursor: pointer;
-    }
-
-    .count {
-      font-size: 16px;
-    }
-  }
-
-  .divider {
-    margin-left: 10px;
-    height: 20px;
-    width: 2px;
-    background-color: black;
-  }
-
   .cart {
+    @include mixins.positioning;
+    padding: 5px 5px;
+    transition: all 0.2s ease;
+    border-radius: variables.$itemBorderRadius;
+
     .cart-badge {
       background-color: variables.$primaryColor;
-      color: #F5EFE7;
+      color: #fff;
       border-radius: 50%;
       width: 20px;
       height: 20px;
-      font-size: 16px;
+      font-size: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    
+    &:hover {
+       background: rgba(white, 0.1);
+       text-shadow: 0 0 5px rgba(white, 0.3);
+    }
+    .cartIcon {
+      @include mixins.icons;
+      cursor: pointer;
+
+    }
+
+    .count {
+      font-size: 1rem;
     }
   }
 }

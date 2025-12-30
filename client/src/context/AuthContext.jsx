@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
 
   async function login(userData) {
     setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   }
 
   async function logout() {
@@ -21,52 +22,52 @@ export function AuthProvider({ children }) {
         method: "POST",
         credentials: "include",
       });
-    } catch (err) {
-      console.error("Logout error:", err);
     } finally {
+      setUser(null);
+      localStorage.removeItem("user");
       document.cookie = "guestCart=; path=/; max-age=0";
-      console.log("🚪 Logout - cleared guest cart cookie");
     }
   }
 
   useEffect(() => {
+    let cancelled = false;
+
+    const cachedUser = localStorage.getItem("user");
+    if (cachedUser) {
+      try {
+        setUser(JSON.parse(cachedUser));
+      } catch {
+        localStorage.removeItem("user");
+      }
+    }
+
     async function loadUser() {
       try {
-        console.log("🔄 Loading user from /api/me...");
         const res = await fetch(`${API_URL}/api/me`, {
           credentials: "include",
         });
 
-        console.log("📄 /api/me response status:", res.status);
+        if (!res.ok) throw new Error("unauthorized");
 
-        if (res.ok) {
-          const userData = await res.json();
-          console.log("✅ User loaded:", userData);
-          setUser(userData);
-        } else {
-          console.log("❌ /api/me failed with status:", res.status);
-          setUser(null);
+        const data = await res.json();
+
+        if (!cancelled) {
+          setUser(data);
+          localStorage.setItem("user", JSON.stringify(data));
         }
-      } catch (err) {
-        console.error("🚨 Error loading user:", err);
+      } catch {
         setUser(null);
+        localStorage.removeItem("user");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     loadUser();
+    return () => (cancelled = true);
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        <div>Loading authentication...</div>
-      </div>
-    );
-  }
-
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
