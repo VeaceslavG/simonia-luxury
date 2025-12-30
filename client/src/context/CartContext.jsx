@@ -19,7 +19,7 @@ export function CartProvider({ children }) {
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [cartInitializing, setCartInitializing] = useState(false);
   const [cartVersion, setCartVersion] = useState(0);
   const [migratingCart, setMigratingCart] = useState(false);
   const [initialized, setInitialized] = useState(false);
@@ -29,11 +29,13 @@ export function CartProvider({ children }) {
   const getProductId = (item) =>
     item.product?.id || item.product?.ID || item.productId;
 
-  const getCartItemId = (item) =>
-    item.id?.toString() ||
-    item.ID?.toString() ||
-    item.tempId ||
-    (item.productId ? `guest-${item.productId}` : null);
+  const getCartItemId = (item) => {
+    if (item.id != null) return item.id.toString();
+    if (item.ID != null) return item.ID.toString();
+    if (item.tempId) return item.tempId;
+    if (item.productId) return `guest-${item.productId}`;
+    return null;
+  };
 
   // guest cart
 
@@ -89,15 +91,13 @@ export function CartProvider({ children }) {
   // load cart
 
   const loadCart = useCallback(async () => {
-    setLoading(true);
-
     if (!user) {
       const guestItems = await getGuestCartFromCookie();
       setCartItems(guestItems);
-      setLoading(false);
       return;
     }
 
+    setCartInitializing(true);
     try {
       const res = await fetch(`${API_URL}/api/cart`, {
         credentials: "include",
@@ -116,7 +116,7 @@ export function CartProvider({ children }) {
     } catch {
       setCartItems([]);
     } finally {
-      setLoading(false);
+      setCartInitializing(false);
     }
   }, [user, getGuestCartFromCookie]);
 
@@ -185,7 +185,7 @@ export function CartProvider({ children }) {
         const idx = prev.findIndex((i) => i.productId === productId);
         if (idx !== -1) {
           const copy = [...prev];
-          copy[idx].quantity += quantity;
+          copy[idx] = { ...copy[idx], quantity: copy[idx].quantity + quantity };
           return copy;
         }
         return [
@@ -282,7 +282,7 @@ export function CartProvider({ children }) {
         openCart,
         closeCart,
         isCartOpen,
-        loading: loading || migratingCart,
+        loading: cartInitializing || migratingCart,
         getProductId,
         getCartItemId,
         migratingCart,
