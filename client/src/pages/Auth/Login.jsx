@@ -5,7 +5,7 @@ import GoogleButton from "../../components/GoogleButton/GoogleButton";
 import { API_URL } from "../../config/api";
 
 export default function Login({ children }) {
-  const { login } = useAuth();
+  const { login, refreshUser } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -32,8 +32,7 @@ export default function Login({ children }) {
       }
 
       await login(data.user);
-
-      // redirect la pagina de profil
+      await refreshUser();
       navigate("/account");
     } catch (err) {
       alert(err.message);

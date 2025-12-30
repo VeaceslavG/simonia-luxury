@@ -5,7 +5,7 @@ import GoogleButton from "../../components/GoogleButton/GoogleButton";
 import { API_URL } from "../../config/api";
 
 export default function Register({ children }) {
-  const { login } = useAuth();
+  const { login, refreshUser } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -40,6 +40,7 @@ export default function Register({ children }) {
       } else if (data.user) {
         // fallback: logare automată dacă server-ul nu returnează double opt-in
         await login(data.user);
+        await refreshUser();
         navigate("/account");
       }
 

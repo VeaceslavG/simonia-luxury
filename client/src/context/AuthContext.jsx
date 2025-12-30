@@ -11,9 +11,28 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  async function refreshUser() {
+    try {
+      const res = await fetch(`${API_URL}/api/me`, {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        setUser(null);
+        return;
+      }
+
+      const data = await res.json();
+      setUser(data);
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function login(userData) {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
   }
 
   async function logout() {
@@ -24,50 +43,16 @@ export function AuthProvider({ children }) {
       });
     } finally {
       setUser(null);
-      localStorage.removeItem("user");
       document.cookie = "guestCart=; path=/; max-age=0";
     }
   }
 
   useEffect(() => {
-    let cancelled = false;
-
-    const cachedUser = localStorage.getItem("user");
-    if (cachedUser) {
-      try {
-        setUser(JSON.parse(cachedUser));
-      } catch {
-        localStorage.removeItem("user");
-      }
-    }
-
-    async function loadUser() {
-      try {
-        const res = await fetch(`${API_URL}/api/me`, {
-          credentials: "include",
-        });
-
-        if (!res.ok) throw new Error("unauthorized");
-
-        const data = await res.json();
-
-        if (!cancelled) {
-          setUser(data);
-          localStorage.setItem("user", JSON.stringify(data));
-        }
-      } catch {
-        setUser(null);
-        localStorage.removeItem("user");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    loadUser();
-    return () => (cancelled = true);
+    refreshUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
