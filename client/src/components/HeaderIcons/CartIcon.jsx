@@ -2,11 +2,7 @@ import "./cartIcon.scss";
 import { useCart } from "../../context/CartContext";
 
 export default function HeaderIcons({ additionClass }) {
-  const { cartItems, openCart, loading } = useCart();
-
-  if (loading) {
-    return <button>Se încarcă...</button>;
-  }
+  const { cartItems, openCart } = useCart();
 
   return (
     <div className={`header-icons ${additionClass}`}>

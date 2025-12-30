@@ -84,9 +84,8 @@ export default function CartModal() {
         ) : (
           <>
             <ul className="cartList">
-              {cartItems.map((item, index) => {
+              {cartItems.map((item) => {
                 const itemId = getCartItemId(item);
-                const uniqueKey = `cart-item-${itemId}-${index}`;
 
                 const productImage = getProductImage(item);
                 const productName =
@@ -96,7 +95,7 @@ export default function CartModal() {
                 ).toFixed(2);
 
                 return (
-                  <li key={uniqueKey} className="cartItem">
+                  <li key={itemId} className="cartItem">
                     <img
                       src={productImage}
                       alt={productName}
