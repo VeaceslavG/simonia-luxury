@@ -3,9 +3,11 @@
 
 .productPage {
   @include mixins.contentContainer(0);
+  padding-top: 150px;
   
   @media (max-width: 995px) {
     margin-top: 70px;
+    padding-top: 100px;
   }
 
   .productImage {

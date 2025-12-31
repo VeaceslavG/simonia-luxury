@@ -81,6 +81,8 @@
       .viewProduct {
         .cartProductIcon {
           display: block;
+          background: rgba(white, 0.1);
+          text-shadow: 0 0 5px rgba(white, 0.3);
         }
       }
       transform: translateY(-5px);
@@ -98,6 +100,7 @@
       background: #f9f9f9;
 
       .cartProductIcon {
+        padding: 5px;
         display: none;
         position: absolute;
         top: 12px;

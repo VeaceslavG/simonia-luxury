@@ -46,7 +46,7 @@
           display: block;
           margin-bottom: 5px;
           color: variables.$primaryColor;
-          opacity: .6;
+          opacity: .8;
         }
 
         .schedule {
@@ -64,15 +64,34 @@
         display: flex;
         gap: 15px;
 
-        img {
+        svg {
           @include mixins.icons(32px);
+          fill: #000;
           margin: 0;
           cursor: pointer;
-          transition: transform 0.2s ease;
+          transition: transform 0.4s ease;
 
           &:hover {
             transform: scale(1.1);
           }
+        }
+      }
+
+      svg.facebook {
+        &:hover {
+        fill: #1877F2;
+        }
+      }
+
+      svg.instagram {
+        &:hover {
+          fill: #E4405F;
+        }
+      }
+
+      svg.tiktok {
+        &:hover {
+          fill: #EE1D52;
         }
       }
     }

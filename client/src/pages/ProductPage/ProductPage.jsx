@@ -84,7 +84,7 @@ export default function ProductPage() {
   return (
     <>
       <Nav />
-      <div className="container productPage py-5">
+      <div className="container productPage">
         <div className="row g-4">
           <div className="col-md-6">
             <img

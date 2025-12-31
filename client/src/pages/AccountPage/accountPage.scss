@@ -76,8 +76,8 @@
 .profilePageContainer {
   @include mixins.contentContainer(50px);
   max-width: 800px;
-  // margin: 0 auto;
   padding: 40px;
+  padding-top: 100px;
   background: #fff;
   border-radius: variables.$itemBorderRadius;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);

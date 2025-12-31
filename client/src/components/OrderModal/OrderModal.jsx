@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import ReactDOM from "react-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./orderModal.scss";
 import { API_URL } from "../../config/api";
@@ -56,7 +57,7 @@ export default function OrderModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className="modal-overlay">
       <div className="modal-content">
         <h2>Comandă sau informează-te</h2>
@@ -93,6 +94,7 @@ export default function OrderModal({ isOpen, onClose }) {
         </form>
         <button onClick={onClose}>Închide</button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

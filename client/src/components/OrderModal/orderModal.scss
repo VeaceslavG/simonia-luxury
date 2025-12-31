@@ -15,11 +15,15 @@
 }
 
 .modal-content {
-  background: hsl(44, 21%, 95%);
+  background: #fff;
   padding: 30px;
   border-radius: variables.$itemBorderRadius;
   width: 90%;
   max-width: 500px;
+
+  h2 {
+    color: variables.$navBackgroundColor;
+  }
 
   form {
     display: flex;
