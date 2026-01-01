@@ -143,13 +143,13 @@ export default function ProductPage() {
                   ? product.category.name.charAt(0).toUpperCase() +
                     product.category.name.slice(1)
                   : "Produse",
-                item: "https://www.simonialuxury.com/produs", // nu există pagină categorie, punem doar URL generic
+                item: "https://www.simonialuxury.com/product",
               },
               {
                 "@type": "ListItem",
                 position: 3,
                 name: product.name,
-                item: `https://www.simonialuxury.com/produs/${slug}`,
+                item: `https://www.simonialuxury.com/product/${slug}`,
               },
             ],
           })}
