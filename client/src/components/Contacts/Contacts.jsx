@@ -12,7 +12,7 @@ export default function Contacts() {
     <div id="contacts" className="contactsBG">
       <div className="contactsContainer">
         <div className="contactsLeftSide">
-          <div className="contactsTitle">Contacte</div>
+          <h2 className="contactsTitle">Contacte</h2>
           <span className="phoneNumber">+373 602 85 786</span>
           <span className="address">Calea Moșilor 4</span>
           <div className="scheduleSection">

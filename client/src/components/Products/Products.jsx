@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import defaultImage from "../../assets/default_image.png";
 import "react-toastify/dist/ReactToastify.css";
 import { API_URL } from "../../config/api";
+import { slugify } from "../Utils/utils";
 import { useInView } from "react-intersection-observer";
 import "./products.scss";
 
@@ -101,7 +102,7 @@ export default function Products({ selectedCategory, searchQuery }) {
       {/* Products Grid */}
       <div className="row row-cols-2 row-cols-sm-2 row-cols-md-4 g-4">
         {displayedProducts.map((product) => (
-          <Link to={`/product/${product.id}`} key={product.id}>
+          <Link to={`/produs/${slugify(product.name)}-${product.id}`}>
             <div className="card h-100 productCard">
               <div className="viewProduct position-relative">
                 <img

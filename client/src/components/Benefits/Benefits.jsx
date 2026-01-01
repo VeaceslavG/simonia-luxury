@@ -14,7 +14,7 @@ export default function Benefits() {
                   src={benefit.title.icon}
                   alt={benefit.title.text}
                 />
-                <span className="benefitTitleText">{benefit.title.text}</span>
+                <h3 className="benefitTitleText">{benefit.title.text}</h3>
               </div>
               <p className="benefitDescription">{benefit.description}</p>
             </div>

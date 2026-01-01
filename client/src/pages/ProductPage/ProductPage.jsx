@@ -13,11 +13,12 @@ import defaultImage from "../../assets/default_image.png";
 import { API_URL } from "../../config/api";
 
 export default function ProductPage() {
-  const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
+  const { slug } = useParams();
+  const id = slug?.split("-").pop();
 
   useEffect(() => {
     async function fetchProduct() {
@@ -84,6 +85,86 @@ export default function ProductPage() {
   return (
     <>
       <Nav />
+      <Helmet>
+        <title>{product.name} | Mobilă la comandă Simonia Luxury</title>
+
+        <meta
+          name="description"
+          content={
+            product.description
+              ? product.description.slice(0, 155)
+              : `Comandă ${product.name} realizată la comandă. Mobilă moale de lux, calitate premium, livrare în Moldova.`
+          }
+        />
+
+        <link
+          rel="canonical"
+          href={`https://www.simonialuxury.com/product/${slug}`}
+        />
+
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.name,
+            image: [displayedImage],
+            description:
+              product.description ||
+              "Mobilă moale de lux realizată la comandă.",
+            brand: {
+              "@type": "Brand",
+              name: "Simonia Luxury",
+            },
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "MDL",
+              price: ((product.price_cents ?? 0) / 100).toFixed(2),
+              availability: "https://schema.org/InStock",
+              url: `https://www.simonialuxury.com/product/${id}`,
+            },
+          })}
+        </script>
+
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Acasă",
+                item: "https://www.simonialuxury.com",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: product?.category?.name
+                  ? product.category.name.charAt(0).toUpperCase() +
+                    product.category.name.slice(1)
+                  : "Produse",
+                item: "https://www.simonialuxury.com/produs", // nu există pagină categorie, punem doar URL generic
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: product.name,
+                item: `https://www.simonialuxury.com/produs/${slug}`,
+              },
+            ],
+          })}
+        </script>
+      </Helmet>
+      <nav className="breadcrumbs mb-3">
+        <Link to="/">Acasă</Link> &gt;{" "}
+        <span>
+          {product?.category?.name
+            ? product.category.name.charAt(0).toUpperCase() +
+              product.category.name.slice(1)
+            : "Produse"}
+        </span>{" "}
+        &gt; <span>{product.name}</span>
+      </nav>
       <div className="container productPage">
         <div className="row g-4">
           <div className="col-md-6">
@@ -102,10 +183,13 @@ export default function ProductPage() {
             <p className="productPrice mb-3">
               {((product.price_cents ?? 0) / 100).toFixed(2)} MDL
             </p>
-            <p className="productDescription mb-4">
-              {product.description ||
-                "Aici se află descrierea produsului selectat de dumneavoastră."}
-            </p>
+            <div className="productDescription">
+              <p>{product.description}</p>
+              <p>
+                Acest produs este realizat la comandă de echipa Simonia Luxury,
+                folosind materiale premium și finisaje de calitate superioară.
+              </p>
+            </div>
 
             {/* Cantitate */}
             <div className="quantityContainer mb-4">

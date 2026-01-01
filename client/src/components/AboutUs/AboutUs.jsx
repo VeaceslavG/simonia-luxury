@@ -4,10 +4,10 @@ export default function AboutUs({ firstPicture, secondPicture }) {
   return (
     <div id="about" className="aboutUsContainer">
       <div className="aboutUsLeftSide">
-        <div className="aboutUsTitle">Despre Simonia Luxury</div>
-        <div className="aboutUsSubtitle">
+        <h2 className="aboutUsTitle">Despre Simonia Luxury</h2>
+        <h5 className="aboutUsSubtitle">
           Mobilă la comandă de lux pentru eleganța și confortul casei tale
-        </div>
+        </h5>
         <div className="aboutUsText">
           Simonia Luxury creează mobilă moale de lux realizată exclusiv la
           comandă, pentru a se potrivi perfect stilului și nevoilor tale.
