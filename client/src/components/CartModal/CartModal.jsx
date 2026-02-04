@@ -1,5 +1,4 @@
 import { useCart } from "../../context/CartContext";
-import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import trashIcon from "../../assets/cartModal/trashIcon.png";
 import defaultImage from "../../assets/default_image.png";
@@ -19,16 +18,9 @@ export default function CartModal() {
     getCartItemId,
   } = useCart();
 
-  const { user } = useAuth();
   const navigate = useNavigate();
 
   async function handleCheckout() {
-    if (!user) {
-      navigate("/account");
-      closeCart();
-      return;
-    }
-
     closeCart();
     navigate("/checkout", {
       state: { fromCart: true },
@@ -124,7 +116,7 @@ export default function CartModal() {
                           onChange={(e) =>
                             updateQuantity(
                               itemId,
-                              Math.max(1, parseInt(e.target.value) || 1)
+                              Math.max(1, parseInt(e.target.value) || 1),
                             )
                           }
                           className="quantityInput"
@@ -154,7 +146,7 @@ export default function CartModal() {
             <div className="cartSummary">
               <p>Estimare totală: {cartSubtotal} MDL</p>
               <button className="checkoutButton" onClick={handleCheckout}>
-                {user ? "Trimite cererea" : "Loghează-te pentru a finaliza"}
+                Trimite cererea
               </button>
               <button className="clearCartButton" onClick={clearCart}>
                 Anulează selecția

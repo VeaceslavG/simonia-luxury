@@ -72,7 +72,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	var userIDPtr *uint
 	if ok {
 		userIDPtr = &userID
-		log.Printf("✅ Creating order for user ID: %d", userID)
+		log.Printf("Creating order for user ID: %d", userID)
 
 		var user User
 		if err := DB.First(&user, userID).Error; err == nil {

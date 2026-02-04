@@ -102,7 +102,10 @@ export default function Products({ selectedCategory, searchQuery }) {
       {/* Products Grid */}
       <div className="row row-cols-2 row-cols-sm-2 row-cols-md-4 g-4">
         {displayedProducts.map((product) => (
-          <Link to={`/product/${slugify(product.name)}-${product.id}`}>
+          <Link
+            key={product.id}
+            to={`/product/${slugify(product.name)}-${product.id}`}
+          >
             <div className="card h-100 productCard">
               <div className="viewProduct position-relative">
                 <img

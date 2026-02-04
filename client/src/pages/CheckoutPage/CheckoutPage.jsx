@@ -242,13 +242,14 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="formGroup">
-                  <label>Email</label>
+                  <label>Email *</label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="E-mail"
+                    required
                   />
                 </div>
 
@@ -268,24 +269,26 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="formGroup">
-                  <label>Adresă de livrare</label>
+                  <label>Adresă de livrare *</label>
                   <input
                     type="text"
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
                     placeholder="Strada, număr, bloc, apartament"
+                    required
                   />
                 </div>
 
                 <div className="formGroup">
-                  <label>Oraș</label>
+                  <label>Oraș *</label>
                   <input
                     type="text"
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
                     placeholder="Orașul tău"
+                    required
                   />
                 </div>
 
