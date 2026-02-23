@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"math"
 	"net/http"
@@ -15,7 +14,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/lib/pq"
+	storage_go "github.com/supabase-community/storage-go"
 )
+
+func getCookieOptions() (sameSite http.SameSite, secure bool) {
+	if os.Getenv("ENV") == "production" {
+		return http.SameSiteNoneMode, true
+	}
+	return http.SameSiteLaxMode, false
+}
 
 // admin login
 type AdminCredentials struct {
@@ -65,14 +72,16 @@ func adminLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sameSite, secure := getCookieOptions()
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "admin_token",
 		Value:    tokenString,
 		Expires:  expirationTime,
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   true,
-		SameSite: http.SameSiteNoneMode,
+		Secure:   secure,
+		SameSite: sameSite,
 	})
 
 	w.Header().Set("Content-Type", "application/json")
@@ -83,6 +92,8 @@ func adminLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminLogout(w http.ResponseWriter, r *http.Request) {
+	sameSite, secure := getCookieOptions()
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "admin_token",
 		Value:    "",
@@ -90,8 +101,8 @@ func adminLogout(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   -1,
 		Expires:  time.Now().Add(-time.Hour),
 		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteNoneMode,
+		Secure:   secure,
+		SameSite: sameSite,
 	})
 
 	w.Header().Set("Content-Type", "application/json")
@@ -368,39 +379,51 @@ func createAdminProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminUpload(w http.ResponseWriter, r *http.Request) {
-	r.ParseMultipartForm(10 << 20)
-
-	file, handler, err := r.FormFile("file")
+	err := r.ParseMultipartForm(10 << 20) // 10 MB
 	if err != nil {
-		http.Error(w, "File missing", http.StatusBadRequest)
+		http.Error(w, "Formular invalid", http.StatusBadRequest)
+		return
+	}
+
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "didn't find any file with the key 'file'", http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
 
-	os.MkdirAll("./uploads/products", os.ModePerm)
+	filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), header.Filename)
+	path := "products/" + filename
+	contentType := header.Header.Get("Content-Type")
+	upsert := true
 
-	filename := fmt.Sprintf(
-		"%d_%s",
-		time.Now().Unix(),
-		handler.Filename,
+	_, err = Supabase.Storage.UploadFile(
+		"products",
+		path,
+		file,
+		storage_go.FileOptions{
+			ContentType: &contentType,
+			Upsert:      &upsert,
+		},
 	)
 
-	dst, err := os.Create("./uploads/products/" + filename)
 	if err != nil {
-		http.Error(w, "Cannot save file", http.StatusInternalServerError)
+		log.Println("Eroare Supabase:", err)
+		http.Error(w, "Eroare la stocare", http.StatusInternalServerError)
 		return
 	}
-	defer dst.Close()
 
-	_, err = io.Copy(dst, file)
-	if err != nil {
-		http.Error(w, "Upload failed", http.StatusInternalServerError)
-		return
-	}
+	supabaseURL := os.Getenv("SUPABASE_URL")
+
+	publicURL := fmt.Sprintf(
+		"%s/storage/v1/object/public/products/%s",
+		supabaseURL,
+		path,
+	)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"url": "/uploads/products/" + filename,
+		"url": publicURL,
 	})
 }
 
