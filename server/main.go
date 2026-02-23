@@ -36,6 +36,7 @@ func enableCORS(next http.Handler) http.Handler {
 
 func main() {
 	godotenv.Load()
+	InitSupabase()
 
 	// Conectare DB
 	ConnectDB()
@@ -110,7 +111,7 @@ func main() {
 	protectedAdmin.HandleFunc("/users", getAdminUsers).Methods("GET", "OPTIONS")
 
 	// --- Static Files ---
-	r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads/"))))
+	// r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads/"))))
 
 	// --- Test Route ---
 	r.HandleFunc("/api/test", func(w http.ResponseWriter, r *http.Request) {

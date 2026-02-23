@@ -10,6 +10,7 @@ import "./productPage.scss";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import defaultImage from "../../assets/default_image.png";
+import { getImageUrl } from "../../components/Utils/image.js";
 
 import { API_URL } from "../../config/api";
 
@@ -43,33 +44,6 @@ export default function ProductPage() {
     fetchProduct();
   }, [id]);
 
-  const getMainImageUrl = (product) => {
-    if (!product || !product.image_urls) {
-      return defaultImage;
-    }
-    let imageArray = [];
-    if (typeof product.image_urls === "string") {
-      imageArray = product.image_urls.split(",").filter((url) => url.trim());
-    } else if (Array.isArray(product.image_urls)) {
-      imageArray = product.image_urls.filter((url) => url);
-    }
-
-    const firstImage = imageArray[0]?.trim();
-    if (firstImage) {
-      if (String(firstImage).startsWith("http")) {
-        return firstImage;
-      }
-
-      const cleanPath = firstImage.startsWith("/")
-        ? firstImage
-        : `/${firstImage}`;
-
-      return `${API_URL}${cleanPath}`;
-    }
-
-    return defaultImage;
-  };
-
   if (loading) return <div className="text-center py-5">Se încarcă...</div>;
   if (!product)
     return <div className="text-center py-5">Produsul nu a fost găsit</div>;
@@ -81,7 +55,7 @@ export default function ProductPage() {
     setQuantity(quantity + 1);
   }
 
-  const displayedImage = getMainImageUrl(product);
+  const displayedImage = getImageUrl(product.image_urls);
 
   return (
     <>
@@ -220,7 +194,7 @@ export default function ProductPage() {
               onClick={() => {
                 addItem({ ...product }, quantity);
                 toast.success(
-                  `${product.name} a fost adăugat în lista de comandă!`
+                  `${product.name} a fost adăugat în lista de comandă!`,
                 );
               }}
             >

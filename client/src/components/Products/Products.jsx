@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import TabButton from "../TabButton";
 import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify";
-import defaultImage from "../../assets/default_image.png";
+import { getImageUrl } from "../Utils/image.js";
 import "react-toastify/dist/ReactToastify.css";
 import { API_URL } from "../../config/api";
 import { slugify } from "../Utils/utils";
@@ -50,6 +50,7 @@ export default function Products({ selectedCategory, searchQuery }) {
         const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) throw new Error();
         const data = await res.json();
+        console.log(data);
         setProducts(Array.isArray(data) ? data : []);
       } catch {
         toast.error("Nu am putut încărca produsele.");
@@ -112,13 +113,7 @@ export default function Products({ selectedCategory, searchQuery }) {
                   loading="lazy"
                   decoding="async"
                   className="card-img-top productImage"
-                  src={
-                    product.image_urls?.[0]
-                      ? `${API_URL}${
-                          product.image_urls[0].startsWith("/") ? "" : "/"
-                        }${product.image_urls[0]}`
-                      : defaultImage
-                  }
+                  src={getImageUrl(product.image_urls)}
                   alt={product.name}
                 />
                 <svg
@@ -128,7 +123,7 @@ export default function Products({ selectedCategory, searchQuery }) {
                     e.stopPropagation();
                     addItem(product);
                     toast.success(
-                      `${product.name} a fost adăugat în lista de comandă!`
+                      `${product.name} a fost adăugat în lista de comandă!`,
                     );
                   }}
                   xmlns="http://www.w3.org/2000/svg"
