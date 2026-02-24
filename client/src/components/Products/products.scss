@@ -79,10 +79,8 @@
 
     &:hover {
       .viewProduct {
-        .cartProductIcon {
+        .productCartIconContainer {
           display: block;
-          background: rgba(white, 0.1);
-          text-shadow: 0 0 5px rgba(white, 0.3);
         }
       }
       transform: translateY(-5px);
@@ -99,17 +97,23 @@
       overflow: hidden;
       background: #f9f9f9;
 
-      .cartProductIcon {
+      .productCartIconContainer {
         display: none;
         position: absolute;
         top: 12px;
         right: 12px;
-        width: 24px;
-        height: 24px;
         cursor: pointer;
-        filter: opacity(0.7);
+        margin: 0 auto;
         transition: all 0.2s ease;
         z-index: 2;
+        border-radius: variables.$itemBorderRadius;
+        background: lighten(variables.$primaryColor, 20%);
+        padding: 7px;
+        
+        .productCartIcon {
+          width: 25px;
+          height: 25px;
+        }
         
         &:hover {
           filter: opacity(1) drop-shadow(0 0 4px rgba(0,0,0,0.1));

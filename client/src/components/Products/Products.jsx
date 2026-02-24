@@ -116,8 +116,9 @@ export default function Products({ selectedCategory, searchQuery }) {
                   src={getImageUrl(product.image_urls)}
                   alt={product.name}
                 />
-                <svg
-                  className="cartProductIcon"
+                <div className="productCartIconContainer">  
+                  <svg
+                  className="productCartIcon"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -140,6 +141,7 @@ export default function Products({ selectedCategory, searchQuery }) {
                   <circle cx="18" cy="20.5" r="1" />
                   <path d="M2.5 2.5h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6l1.6-8.4H7.1" />
                 </svg>
+                </div>
               </div>
               <div className="card-body">
                 <span className="card-title productName">{product.name}</span>
