@@ -11,6 +11,6 @@ export function getImageUrl(image_urls) {
 
   if (first.startsWith("http")) return first;
 
-  const cleanPath = first.startsWith("/") ? first : `\${first}`;
+  const cleanPath = first.startsWith("/") ? first : `/${first}`;
   return `${API_URL}${cleanPath}`;
 }

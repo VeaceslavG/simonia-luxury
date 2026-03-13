@@ -15,6 +15,7 @@ import { getImageUrl } from "../../components/Utils/image.js";
 import { API_URL } from "../../config/api";
 
 export default function ProductPage() {
+  const [selectedImage, setSelectedImage] = useState(null)
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,12 @@ export default function ProductPage() {
     fetchProduct();
   }, [id]);
 
+  useEffect(() => {
+    if (product?.image_urls?.length) {
+      setSelectedImage(product.image_urls[0]);
+    }
+  }, [product])
+
   if (loading) return <div className="text-center py-5">Se încarcă...</div>;
   if (!product)
     return <div className="text-center py-5">Produsul nu a fost găsit</div>;
@@ -55,7 +62,7 @@ export default function ProductPage() {
     setQuantity(quantity + 1);
   }
 
-  const displayedImage = getImageUrl(product.image_urls);
+  const displayedImage = getImageUrl(selectedImage);
 
   return (
     <>
@@ -146,11 +153,23 @@ export default function ProductPage() {
             <img
               src={displayedImage}
               alt={product.name}
-              className="img-fluid shadow productImage"
+              className="img-fluid shadow mainProductImage"
               onError={(e) => {
                 e.target.src = defaultImage;
               }}
             />
+
+            <div className="thumbnailContainer">
+              {product.image_urls?.map((img, index) => (
+                <img 
+                  key={index}
+                  src={getImageUrl(img)}
+                  className={`thumbnailImage ${selectedImage === img ? "activeThumbnail" : ""}`}
+                  onClick={() => setSelectedImage(img)}
+                  alt={`${product.name}-${index}`}
+                />
+              ))}
+            </div>
           </div>
 
           <div className="col-md-6 d-flex flex-column justify-content-center">

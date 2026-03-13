@@ -10,10 +10,35 @@
     padding-top: 100px;
   }
 
-  .productImage {
+  .mainProductImage {
     border-radius: variables.$itemBorderRadius;
     max-height: 500px;
+    width: 100%;
     object-fit: cover;
+  }
+
+  .thumbnailContainer {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+
+    .thumbnailImage {
+      width: 90px;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+      border-radius: variables.$itemBorderRadius;
+      transition: transform 0.2s ease, border 0.2s ease;
+      border: 2px solid transparent;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+      &.activeThumbnail {
+        border: 2px solid variables.$navBackgroundColor;
+        transform: scale(1.05);
+      }
+    }
   }
 
   .productName {

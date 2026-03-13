@@ -17,6 +17,7 @@ export default function Products({ selectedCategory, searchQuery }) {
   const [activeCategory, setActiveCategory] = useState("canapele");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  // const [hoveredProductId, setHoveredProductId] = useState(false);
 
   // Folosește searchQuery dacă există, altfel citește din URL
   const params = new URLSearchParams(location.search);
@@ -73,6 +74,14 @@ export default function Products({ selectedCategory, searchQuery }) {
     });
   }, [products, query, activeCategory]);
 
+  // handling hovering on product card
+  // const handleMouseEnter = (id) => {
+  //   setHoveredProductId(id);
+  // }
+  // const handleMouseLeave = () => {
+  //   setHoveredProductId(null);
+  // }
+
   return (
     <div ref={ref} id="products" className="container productsContainer">
       {/* Tabs menu – doar dacă nu e search */}
@@ -107,15 +116,28 @@ export default function Products({ selectedCategory, searchQuery }) {
             key={product.id}
             to={`/product/${slugify(product.name)}-${product.id}`}
           >
-            <div className="card h-100 productCard">
+            <div className={`card h-100 productCard ${
+              product.image_urls?.[1] ? "hasHoverImage" : ""
+            }`}>
               <div className="viewProduct position-relative">
-                <img
-                  loading="lazy"
-                  decoding="async"
-                  className="card-img-top productImage"
-                  src={getImageUrl(product.image_urls)}
-                  alt={product.name}
-                />
+                <div className="imageWrapper">
+                  <img
+                    loading="lazy"
+                    decoding="async"
+                    src={getImageUrl(product.image_urls?.[0])} 
+                    alt={product.name} 
+                    className="card-img-top productImage primaryImage" 
+                  />
+                  {product.image_urls?.[1] && (
+                    <img
+                      loading="lazy"
+                      decoding="async"
+                      src={getImageUrl(product.image_urls?.[1])} 
+                      alt={product.name} 
+                      className="card-img-top productImage hoverImage" 
+                    />
+                  )}
+                </div>
                 <div className="productCartIconContainer">  
                   <svg
                   className="productCartIcon"
