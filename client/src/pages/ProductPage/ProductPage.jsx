@@ -1,4 +1,9 @@
 import { useState, useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import { useParams, Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify";
@@ -15,7 +20,8 @@ import { getImageUrl } from "../../components/Utils/image.js";
 import { API_URL } from "../../config/api";
 
 export default function ProductPage() {
-  const [selectedImage, setSelectedImage] = useState(null)
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [swiperInstance, setSwiperInstance] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const [loading, setLoading] = useState(true);
@@ -45,12 +51,6 @@ export default function ProductPage() {
     fetchProduct();
   }, [id]);
 
-  useEffect(() => {
-    if (product?.image_urls?.length) {
-      setSelectedImage(product.image_urls[0]);
-    }
-  }, [product])
-
   if (loading) return <div className="text-center py-5">Se încarcă...</div>;
   if (!product)
     return <div className="text-center py-5">Produsul nu a fost găsit</div>;
@@ -61,8 +61,6 @@ export default function ProductPage() {
   function increaseQuantity() {
     setQuantity(quantity + 1);
   }
-
-  const displayedImage = getImageUrl(selectedImage);
 
   return (
     <>
@@ -89,7 +87,7 @@ export default function ProductPage() {
             "@context": "https://schema.org",
             "@type": "Product",
             name: product.name,
-            image: [displayedImage],
+            image: product.image_urls?.map(img => getImageUrl(img)),
             description:
               product.description ||
               "Mobilă moale de lux realizată la comandă.",
@@ -147,25 +145,45 @@ export default function ProductPage() {
         </span>{" "}
         &gt; <span>{product.name}</span>
       </nav>
+      
       <div className="container productPage">
         <div className="row g-4">
           <div className="col-md-6">
-            <img
-              src={displayedImage}
-              alt={product.name}
-              className="img-fluid shadow mainProductImage"
-              onError={(e) => {
-                e.target.src = defaultImage;
-              }}
-            />
+            {product.image_urls?.length > 0 && (
+              <Swiper
+                grabCursor={true}
+                resistanceRatio={0.85}
+                modules={[Navigation, Pagination]}
+                navigation
+                pagination={{ clickable: true }}
+                spaceBetween={10}
+                slidesPerView={1}
+                onSwiper={setSwiperInstance}
+                onSlideChange={(swiper) => setCurrentSlide(swiper.activeIndex)}
+              
+              >
+                {product.image_urls?.map((img, index) => (
+                  <SwiperSlide key={index}>
+                    <img
+                      src={getImageUrl(img)}
+                      alt={`${product.name}-${index}`}
+                      className="mainProductImage"
+                      onError={(e) => {
+                        e.target.src = defaultImage;
+                      }}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
 
             <div className="thumbnailContainer">
               {product.image_urls?.map((img, index) => (
                 <img 
                   key={index}
                   src={getImageUrl(img)}
-                  className={`thumbnailImage ${selectedImage === img ? "activeThumbnail" : ""}`}
-                  onClick={() => setSelectedImage(img)}
+                  className={`thumbnailImage ${currentSlide === index ? "activeThumbnail" : ""}`}
+                  onClick={() => swiperInstance?.slideTo(index)}
                   alt={`${product.name}-${index}`}
                 />
               ))}
