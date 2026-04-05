@@ -19,24 +19,32 @@
 
   .thumbnailContainer {
     display: flex;
-    gap: 10px;
-    margin-top: 12px;
+    gap: 15px;
+    margin-top: 15px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    ::-webkit-scrollbar { display: none; }
+
 
     .thumbnailImage {
-      width: 90px;
+      width: 100px;
       height: 100%;
       object-fit: cover;
       cursor: pointer;
       border-radius: variables.$itemBorderRadius;
       transition: transform 0.2s ease, border 0.2s ease;
       border: 2px solid transparent;
+      scroll-snap-align: start;
 
       &:hover {
-        transform: scale(1.05);
+        // transform: scale(1.05);
+        border: 2px solid variables.$navBackgroundColor;
       }
       &.activeThumbnail {
         border: 2px solid variables.$navBackgroundColor;
-        transform: scale(1.05);
       }
     }
   }
