@@ -152,7 +152,7 @@ export default function BurgerMenu({ onCategorySelect }) {
             {copied ? "Număr copiat" : phoneNumber}
           </span>
 
-          <a href="mailto:simonia-luxury@gmail.com">simonia-luxury@gmail.com</a>
+          <a href="mailto:simonia.luxury@gmail.com">simonia.luxury@gmail.com</a>
         </div>
       </div>
     </Menu>
