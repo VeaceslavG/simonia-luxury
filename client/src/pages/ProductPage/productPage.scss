@@ -123,3 +123,46 @@
     }
   }
 }
+
+.fullscreenOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .fullscreenContent {
+    width: 90%;
+    height: 90%;
+    position: relative;
+
+    .closeBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+    
+      background: white;
+      border: none;
+      font-size: 20px;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .fullscreenImage {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: zoom-in;
+    }
+  }
+}
+
+

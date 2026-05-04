@@ -26,6 +26,8 @@ export default function ProductPage() {
   const { addItem } = useCart();
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
+  // const [isFullscreen, setIsFullscreen] = useState(false);
+  // const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const { slug } = useParams();
   const id = slug?.split("-").pop();
 
@@ -168,6 +170,10 @@ export default function ProductPage() {
                       src={getImageUrl(img)}
                       alt={`${product.name}-${index}`}
                       className="mainProductImage"
+                      // onClick={() => {
+                      //   setFullscreenIndex(index);
+                      //   setIsFullscreen(true);
+                      // }}
                       onError={(e) => {
                         e.target.src = defaultImage;
                       }}
@@ -241,6 +247,33 @@ export default function ProductPage() {
         </div>
       </div>
       <Footer />
+
+      // Fullscreen for diaplying images
+      {/* {isFullscreen && (
+        <div className="fullscreenOverlay" onClick={() => setIsFullscreen(false)}>
+          <div className="fullscreenContent" onClick={(e) => e.stopPropagation()}>
+            <button className="closeBtn" onClick={() => setIsFullscreen(false)}>
+              x
+            </button>
+
+            <Swiper
+              modules={[Navigation, Pagination]}
+              navigation
+              grabCursor={true}
+              pagination={{ clickable: true }}
+              initialSlide={fullscreenIndex}
+              spaceBetween={10}
+              slidesPerView={1}
+            >
+              {product.image_urls?.map((img, index) => (
+                <SwiperSlide key={index}>
+                  <img src={getImageUrl(img)} className="FullscreenImage" alt={`${product.name}-${index}`} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        </div>
+      )} */}
     </>
   );
 }
