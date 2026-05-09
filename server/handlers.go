@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -59,12 +60,45 @@ func deleteProduct(w http.ResponseWriter, r *http.Request) {
 func createOrder(w http.ResponseWriter, r *http.Request) {
 	var req OrderRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Date invalide", http.StatusBadRequest)
+		httpError(w, http.StatusBadRequest, "Date invalide")
+		return
+	}
+
+	req.Name = strings.TrimSpace(req.Name)
+	if req.Name == "" || len(req.Name) < 3 {
+		httpError(w, http.StatusBadRequest, "Numele este obligatoriu și trebuie să aibă minim 3 caractere")
 		return
 	}
 
 	if req.Phone == "" {
-		http.Error(w, "Numărul de telefon este obligatoriu pentru comandă", http.StatusBadRequest)
+		httpError(w, http.StatusBadRequest, "Numărul de telefon este obligatoriu pentru comandă")
+		return
+	}
+	if !regexp.MustCompile(`^\+?[0-9]{8,15}$`).MatchString(req.Phone) {
+		httpError(w, http.StatusBadRequest, "Număr de telefon invalid")
+		return
+	}
+
+	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
+	if req.Email != "" && !validEmail(req.Email) {
+		httpError(w, http.StatusBadRequest, "Adresa de email este invalidă")
+		return
+	}
+
+	req.Address = strings.TrimSpace(req.Address)
+	if req.Address == "" {
+		httpError(w, http.StatusBadRequest, "Adresa de livrare este obligatorie")
+		return
+	}
+
+	req.City = strings.TrimSpace(req.City)
+	if req.City == "" {
+		httpError(w, http.StatusBadRequest, "Orașul este obligatoriu")
+		return
+	}
+
+	if len(req.Items) == 0 {
+		httpError(w, http.StatusBadRequest, "Comanda trebuie să conțină cel puțin un produs")
 		return
 	}
 
@@ -97,9 +131,14 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 
 	var totalCents int64
 	for _, item := range req.Items {
+		if item.Quantity <= 0 {
+			httpError(w, http.StatusBadRequest, fmt.Sprintf("Cantitate invalidă pentru produsul cu ID %d", item.ProductID))
+			return
+		}
+
 		var product Product
 		if err := DB.First(&product, item.ProductID).Error; err != nil {
-			http.Error(w, fmt.Sprintf("Produsul cu ID %d nu există", item.ProductID), http.StatusBadRequest)
+			httpError(w, http.StatusNotFound, fmt.Sprintf("Produsul %d nu mai este disponibil", item.ProductID))
 			return
 		}
 
@@ -119,7 +158,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 
 	if err := DB.Create(&order).Error; err != nil {
 		log.Printf("Error creating order: %v", err)
-		http.Error(w, "Eroare la salvarea comenzii", http.StatusInternalServerError)
+		httpError(w, http.StatusInternalServerError, "Eroare la salvarea comenzii")
 		return
 	}
 

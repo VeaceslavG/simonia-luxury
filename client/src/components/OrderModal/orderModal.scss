@@ -29,11 +29,31 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    
-    
-    input, textarea {
-      @include mixins.inputForm;
+
+    div{
+      display: flex;
+      flex-direction: column;
+
+      .input, textarea {
+        @include mixins.inputForm;
+      }
+
+      .inputFormErrMessage {
+        display: none;
+        color: #d10606;
+        padding: 5px;
+        font-size: 14px;
+      }
+
+      .input:invalid[focused="true"] {
+        border: 1px solid #d10606;
+      }
+
+      .input:invalid[focused="true"] ~ .inputFormErrMessage {
+        display: block;
+      }
     }
+    
 
     button[type="submit"] {
       cursor: pointer;

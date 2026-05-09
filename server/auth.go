@@ -60,8 +60,13 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
-	if !validEmail(req.Email) || len(req.Password) < 6 {
-		httpError(w, http.StatusBadRequest, "Email invalid sau parola prea scurtă")
+	if !validEmail(req.Email) {
+		httpError(w, http.StatusBadRequest, "Email invalid")
+		return
+	}
+
+	if len(req.Password) < 8 {
+		httpError(w, http.StatusBadRequest, "Parola prea scurtă")
 		return
 	}
 
@@ -78,8 +83,47 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	// verificăm dacă email deja există
 	var exists User
 	if err := DB.Where("email = ?", req.Email).First(&exists).Error; err == nil {
-		httpError(w, http.StatusConflict, "Email deja folosit")
+		if exists.IsVerified {
+			httpError(w, http.StatusConflict, "Email deja folosit")
+			return
+		}
+
+		hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		if err != nil {
+			httpError(w, http.StatusInternalServerError, "Eroare server")
+			return
+		}
+
+		token, err := generateToken()
+		if err != nil {
+			httpError(w, http.StatusInternalServerError, "Eroare server")
+			return
+		}
+
+		exists.Name = req.Name
+		exists.Phone = req.Phone
+		exists.PasswordHash = string(hash)
+		exists.VerificationToken = token
+		exists.VerificationExpiresAt = time.Now().Add(24 * time.Hour)
+
+		if err := DB.Save(&exists).Error; err != nil {
+			httpError(w, http.StatusInternalServerError, "Eroare server")
+			return
+		}
+
+		verifyURL := fmt.Sprintf("%s/api/verify?token=%s", getEnv("APP_BASE_URL", "http://localhost:8080"), token)
+		subject := "Confirmă-ți adresa de email (Link Now)"
+		body := fmt.Sprintf("Salut %s,\n\nAm trimis un nou link pentru confirmarea contului tău. Accesează-l mai jos:\n\n%s\n\nLinkul expiră în 24 ore.", exists.Name, verifyURL)
+
+		if err := SendEmail(exists.Email, subject, body); err != nil {
+			log.Println("Eroare trimitere email re-verificare:", err)
+		}
+
+		okJSON(w, map[string]string{
+			"message": "Un nou email de confirmare a fost trimis pe această adresă.",
+		})
 		return
+
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		httpError(w, http.StatusInternalServerError, "Eroare server")
 		return
@@ -347,7 +391,13 @@ func httpError(w http.ResponseWriter, code int, msg string) {
 }
 
 func validEmail(s string) bool {
-	return strings.Contains(s, "@") && strings.Contains(s, ".") && len(s) <= 255
+	if len(s) > 255 {
+		return false
+	}
+
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
+
+	return emailRegex.MatchString(s)
 }
 
 func getEnv(key, fallback string) string {

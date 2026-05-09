@@ -8,6 +8,7 @@ import Footer from "../../components/Footer/Footer";
 import defaultImage from "../../assets/default_image.png";
 import "./checkoutPage.scss";
 import { API_URL } from "../../config/api";
+import { handleBlur } from "../../components/Utils/formHandlers";
 
 export default function CheckoutPage() {
   const { cartItems, cartSubtotal, clearCart } = useCart();
@@ -210,8 +211,8 @@ export default function CheckoutPage() {
                         <p>Cantitate: {item.quantity}</p>
                         <p>
                           Preț:{" "}
-                          {((item.product?.price_cents ?? 0) / 100).toFixed(2) *
-                            item.quantity || 0}{" "}
+                          {((item.product?.price_cents ?? 0) / 100 *
+                            item.quantity).toFixed(2) || 0}{" "}
                           MDL
                         </p>
                       </div>
@@ -232,13 +233,18 @@ export default function CheckoutPage() {
                 <div className="formGroup">
                   <label>Nume complet *</label>
                   <input
+                    id="name"
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Nume"
+                    className="input"
                     required
+                    pattern="[A-Za-z ]{3,16}$"
+                    onBlur={handleBlur}
                   />
+                  <span className="inputFormErrMessage">Numele trebuie să aibă 3-16 caractere și să nu includă niciun caracter special!</span>
                 </div>
 
                 <div className="formGroup">
@@ -249,23 +255,30 @@ export default function CheckoutPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="E-mail"
+                    className="input"
                     required
+                    onBlur={handleBlur}
                   />
+                  <span className="inputFormErrMessage">Introduceți o adresă de e-mail validă (ex: name@example.com)!</span>
                 </div>
 
                 <div className="formGroup">
                   <label>Număr de telefon *</label>
+                  <small>
+                    Vei fi contactat la acest număr pentru confirmare
+                  </small>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
                     placeholder="Telefon"
+                    className="input"
                     required
+                    pattern="^\+?[0-9]{8,15}$"
+                    onBlur={handleBlur}
                   />
-                  <small>
-                    Vei fi contactat la acest număr pentru confirmare
-                  </small>
+                  <span className="inputFormErrMessage">Introduceți un număr de telefon valid (8-15 cifre, opțional + la început)!</span>
                 </div>
 
                 <div className="formGroup">
@@ -276,8 +289,12 @@ export default function CheckoutPage() {
                     value={formData.address}
                     onChange={handleInputChange}
                     placeholder="Strada, număr, bloc, apartament"
+                    className="input"
                     required
+                    pattern="^[a-zA-Z0-9\s,'\-\.\#]{5,100}$"
+                    onBlur={handleBlur}
                   />
+                  <span className="inputFormErrMessage">Introduceți o adresă validă. Sunt permise doar litere, cifre, spații și unele caractere (#, . ' -)!</span>
                 </div>
 
                 <div className="formGroup">
@@ -288,8 +305,12 @@ export default function CheckoutPage() {
                     value={formData.city}
                     onChange={handleInputChange}
                     placeholder="Orașul tău"
+                    className="input"
                     required
+                    pattern="^[a-zA-Z\u00C0-\u017F\s\-\.']{2,50}$"
+                    onBlur={handleBlur}
                   />
+                  <span className="inputFormErrMessage">Introduceți un nume de oraș valid. Folosiți doar litere, spații și semne de punctuație standard, cum ar fi cratime sau puncte!</span>
                 </div>
 
                 <div className="formGroup">
@@ -299,6 +320,7 @@ export default function CheckoutPage() {
                     value={formData.notes}
                     onChange={handleInputChange}
                     placeholder="Observații, preferințe, etc."
+                    className="input"
                     rows="3"
                   />
                 </div>

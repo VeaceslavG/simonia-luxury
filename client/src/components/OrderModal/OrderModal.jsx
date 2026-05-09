@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./orderModal.scss";
 import { API_URL } from "../../config/api";
+import { handleBlur } from "../../components/Utils/formHandlers";
 
 export default function OrderModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ export default function OrderModal({ isOpen, onClose }) {
     email: "",
     notes: "",
   });
+  const [loading, setLoading] = useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -52,6 +54,8 @@ export default function OrderModal({ isOpen, onClose }) {
     } catch (err) {
       toast.error("Eroare de rețea.");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -62,35 +66,61 @@ export default function OrderModal({ isOpen, onClose }) {
       <div className="modal-content">
         <h2>Comandă sau informează-te</h2>
         <form onSubmit={handleSubmit}>
-          <input
-            name="name"
-            placeholder="Nume"
-            required
-            value={formData.name}
-            onChange={handleChange}
-          />
-          <input
-            name="phone"
-            placeholder="Telefon"
-            required
-            value={formData.phone}
-            onChange={handleChange}
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="E-mail"
-            required
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <textarea
-            name="notes"
-            placeholder="Observații"
-            value={formData.notes}
-            onChange={handleChange}
-          />
-          <button type="submit">Trimite</button>
+          <div>
+            <input
+              id="name"
+              name="name"
+              placeholder="Nume"
+              type="text"
+              className="input"
+              required
+              pattern="[A-Za-z ]{3,16}$"
+              value={formData.name}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            <span className="inputFormErrMessage">Numele trebuie să aibă 3-16 caractere și să nu includă niciun caracter special!</span>
+          </div>
+          <div>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              placeholder="Telefon"
+              className="input"
+              required
+              pattern="^\+?[0-9]{8,15}$"
+              value={formData.phone}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            <span className="inputFormErrMessage">Introduceți un număr de telefon valid (8-15 cifre, opțional + la început)!</span>
+          </div>
+          <div>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="E-mail"
+              className="input"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            <span className="inputFormErrMessage">Introduceți o adresă de e-mail validă (ex: name@example.com)!</span>
+          </div>
+          <div>
+            <textarea
+              name="notes"
+              placeholder="Observații"
+              value={formData.notes}
+              onChange={handleChange}
+            />
+          </div>
+          <button type="submit" disabled={loading}>
+            {loading ? "Se trimite..." : "Trimite"}
+          </button>
         </form>
         <button onClick={onClose}>Închide</button>
       </div>

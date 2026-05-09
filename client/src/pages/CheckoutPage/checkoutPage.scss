@@ -3,8 +3,8 @@
 
 .checkoutPage {
   @include mixins.contentContainer(50px);
-  background-color: #f8fafc;
   min-height: 50vh;
+  margin-top: 100px;
 
   .container {
     background: #fff;
@@ -168,6 +168,21 @@
             border-color: variables.$primaryColor;
             box-shadow: 0 0 0 3px rgba(variables.$primaryColor, 0.15);
           }
+        }
+
+        .inputFormErrMessage {
+          display: none;
+          color: #d10606;
+          padding: 5px;
+          font-size: 14px;
+        }
+  
+        .input:invalid[focused="true"] {
+          border: 1px solid #d10606;
+        }
+  
+        .input:invalid[focused="true"] ~ .inputFormErrMessage {
+          display: block;
         }
 
         small {
